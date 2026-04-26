@@ -1,0 +1,160 @@
+# First Folio / Yapper — shared script config
+# THIS IS THE **CANONICAL** CONFIG FOR THIS PROJECT. All other configs should follow it.
+# This config is shared by Yapper app https://github.com/tigger04/yapper
+# `render` flags are honoured by both apps.
+# `folio.*` is First Folio-specific (PDF layout) and ignored by Yapper.
+# Yapper-specific keys (voices, narrator, etc.) live elsewhere and are
+# ignored by First Folio.
+
+render:
+  stage-directions: true
+  frontmatter: true
+  footnotes: true
+  character-table: true
+  transitions: true
+
+folio:
+  font: serif
+  font-size: 12pt
+  page: a4
+  margin: 25mm
+  default-format: pdf
+
+  title-page:
+    page-number: false
+
+    title:
+      align: center
+      font-size: 24pt
+      bold: true
+      italic: false
+      case-transform: as-written
+      position: third
+      space-before: 0
+
+    subtitle:
+      align: center
+      font-size: 14pt
+      bold: false
+      italic: true
+      case-transform: as-written
+      space-before: 1em
+
+    author:
+      align: center
+      font-size: 12pt
+      bold: false
+      italic: false
+      case-transform: as-written
+      prefix: "by "
+      space-before: 2em
+
+    date:
+      position: bottom-left
+      font-size: 10pt
+      bold: false
+      italic: false
+      case-transform: as-written
+      prefix: ""
+      suffix: ""
+
+    version:
+      position: bottom-right
+      font-size: 10pt
+      bold: false
+      italic: false
+      case-transform: as-written
+      prefix: ""
+      suffix: ""
+
+  positioning:
+
+    speech:
+      space-before: 1.6em
+      align: left
+
+      speaker:
+        align: left
+        indent: 0
+        bold: true
+        italic: false
+        case-transform: small-caps
+        prefix: ""
+        suffix: ":"
+
+      speech-instruction:
+        placement: same-line
+        align: left
+        indent: 0
+        bold: false
+        italic: true
+        case-transform: as-written
+        prefix: "("
+        suffix: ")"
+
+      dialogue:
+        placement: same-line
+        align: left
+        indent: 0
+        wrap-indent: 5em
+        bold: false
+        italic: false
+        case-transform: as-written
+        prefix: ""
+        suffix: ""
+
+    stage-direction:
+      space-before: 1.6em
+      align: left
+      bold: false
+      italic: true
+      case-transform: as-written
+      prefix: ""
+      suffix: ""
+      indent: 0
+      wrap-indent: 0
+
+    transition:
+      space-before: 1.6em
+      align: right
+      bold: false
+      italic: false
+      case-transform: upper
+      prefix: ""
+      suffix: ""
+      indent: 0
+      wrap-indent: 0
+
+    frontmatter:
+      header:
+        align: left
+        font-size: 14pt
+        bold: true
+        italic: false
+        case-transform: as-written
+        prefix: ""
+        suffix: ""
+        page-break-before: false
+        space-before: 2em
+
+    act-header:
+      align: center
+      font-size: 14pt
+      bold: true
+      italic: false
+      case-transform: as-written
+      prefix: ""
+      suffix: ""
+      page-break-before: true
+      space-before: 3em
+
+    scene-header:
+      align: left
+      font-size: 12pt
+      bold: true
+      italic: false
+      case-transform: as-written
+      prefix: ""
+      suffix: ""
+      page-break-before: false
+      space-before: 2.5em

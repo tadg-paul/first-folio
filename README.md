@@ -6,23 +6,27 @@ A format converter for stage plays. Reads plays in structured source formats and
 
 ```bash
 # Convert an org-mode play to Markdown
-org-play-to-markdown play.org > play.md
+folio convert play.org play.md
 
 # Convert to PDF (requires Typst)
-org-play-to-pdf play.org
+folio convert play.org play.pdf
 
-# Read from stdin
-cat play.org | org-play-to-markdown > play.md
+# Convert to Fountain
+folio convert play.org play.fountain
 
-# Customise PDF output
-org-play-to-pdf --font "Georgia" --font-size 14pt --page letter play.org
+# Output to stdout
+folio convert play.org --to md
+
+# Convert between any supported formats
+folio convert play.fountain play.md
+folio convert play.md play.org
 ```
 
 ## Installation
 
 ```bash
-make install    # symlinks scripts to ~/.local/bin/
-make uninstall  # removes the symlinks
+make install    # symlinks folio to ~/.local/bin/
+make uninstall  # removes the symlink
 ```
 
 ### Dependencies
@@ -32,60 +36,35 @@ make uninstall  # removes the symlinks
 
 ## Supported Formats
 
-| Format | Read | Write |
-|--------|------|-------|
-| Org-mode play | Yes | - |
-| Markdown | - | Yes |
-| PDF (via Typst) | - | Yes |
-| Fountain | Planned | Planned |
+| Format | Read | Write | Schema |
+|--------|------|-------|--------|
+| Org-mode | Yes | Yes | [docs/format-org.md](docs/format-org.md) |
+| Markdown | Yes | Yes | [docs/format-markdown.md](docs/format-markdown.md) |
+| Fountain | Yes | Yes | [docs/format-fountain.md](docs/format-fountain.md) |
+| PDF (via Typst) | - | Yes | - |
 
-## Org-mode Play Format
+Org-mode uses heading levels to encode play structure. Markdown uses headers, bold, and italic conventions. Fountain follows the [Fountain spec](https://fountain.io/syntax). See the schema docs for full element mappings, and [docs/formats.md](docs/formats.md) for the event stream and fidelity matrix.
 
-The input format uses org-mode heading levels to encode play structure:
-
-| Element | Org syntax |
-|---------|-----------|
-| Front matter | `#+TITLE:`, `#+AUTHOR:`, etc. |
-| Act | `* Act I` (H1) |
-| Scene | `** Scene 1` (H2) |
-| Stage direction | `*** A bare stage.` (H3) |
-| Character + direction | `**** BOB softly` (H4) |
-| Dialogue | Plain text after H4 |
-| Character table | `* CHARACTERS` followed by an org table |
-| Excluded sections | `:noexport:` tag on any heading |
-| Footnotes | `[fn:name] text` |
-| Prop text | `- *"TEXT"*` |
+**Intro sections** (Synopsis, Setting, Scene List, etc.) are automatically distinguished from the play proper. Any headers and prose before the first character dialogue are treated as intro material and can be toggled on/off via `render-intro` in config.
 
 ## Configuration
 
 First Folio reads configuration from `script.yaml` files. It never creates or modifies config files.
 
 ```yaml
-# ~/.config/first-folio/script.yaml (global defaults)
-# or alongside your source file (per-project overrides)
+# ~/.config/first-folio/script.yaml or alongside your source file
 
 title: "About Time"
 author: "Tadhg Paul"
 
-render-stage-directions: true
-render-intro: true
-render-footnotes: true
-render-character-table: true
-
 folio:
   font: EB Garamond
   font-size: 11pt
-  margin: 25mm
   page: a4
-  indent: 5em
-  dialogue-spacing: 1.1em
-  direction-italic: true
   default-format: pdf
 ```
 
-All config sources are merged in precedence order: CLI flags > local `script.yaml` > global `script.yaml` > built-in defaults. Each layer overrides individual keys, not the entire config.
-
-The config file is shared with [yapper](https://github.com/tigger04/yapper) (TTS rendering). Each tool reads its own namespace and ignores the rest.
+All config sources are merged in precedence order: CLI flags > local `script.yaml` > global `script.yaml` > built-in defaults. The config file is shared with [yapper](https://github.com/tigger04/yapper) (TTS rendering).
 
 See [docs/config.md](docs/config.md) for the full schema and [examples/script.yaml](examples/script.yaml) for a complete annotated example.
 
@@ -93,16 +72,16 @@ See [docs/config.md](docs/config.md) for the full schema and [examples/script.ya
 
 | Path | Purpose |
 |------|---------|
-| `org-play-to-markdown` | CLI: org-mode play to Markdown |
-| `org-play-to-pdf` | CLI: org-mode play to PDF via Typst |
-| `lib/OrgPlay/Parser.pm` | Shared parser - line-by-line state machine emitting typed events |
-| `lib/OrgPlay/TypstTemplate.pm` | Typst preamble and title page template |
+| `bin/folio` | Unified CLI with `convert` subcommand |
+| `lib/Folio/Parser/` | Format parsers (Org, Markdown, Fountain) |
+| `lib/Folio/Emitter/` | Format emitters (Org, Markdown, Fountain, Typst/PDF) |
+| `lib/Folio/Config.pm` | Config loading with layered merge |
+| `lib/Folio/Format.pm` | Extension and format mapping |
+| `lib/OrgPlay/` | Shared parser and Typst template (legacy namespace) |
 | `tests/regression/` | Regression test suite (run via `make test`) |
 | `tests/one_off/` | One-off tests for specific issues |
-| `docs/vision.md` | Project vision and goals |
-| `docs/config.md` | Configuration system - schema, precedence, migration |
-| `examples/script.yaml` | Complete annotated config example |
-| `Makefile` | Build, install, test targets |
+| `examples/` | Annotated config example |
+| `docs/` | Format schemas, config reference, vision |
 
 ## Running Tests
 
@@ -124,3 +103,7 @@ make test-one-off ISSUE=5  # one-off tests for a specific issue
 ## Licence
 
 MIT - Copyright Taḋg Paul
+
+## Acknowledgements
+
+- [YAML::Tiny](https://metacpan.org/pod/YAML::Tiny) v1.76 by Adam Kennedy — embedded YAML parser. Licensed under the same terms as Perl itself (Artistic License 1.0 / GPL 1+).

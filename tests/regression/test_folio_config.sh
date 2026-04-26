@@ -267,8 +267,9 @@ echo "AC2.3: First Folio reads shared and folio: keys, ignores others"
 # RT-2.7: Shared rendering keys control output content
 create_minimal_fixture
 cat > "$TMPDIR_TEST/script.yaml" <<'YAML'
-render-stage-directions: false
-render-character-table: false
+render:
+  stage-directions: false
+  character-table: false
 YAML
 
 remove_global_config
@@ -438,22 +439,26 @@ else
          "Script exited non-zero"
 fi
 
-# RT-2.15: Config draft-date appears on the PDF title page
+# RT-2.15: Config date and version appear on the PDF title page
 create_minimal_fixture
 cat > "$TMPDIR_TEST/script.yaml" <<'YAML'
-draft-date: "2026-04-26"
+date: "2026-04-26"
+version: "Draft v3"
 YAML
 
 remove_global_config
 if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt215.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
-    if grep -q "2026-04-26" "$TMPDIR_TEST/rt215.typ"; then
-        pass "RT-2.15: Config draft-date appears on the PDF title page"
+    found_date=false; found_version=false
+    if grep -q "2026-04-26" "$TMPDIR_TEST/rt215.typ"; then found_date=true; fi
+    if grep -q "Draft v3" "$TMPDIR_TEST/rt215.typ"; then found_version=true; fi
+    if $found_date && $found_version; then
+        pass "RT-2.15: Config date and version appear on the PDF title page"
     else
-        fail "RT-2.15: Config draft-date appears on the PDF title page" \
-             "2026-04-26 not found in Typst output"
+        fail "RT-2.15: Config date and version appear on the PDF title page" \
+             "date=$found_date version=$found_version"
     fi
 else
-    fail "RT-2.15: Config draft-date appears on the PDF title page" \
+    fail "RT-2.15: Config date and version appear on the PDF title page" \
          "Script exited non-zero"
 fi
 

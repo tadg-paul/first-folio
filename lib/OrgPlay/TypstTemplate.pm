@@ -85,11 +85,35 @@ sub title_page {
     my $title      = $opts{title}      // '';
     my $subtitle   = $opts{subtitle}   // '';
     my $author     = $opts{author}     // '';
-    my $draft_date = $opts{draft_date} // '';
+    my $date       = $opts{date}       // '';
+    my $version    = $opts{version}    // '';
 
     return '' unless $title;
 
-    my $out = <<"TYPST";
+    # Build footer content for title page
+    my $footer_left  = $version ? "text(size: 0.9em)[${version}]" : 'none';
+    my $footer_right = $date    ? "text(size: 0.9em)[${date}]"    : 'none';
+    my $has_footer = $version || $date;
+
+    my $out = '';
+
+    # Title page: no page number, custom footer for version/date
+    if ($has_footer) {
+        $out .= <<"TYPST";
+#set page(numbering: none, footer: grid(
+  columns: (1fr, 1fr),
+  align: (left, right),
+  ${footer_left},
+  ${footer_right},
+))
+TYPST
+    } else {
+        $out .= <<"TYPST";
+#set page(numbering: none)
+TYPST
+    }
+
+    $out .= <<"TYPST";
 #align(center)[
   #v(30%)
   #text(size: 2em, weight: "bold")[$title]
@@ -105,20 +129,14 @@ TYPST
     if ($author) {
         $out .= <<"TYPST";
   #v(1em)
-  #text(size: 1.2em)[by $author]
-TYPST
-    }
-
-    if ($draft_date) {
-        $out .= <<"TYPST";
-  #v(0.5em)
-  #text(size: 1em)[Draft: $draft_date]
+  #text(size: 1.2em, style: "italic")[$author]
 TYPST
     }
 
     $out .= <<'TYPST';
 ]
 #pagebreak()
+#set page(numbering: "1", number-align: center + bottom, footer: auto)
 
 TYPST
 

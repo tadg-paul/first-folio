@@ -1,11 +1,12 @@
-sanitize: defaulting to oed + symbols
-<!-- Version: 0.1 | Last updated: 2026-04-26 -->
+<!-- Version: 0.2 | Last updated: 2026-04-26 -->
 
 # Org-mode Play Format
 
 Org-mode is the primary authoring format for First Folio. It uses Emacs org-mode heading levels to encode the hierarchical structure of a stage play. This format supports all event-stream elements without loss.
 
 **External reference:** [orgmode.org - Document Structure](https://orgmode.org/manual/Document-Structure.html)
+
+**Intro sections:** H1 headings before the first character dialogue (e.g. Synopsis, Setting, Scene List) are automatically detected as intro material. These render the same as act headers but can be toggled on/off via `render-intro` in [config](config.md).
 
 ## Element Schema
 

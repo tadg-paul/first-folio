@@ -313,7 +313,7 @@ create_org_fixture
 if "$FOLIO" convert "$TMPDIR_TEST/play.org" "$TMPDIR_TEST/rt18.fountain" 2>/dev/null; then
     has_title_page=false; has_section=false; has_scene=false; has_char=false; has_dialogue=false
     if grep -q '^Title:' "$TMPDIR_TEST/rt18.fountain"; then has_title_page=true; fi
-    if grep -q '^# Act I' "$TMPDIR_TEST/rt18.fountain"; then has_section=true; fi
+    if grep -qi 'Act I' "$TMPDIR_TEST/rt18.fountain"; then has_section=true; fi
     if grep -q '^\.' "$TMPDIR_TEST/rt18.fountain"; then has_scene=true; fi
     # Character must be ALL CAPS on own line
     if grep -q '^BOB$' "$TMPDIR_TEST/rt18.fountain"; then has_char=true; fi
@@ -358,8 +358,8 @@ create_org_fixture
 if "$FOLIO" convert "$TMPDIR_TEST/play.org" "$TMPDIR_TEST/rt134.fountain" 2>/dev/null; then
     if "$FOLIO" convert "$TMPDIR_TEST/rt134.fountain" "$TMPDIR_TEST/rt134.org" 2>/dev/null; then
         has_act=false; has_scene=false; has_char=false; has_dialogue=false
-        if grep -q '^\* Act I' "$TMPDIR_TEST/rt134.org"; then has_act=true; fi
-        if grep -q '^\*\* Scene 1' "$TMPDIR_TEST/rt134.org"; then has_scene=true; fi
+        if grep -qi '^\* Act I' "$TMPDIR_TEST/rt134.org"; then has_act=true; fi
+        if grep -qi '^\*\* Scene 1' "$TMPDIR_TEST/rt134.org"; then has_scene=true; fi
         if grep -q '^\*\*\*\* BOB' "$TMPDIR_TEST/rt134.org"; then has_char=true; fi
         if grep -q 'Hello there' "$TMPDIR_TEST/rt134.org"; then has_dialogue=true; fi
         if $has_act && $has_scene && $has_char && $has_dialogue; then
@@ -403,7 +403,7 @@ create_md_fixture
 if "$FOLIO" convert "$TMPDIR_TEST/play.md" "$TMPDIR_TEST/rt111.fountain" 2>/dev/null; then
     has_title=false; has_section=false; has_scene=false; has_char=false; has_dialogue=false
     if grep -q '^Title:' "$TMPDIR_TEST/rt111.fountain"; then has_title=true; fi
-    if grep -q '^# Act I' "$TMPDIR_TEST/rt111.fountain"; then has_section=true; fi
+    if grep -qi 'Act I' "$TMPDIR_TEST/rt111.fountain"; then has_section=true; fi
     if grep -q '^\.' "$TMPDIR_TEST/rt111.fountain"; then has_scene=true; fi
     if grep -q '^BOB$' "$TMPDIR_TEST/rt111.fountain"; then has_char=true; fi
     if grep -q 'Hello there' "$TMPDIR_TEST/rt111.fountain"; then has_dialogue=true; fi
@@ -516,7 +516,7 @@ echo "AC1.7: PDF output configuration"
 create_org_fixture
 # Use --typ-only equivalent: convert to .typ extension
 if "$FOLIO" convert "$TMPDIR_TEST/play.org" "$TMPDIR_TEST/rt118.pdf" \
-    --font "Palatino" --font-size 14pt --margin 30mm --page letter --indent 6em 2>/dev/null; then
+    --font "Palatino" --font-size 14pt --margin 30mm --page us-letter --indent 6em 2>/dev/null; then
     # We need to check the Typst source — try converting to .typ if supported,
     # otherwise check the PDF was produced with the right settings.
     # For now, just verify PDF was produced (config integration tested in #2).

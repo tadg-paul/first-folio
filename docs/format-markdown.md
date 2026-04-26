@@ -1,5 +1,4 @@
-sanitize: defaulting to oed + symbols
-<!-- Version: 0.1 | Last updated: 2026-04-26 -->
+<!-- Version: 0.2 | Last updated: 2026-04-26 -->
 
 # Markdown Play Format
 
@@ -9,19 +8,23 @@ First Folio uses a convention-based Markdown format to represent stage plays. Th
 - [CommonMark Specification](https://commonmark.org)
 - [GitHub Flavoured Markdown](https://github.github.com/gfm/) (tables)
 
+**Intro sections:** `##` headings before the first character dialogue (e.g. Synopsis, Setting, Scene List) are automatically detected as intro material. These render identically to act headers but can be toggled on/off via `render-intro` in [config](config.md).
+
 ## Element Schema
 
 ### Front Matter
 
-The document title is a level-1 ATX heading. The author appears on the next non-blank line as an italic string prefixed with "by".
+The document title is a level-1 ATX heading. The subtitle (if present) appears as an italic line below the title. The author appears as an italic string prefixed with "by".
 
 ```markdown
 # The Importance of Being Earnest
 
+*A Trivial Comedy for Serious People*
+
 *by Oscar Wilde*
 ```
 
-Only `title` and `author` are represented. Other front matter keys (subtitle, template, etc.) are **lost** in Markdown output. This is the only fidelity gap in the Markdown format.
+`title`, `subtitle`, and `author` are represented. Other front matter keys (template, draft-date, etc.) are not included in Markdown output. The `draft-date` is available via the config system and rendered on the PDF title page only.
 
 ### Acts (H2)
 
@@ -113,6 +116,8 @@ A famous verse[^verse] is quoted here.
 ```markdown
 # A Short Play
 
+*A Trivial Comedy*
+
 *by A. Playwright*
 
 | Character | Description        |
@@ -137,4 +142,3 @@ Is the kettle on?
 **BOB:** *(cheerfully)*
 Just boiled.
 ```
-1 US spelling correction

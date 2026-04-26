@@ -1,0 +1,356 @@
+#!/usr/bin/env perl
+# ABOUTME: Unified CLI for First Folio — converts stage plays between formats.
+# ABOUTME: Subcommand: convert [source] [target] with format deduction from extensions.
+use strict;
+use warnings;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use File::Basename qw(dirname);
+use Getopt::Long qw(:config no_ignore_case bundling pass_through);
+
+use Folio::Config;
+use Folio::Format;
+use Folio::IntroFilter;
+
+our $VERSION = '0.1.0';
+
+# Top-level flags
+my $help    = 0;
+my $version = 0;
+
+# Peek at first argument for subcommand before GetOptions
+my $subcommand = '';
+if (@ARGV && $ARGV[0] !~ /^-/) {
+    $subcommand = $ARGV[0];
+}
+
+# Handle top-level --help and --version (before subcommand parsing)
+if (grep { $_ eq '--help' || $_ eq '-h' } @ARGV) {
+    if ($subcommand eq 'convert') {
+        shift @ARGV;  # remove 'convert'
+        print_convert_usage();
+        exit 0;
+    }
+    print_usage();
+    exit 0;
+}
+
+if (grep { $_ eq '--version' } @ARGV) {
+    print "folio $VERSION\n";
+    exit 0;
+}
+
+# Dispatch subcommand
+if ($subcommand eq 'convert') {
+    shift @ARGV;  # remove 'convert'
+    cmd_convert();
+} elsif ($subcommand eq '') {
+    print STDERR "Error: no subcommand given.\n";
+    print STDERR "Usage: folio <command> [options]\n";
+    print STDERR "Run 'folio --help' for available commands.\n";
+    exit 1;
+} else {
+    print STDERR "Error: unknown subcommand '$subcommand'.\n";
+    print STDERR "Run 'folio --help' for available commands.\n";
+    exit 1;
+}
+
+exit 0;
+
+# --- convert subcommand ---
+
+sub cmd_convert {
+    my $to_format   = '';
+    my $force       = 0;
+    my %cli_overrides;
+
+    GetOptions(
+        'to=s'                => \$to_format,
+        'force'               => \$force,
+        'font=s'              => \$cli_overrides{'font'},
+        'font-size=s'         => \$cli_overrides{'font-size'},
+        'margin=s'            => \$cli_overrides{'margin'},
+        'page=s'              => \$cli_overrides{'page'},
+        'indent=s'            => \$cli_overrides{'indent'},
+        'dialogue-spacing=s'  => \$cli_overrides{'dialogue-spacing'},
+        'direction-spacing=s' => \$cli_overrides{'direction-spacing'},
+        'direction-italic!'   => \$cli_overrides{'direction-italic'},
+        'direction-center!'   => \$cli_overrides{'direction-center'},
+    ) or do { print_convert_usage(); exit 2; };
+
+    my $source_path = shift @ARGV;
+    my $target_path = shift @ARGV;
+
+    if (!defined $source_path) {
+        print STDERR "Error: no source file specified.\n";
+        print STDERR "Usage: folio convert <source> [target] [--to FORMAT]\n";
+        exit 1;
+    }
+
+    # Validate source file exists
+    if (! -f $source_path) {
+        die "Error: file not found: $source_path\n";
+    }
+
+    # Detect binary/encoding issues
+    _validate_text_file($source_path);
+
+    # Determine source format
+    my ($src_format, $src_err) = Folio::Format->from_extension($source_path);
+    if ($src_err) {
+        die "Error: $src_err\n";
+    }
+    if (!Folio::Format->is_readable($src_format)) {
+        die "Error: cannot read from $src_format format. PDF is write-only.\n";
+    }
+
+    # Load config
+    my $source_dir = dirname($source_path);
+    my $config = Folio::Config->load(
+        source_dir => $source_dir,
+        cli        => \%cli_overrides,
+    );
+
+    # Determine target format
+    my $tgt_format;
+    my $to_stdout = 0;
+
+    if (defined $target_path) {
+        my ($fmt, $err) = Folio::Format->from_extension($target_path);
+        if ($err) {
+            die "Error: $err\n";
+        }
+        $tgt_format = $fmt;
+    } elsif ($to_format ne '') {
+        my ($fmt, $err) = Folio::Format->from_name($to_format);
+        if ($err) {
+            die "Error: $err\n";
+        }
+        $tgt_format = $fmt;
+        $to_stdout = 1;
+    } else {
+        # Try default-format from config
+        my $default = $config->get('folio.default-format');
+        if (defined $default && $default ne '') {
+            my ($fmt, $err) = Folio::Format->from_name($default);
+            if ($err) {
+                die "Error: invalid default-format in config: $default\n";
+            }
+            $tgt_format = $fmt;
+            $to_stdout = 1;
+        } else {
+            die "Error: no target file or --to format specified, and no default-format configured.\n";
+        }
+    }
+
+    # TTY safety for binary output
+    if ($tgt_format eq 'pdf' && $to_stdout && !$force && -t STDOUT) {
+        die "Error: PDF is binary output. Refusing to write to terminal.\n" .
+            "Use a target file, redirect stdout, or pass --force to override.\n";
+    }
+
+    # Build config overrides for front matter
+    my %fm_overrides;
+    for my $key (qw(title subtitle author date version)) {
+        my $val = $config->get($key);
+        if (defined $val) {
+            $fm_overrides{$key} = $val;
+        }
+    }
+
+    # Create parser
+    my $parser_class = _parser_for($src_format);
+
+    # Create emitter
+    my $emitter_obj = _emitter_for($tgt_format, config => $config);
+    my $raw_emitter = $emitter_obj->emitter;
+
+    # Apply render-* filtering first (sets up no-op callbacks for suppressed events)
+    my $render_filtered = _filter_emitter($raw_emitter, $config);
+
+    # Apply intro detection on top — reclassifies pre-play headers as intro events
+    # IntroFilter calls through to the filtered emitter, so suppressed intro events stay suppressed
+    my $filtered = Folio::IntroFilter->wrap($render_filtered);
+
+    # Parse
+    open(my $fh, '<:encoding(UTF-8)', $source_path)
+        or die "Error: cannot open $source_path: $!\n";
+
+    my %parse_opts = (
+        warn_fh   => \*STDERR,
+        file_path => $source_path,
+    );
+
+    if ($parser_class eq 'Folio::Parser::Fountain') {
+        $parser_class->parse($fh, $filtered, %parse_opts);
+    } else {
+        $parser_class->parse($fh, $filtered);
+    }
+    close $fh;
+
+    # Emit output
+    if ($tgt_format eq 'pdf') {
+        if ($to_stdout) {
+            $emitter_obj->finish_to_stdout(
+                config    => $config,
+                overrides => \%fm_overrides,
+            );
+        } else {
+            $emitter_obj->finish(
+                output    => $target_path,
+                config    => $config,
+                overrides => \%fm_overrides,
+            );
+        }
+    } else {
+        my $output_text = $emitter_obj->finish(%fm_overrides);
+
+        if ($to_stdout) {
+            print STDOUT $output_text;
+        } else {
+            open(my $out_fh, '>:encoding(UTF-8)', $target_path)
+                or die "Error: cannot write to $target_path: $!\n";
+            print $out_fh $output_text;
+            close $out_fh;
+        }
+    }
+}
+
+# --- Helpers ---
+
+sub _parser_for {
+    my ($format) = @_;
+
+    my %parsers = (
+        'org'      => 'Folio::Parser::Org',
+        'markdown' => 'Folio::Parser::Markdown',
+        'fountain' => 'Folio::Parser::Fountain',
+    );
+
+    my $class = $parsers{$format}
+        or die "Error: no parser for format '$format'\n";
+
+    eval "require $class" or die "Error: cannot load parser $class: $@\n";
+    return $class;
+}
+
+sub _emitter_for {
+    my ($format, %opts) = @_;
+
+    my %emitters = (
+        'org'      => 'Folio::Emitter::Org',
+        'markdown' => 'Folio::Emitter::Markdown',
+        'fountain' => 'Folio::Emitter::Fountain',
+        'pdf'      => 'Folio::Emitter::Typst',
+    );
+
+    my $class = $emitters{$format}
+        or die "Error: no emitter for format '$format'\n";
+
+    eval "require $class" or die "Error: cannot load emitter $class: $@\n";
+    return $class->new(%opts);
+}
+
+sub _filter_emitter {
+    my ($base, $config) = @_;
+    my %filtered = %$base;
+
+    if (!$config->get('render.stage-directions')) {
+        $filtered{stage_direction} = sub {};
+    }
+    if (!$config->get('render.character-table')) {
+        $filtered{character_table_start} = sub {};
+        $filtered{character_table_row}   = sub {};
+        $filtered{character_table_end}   = sub {};
+    }
+    if (!$config->get('render.footnotes')) {
+        $filtered{footnote_def} = sub {};
+    }
+    if (!$config->get('render.frontmatter')) {
+        $filtered{intro_header} = sub {};
+        $filtered{intro_text}   = sub {};
+    }
+
+    return \%filtered;
+}
+
+sub _validate_text_file {
+    my ($path) = @_;
+
+    # Read first 8KB and check for null bytes (binary indicator)
+    open(my $fh, '<:raw', $path)
+        or die "Error: cannot open $path: $!\n";
+    my $buf;
+    read($fh, $buf, 8192);
+    close $fh;
+
+    if ($buf =~ /\x00/) {
+        die "Error: $path appears to be a binary file, not a text document.\n";
+    }
+
+    # Try opening as UTF-8 to catch encoding errors
+    open(my $utf8_fh, '<:encoding(UTF-8)', $path)
+        or die "Error: cannot open $path as UTF-8: $!\n";
+    eval {
+        local $SIG{__WARN__} = sub {
+            die "encoding warning: $_[0]";
+        };
+        while (<$utf8_fh>) {
+            # just read through to trigger encoding errors
+        }
+    };
+    close $utf8_fh;
+    if ($@) {
+        die "Error: $path has invalid encoding: $@\n";
+    }
+}
+
+sub print_usage {
+    print <<'USAGE';
+Usage: folio <command> [options]
+
+A format converter for stage plays.
+
+Commands:
+  convert    Convert a play between formats
+
+Options:
+  -h, --help     Show this help message
+  --version      Show version
+
+Run 'folio convert --help' for convert-specific options.
+USAGE
+}
+
+sub print_convert_usage {
+    print <<'USAGE';
+Usage: folio convert <source> [target] [options]
+
+Convert a play from one format to another.
+Format is deduced from file extensions (.org, .md, .fountain, .ftn, .pdf).
+
+When no target file is given, output goes to stdout.
+Use --to to specify the output format for stdout mode.
+
+Options:
+  --to FORMAT              Output format (org, md, fountain, pdf)
+  --force                  Force binary output to terminal
+
+PDF options (ignored for non-PDF output):
+  --font FONT              Body font family
+  --font-size SIZE         Body font size
+  --margin SIZE            Page margins
+  --page SIZE              Page size (a4, letter, etc.)
+  --indent SIZE            Dialogue indent depth
+  --dialogue-spacing SIZE  Space before dialogue blocks
+  --direction-spacing SIZE Space before stage directions
+  --[no-]direction-italic  Italicise stage directions
+  --[no-]direction-center  Centre stage directions
+
+Config: script.yaml in source dir or ~/.config/first-folio/script.yaml
+USAGE
+}

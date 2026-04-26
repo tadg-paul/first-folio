@@ -63,13 +63,13 @@ All First Folio-specific settings live under the `folio:` key. These control PDF
 | `font` | string | `New Computer Modern` | Body font family |
 | `font-size` | string | `12pt` | Body font size |
 | `margin` | string | `25mm` | Page margins |
-| `page` | string | `a4` | Page size (a4, letter, etc.) |
-| `indent` | string | `4em` | Dialogue indent depth |
+| `page` | string | `a4` | Page size (a4, us-letter, etc.) |
+| `indent` | string | `5em` | Dialogue indent depth |
 | `dialogue-spacing` | string | `1.6em` | Vertical space before dialogue blocks |
 | `direction-spacing` | string | `1.6em` | Vertical space before stage directions |
-| `direction-italic` | bool | `true` | Italicize stage directions |
+| `direction-italic` | bool | `true` | Italicise stage directions |
 | `direction-center` | bool | `false` | Centre stage directions |
-| `default-format` | string | (none) | Default output format when no target file or `--to` given |
+| `default-format` | string | `pdf` | Default output format when no target file or `--to` given |
 
 All `folio:` keys correspond to CLI flags of the same name. CLI flags override config values.
 

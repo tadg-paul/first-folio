@@ -171,7 +171,7 @@ OrgPlay::Parser->parse($fh, $filtered_emitter);
 close $fh if defined $input_file;
 
 # Apply config metadata overrides (config overrides source document)
-for my $key (qw(title subtitle author draft-date)) {
+for my $key (qw(title subtitle author date version)) {
     my $cfg_val = $config->get($key);
     if (defined $cfg_val) {
         $front_matter{$key} = $cfg_val;
@@ -238,15 +238,15 @@ sub _filter_emitter_by_config {
     my ($base, $cfg) = @_;
     my %filtered = %$base;
 
-    if (!$cfg->get('render-stage-directions')) {
+    if (!$cfg->get('render.stage-directions')) {
         $filtered{stage_direction} = sub {};
     }
-    if (!$cfg->get('render-character-table')) {
+    if (!$cfg->get('render.character-table')) {
         $filtered{character_table_start} = sub {};
         $filtered{character_table_row}   = sub {};
         $filtered{character_table_end}   = sub {};
     }
-    if (!$cfg->get('render-footnotes')) {
+    if (!$cfg->get('render.footnotes')) {
         $filtered{footnote_def} = sub {};
     }
 
