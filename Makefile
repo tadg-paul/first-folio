@@ -1,4 +1,4 @@
-INSTALL_DIR := $(HOME)/bin
+INSTALL_DIR := $(HOME)/.local/bin
 SCRIPTS := org-play-to-pdf org-play-to-markdown
 PROJECT_DIR := $(shell cd "$(dir $(lastword $(MAKEFILE_LIST)))" && pwd)
 
