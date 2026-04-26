@@ -15,38 +15,30 @@ use Getopt::Long qw(:config no_ignore_case bundling);
 
 use OrgPlay::Parser;
 use OrgPlay::TypstTemplate;
+use Folio::Config;
 
 our $VERSION = '0.1.0';
 
-# Hardcoded defaults — overridden by config file, then by CLI flags
-my $font              = 'New Computer Modern';
-my $font_size         = '12pt';
-my $margin            = '25mm';
-my $page              = 'a4';
-my $indent            = '4em';
-my $dialogue_spacing  = '1.6em';
-my $direction_spacing = '1.6em';
-my $direction_italic  = 1;
-my $direction_center  = 0;
+# CLI-only flags (not part of config)
 my $output            = '';
 my $keep_typ          = 0;
 my $typ_only          = 0;
 my $help              = 0;
 my $version           = 0;
 
-# Load config file defaults (CLI flags override these)
-_load_config();
+# CLI overrides for config values — only populated when flags are given
+my %cli_overrides;
 
 GetOptions(
-    'font=s'              => \$font,
-    'font-size=s'         => \$font_size,
-    'margin=s'            => \$margin,
-    'page=s'              => \$page,
-    'indent=s'            => \$indent,
-    'dialogue-spacing=s'  => \$dialogue_spacing,
-    'direction-spacing=s' => \$direction_spacing,
-    'direction-italic!'   => \$direction_italic,
-    'direction-center!'   => \$direction_center,
+    'font=s'              => \$cli_overrides{'font'},
+    'font-size=s'         => \$cli_overrides{'font-size'},
+    'margin=s'            => \$cli_overrides{'margin'},
+    'page=s'              => \$cli_overrides{'page'},
+    'indent=s'            => \$cli_overrides{'indent'},
+    'dialogue-spacing=s'  => \$cli_overrides{'dialogue-spacing'},
+    'direction-spacing=s' => \$cli_overrides{'direction-spacing'},
+    'direction-italic!'   => \$cli_overrides{'direction-italic'},
+    'direction-center!'   => \$cli_overrides{'direction-center'},
     'output|o=s'          => \$output,
     'keep-typ'            => \$keep_typ,
     'typ-only'            => \$typ_only,
@@ -77,6 +69,24 @@ if (defined $input_file) {
 } else {
     $fh = \*STDIN;
 }
+
+# Load config: built-in defaults < global script.yaml < local script.yaml < CLI flags
+my $source_dir = defined $input_file ? dirname($input_file) : undef;
+my $config = Folio::Config->load(
+    source_dir => $source_dir,
+    cli        => \%cli_overrides,
+);
+
+# Resolve folio: config values into local variables for use below
+my $font              = $config->get('folio.font');
+my $font_size         = $config->get('folio.font-size');
+my $margin            = $config->get('folio.margin');
+my $page              = $config->get('folio.page');
+my $indent            = $config->get('folio.indent');
+my $dialogue_spacing  = $config->get('folio.dialogue-spacing');
+my $direction_spacing = $config->get('folio.direction-spacing');
+my $direction_italic  = $config->get('folio.direction-italic');
+my $direction_center  = $config->get('folio.direction-center');
 
 # Determine output path
 if ($output eq '' && defined $input_file) {
@@ -179,9 +189,12 @@ my $emitter = {
     },
 };
 
+# Apply render-* filtering: suppress events based on config
+my $filtered_emitter = _filter_emitter_by_config($emitter, $config);
+
 # We need to close dialogue blocks before new events
 # Wrap the emitter to auto-close dialogue
-my $wrapped_emitter = _wrap_emitter_with_dialogue_close($emitter);
+my $wrapped_emitter = _wrap_emitter_with_dialogue_close($filtered_emitter);
 
 OrgPlay::Parser->parse($fh, $wrapped_emitter);
 
@@ -198,6 +211,14 @@ if (%footnotes) {
 
 close $fh if defined $input_file;
 
+# Apply config metadata overrides (config overrides source document)
+for my $key (qw(title subtitle author draft-date)) {
+    my $cfg_val = $config->get($key);
+    if (defined $cfg_val) {
+        $front_matter{$key} = $cfg_val;
+    }
+}
+
 # Assemble full Typst document
 my $preamble = OrgPlay::TypstTemplate->preamble(
     font              => $font,
@@ -212,9 +233,10 @@ my $preamble = OrgPlay::TypstTemplate->preamble(
 );
 
 my $title_page = OrgPlay::TypstTemplate->title_page(
-    title    => $front_matter{title}    // '',
-    subtitle => $front_matter{subtitle} // '',
-    author   => $front_matter{author}   // '',
+    title      => $front_matter{title}        // '',
+    subtitle   => $front_matter{subtitle}     // '',
+    author     => $front_matter{author}       // '',
+    draft_date => $front_matter{'draft-date'} // '',
 );
 
 my $typst_doc = $preamble . $title_page . join("\n", @typst_body) . "\n";
@@ -310,44 +332,25 @@ sub _wrap_emitter_with_dialogue_close {
     return $wrapped;
 }
 
-sub _load_config {
-    my $config_path = "$ENV{HOME}/.config/org-play/config";
-    return unless -f $config_path;
+# Filter emitter callbacks based on render-* config keys.
+# Returns a new emitter hashref with suppressed events replaced by no-ops.
+sub _filter_emitter_by_config {
+    my ($base, $cfg) = @_;
+    my %filtered = %$base;
 
-    open(my $fh, '<:encoding(UTF-8)', $config_path)
-        or return;  # silently skip if unreadable
-
-    my %bool_true  = map { $_ => 1 } qw(1 true yes on);
-    my %bool_false = map { $_ => 1 } qw(0 false no off);
-
-    my %setters = (
-        'font'              => sub { $font              = $_[0] },
-        'font-size'         => sub { $font_size         = $_[0] },
-        'margin'            => sub { $margin            = $_[0] },
-        'page'              => sub { $page              = $_[0] },
-        'indent'            => sub { $indent            = $_[0] },
-        'dialogue-spacing'  => sub { $dialogue_spacing  = $_[0] },
-        'direction-spacing' => sub { $direction_spacing = $_[0] },
-        'direction-italic'  => sub { $direction_italic  = $bool_true{lc $_[0]}  ? 1 : $bool_false{lc $_[0]} ? 0 : $_[0] },
-        'direction-center'  => sub { $direction_center  = $bool_true{lc $_[0]}  ? 1 : $bool_false{lc $_[0]} ? 0 : $_[0] },
-    );
-
-    while (my $line = <$fh>) {
-        chomp $line;
-        $line =~ s/^\s+//;
-        $line =~ s/\s+$//;
-        next if $line eq '' || $line =~ /^#/;
-
-        if ($line =~ /^(\S+(?:-\S+)?)\s*=\s*(.+)$/) {
-            my ($key, $value) = ($1, $2);
-            $value =~ s/^\s+//;
-            $value =~ s/\s+$//;
-            if (my $setter = $setters{$key}) {
-                $setter->($value);
-            }
-        }
+    if (!$cfg->get('render-stage-directions')) {
+        $filtered{stage_direction} = sub {};
     }
-    close $fh;
+    if (!$cfg->get('render-character-table')) {
+        $filtered{character_table_start} = sub {};
+        $filtered{character_table_row}   = sub {};
+        $filtered{character_table_end}   = sub {};
+    }
+    if (!$cfg->get('render-footnotes')) {
+        $filtered{footnote_def} = sub {};
+    }
+
+    return \%filtered;
 }
 
 sub print_usage {
@@ -357,7 +360,7 @@ Usage: org-play-to-pdf [OPTIONS] [FILE]
 Convert an org-mode play to PDF via Typst.
 Reads from FILE or stdin if no file given.
 
-Config file: ~/.config/org-play/config (key = value, one per line)
+Config: script.yaml in source dir or ~/.config/first-folio/script.yaml
 CLI flags override config file values.
 
 Options:

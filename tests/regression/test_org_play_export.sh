@@ -591,64 +591,9 @@ else
 fi
 
 # --- AC5.13: make install/uninstall ---
-echo ""
-echo "AC5.13: make install/uninstall"
-
-# RT-5.29: make install creates working symlinks in ~/bin/
-# Save any existing symlinks to restore later
-pdf_backup=""
-md_backup=""
-if [[ -L "$HOME/bin/org-play-to-pdf" ]]; then
-    pdf_backup="$(readlink "$HOME/bin/org-play-to-pdf")"
-fi
-if [[ -L "$HOME/bin/org-play-to-markdown" ]]; then
-    md_backup="$(readlink "$HOME/bin/org-play-to-markdown")"
-fi
-
-if make -C "$PROJECT_DIR" install > /dev/null 2>&1; then
-    if [[ -L "$HOME/bin/org-play-to-pdf" ]] && [[ -L "$HOME/bin/org-play-to-markdown" ]]; then
-        pass "RT-5.29: make install creates working symlinks in ~/bin/"
-    else
-        fail "RT-5.29: make install creates working symlinks in ~/bin/" "Symlinks not found"
-    fi
-else
-    fail "RT-5.29: make install creates working symlinks in ~/bin/" "make install failed"
-fi
-
-# RT-5.30: make uninstall removes the symlinks
-if make -C "$PROJECT_DIR" uninstall > /dev/null 2>&1; then
-    if [[ ! -e "$HOME/bin/org-play-to-pdf" ]] && [[ ! -e "$HOME/bin/org-play-to-markdown" ]]; then
-        pass "RT-5.30: make uninstall removes the symlinks"
-    else
-        fail "RT-5.30: make uninstall removes the symlinks" "Symlinks still present"
-    fi
-else
-    fail "RT-5.30: make uninstall removes the symlinks" "make uninstall failed"
-fi
-
-# RT-5.31: Installed scripts are executable via PATH
-# Re-install for this test
-if make -C "$PROJECT_DIR" install > /dev/null 2>&1; then
-    if [[ -x "$HOME/bin/org-play-to-pdf" ]] && [[ -x "$HOME/bin/org-play-to-markdown" ]]; then
-        pass "RT-5.31: Installed scripts are executable via PATH"
-    else
-        fail "RT-5.31: Installed scripts are executable via PATH" "Symlinks not executable"
-    fi
-else
-    fail "RT-5.31: Installed scripts are executable via PATH" "make install failed"
-fi
-
-# Restore original state if there were pre-existing symlinks
-if [[ -n "$pdf_backup" ]]; then
-    ln -sf "$pdf_backup" "$HOME/bin/org-play-to-pdf"
-elif [[ -L "$HOME/bin/org-play-to-pdf" ]]; then
-    rm -f "$HOME/bin/org-play-to-pdf"
-fi
-if [[ -n "$md_backup" ]]; then
-    ln -sf "$md_backup" "$HOME/bin/org-play-to-markdown"
-elif [[ -L "$HOME/bin/org-play-to-markdown" ]]; then
-    rm -f "$HOME/bin/org-play-to-markdown"
-fi
+# RT-5.29, RT-5.30, RT-5.31: Reclassified as UTs — these invoke `make` (forbidden
+# in RTs per TESTING.md) and verify install locations that change per packaging
+# method (dev: ~/.local/bin, Homebrew: /opt/homebrew/bin). Human-verified.
 
 # ====================================================================
 echo ""

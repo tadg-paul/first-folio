@@ -82,9 +82,10 @@ TYPST
 # Returns a Typst title page block.
 sub title_page {
     my ($class, %opts) = @_;
-    my $title    = $opts{title}    // '';
-    my $subtitle = $opts{subtitle} // '';
-    my $author   = $opts{author}   // '';
+    my $title      = $opts{title}      // '';
+    my $subtitle   = $opts{subtitle}   // '';
+    my $author     = $opts{author}     // '';
+    my $draft_date = $opts{draft_date} // '';
 
     return '' unless $title;
 
@@ -105,6 +106,13 @@ TYPST
         $out .= <<"TYPST";
   #v(1em)
   #text(size: 1.2em)[by $author]
+TYPST
+    }
+
+    if ($draft_date) {
+        $out .= <<"TYPST";
+  #v(0.5em)
+  #text(size: 1em)[Draft: $draft_date]
 TYPST
     }
 

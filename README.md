@@ -58,19 +58,36 @@ The input format uses org-mode heading levels to encode play structure:
 
 ## Configuration
 
-PDF output options can be set in a config file at `~/.config/org-play/config`:
+First Folio reads configuration from `script.yaml` files. It never creates or modifies config files.
 
-```
-font = New Computer Modern
-font-size = 12pt
-margin = 25mm
-page = a4
-indent = 4em
-direction-italic = true
-direction-center = false
+```yaml
+# ~/.config/first-folio/script.yaml (global defaults)
+# or alongside your source file (per-project overrides)
+
+title: "About Time"
+author: "Tadhg Paul"
+
+render-stage-directions: true
+render-intro: true
+render-footnotes: true
+render-character-table: true
+
+folio:
+  font: EB Garamond
+  font-size: 11pt
+  margin: 25mm
+  page: a4
+  indent: 5em
+  dialogue-spacing: 1.1em
+  direction-italic: true
+  default-format: pdf
 ```
 
-CLI flags override config file values. Run `org-play-to-pdf --help` for the full list.
+All config sources are merged in precedence order: CLI flags > local `script.yaml` > global `script.yaml` > built-in defaults. Each layer overrides individual keys, not the entire config.
+
+The config file is shared with [yapper](https://github.com/tigger04/yapper) (TTS rendering). Each tool reads its own namespace and ignores the rest.
+
+See [docs/config.md](docs/config.md) for the full schema and [examples/script.yaml](examples/script.yaml) for a complete annotated example.
 
 ## Project Structure
 
@@ -83,6 +100,8 @@ CLI flags override config file values. Run `org-play-to-pdf --help` for the full
 | `tests/regression/` | Regression test suite (run via `make test`) |
 | `tests/one_off/` | One-off tests for specific issues |
 | `docs/vision.md` | Project vision and goals |
+| `docs/config.md` | Configuration system - schema, precedence, migration |
+| `examples/script.yaml` | Complete annotated config example |
 | `Makefile` | Build, install, test targets |
 
 ## Running Tests
@@ -96,6 +115,7 @@ make test-one-off ISSUE=5  # one-off tests for a specific issue
 ## Documentation
 
 - [Vision](docs/vision.md) - project goals, supported formats, and direction of travel
+- [Configuration](docs/config.md) - config schema, precedence, shared keys, migration
 - [Formats](docs/formats.md) - format overview, event stream, and fidelity matrix
   - [Org-mode](docs/format-org.md) - org-mode play format schema
   - [Markdown](docs/format-markdown.md) - Markdown play format schema

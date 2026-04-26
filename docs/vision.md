@@ -26,6 +26,8 @@ Playwrights and dramaturgs work across multiple tools and workflows. A play may 
 
 5. **Minimal dependencies.** Core conversion requires only Perl and its standard library. PDF output requires Typst. No other external tools are needed.
 
+6. **Shared configuration.** A single `script.yaml` file configures both First Folio and companion tools (e.g. [yapper](https://github.com/tigger04/yapper) for TTS rendering). Each tool reads shared metadata and its own namespace, ignoring the rest. Per-project config files override global defaults. See [docs/config.md](config.md).
+
 ## Supported Formats
 
 | Format | Read | Write | Notes |

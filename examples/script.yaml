@@ -1,0 +1,70 @@
+# Example script.yaml for First Folio and yapper
+#
+# This file can live in two places:
+#   ~/.config/first-folio/script.yaml   (global user defaults)
+#   alongside your source file           (per-project overrides)
+#
+# Both are read and merged. Per-project values override global values.
+# CLI flags override everything.
+#
+# First Folio only reads this file — it never modifies or creates it.
+
+# --- Shared metadata ---
+# Authoritative project-level values.
+# These override any title/author/subtitle found in the source document.
+title: "About Time"
+subtitle: "A Play in Two Acts"
+author: "Tadhg Paul"
+draft-date: "2026-04-26"
+
+# --- Shared rendering options ---
+# Read by both First Folio and yapper. Control which elements appear in output.
+render-stage-directions: true
+render-intro: true
+render-footnotes: true
+render-character-table: true
+
+# --- First Folio PDF rendering ---
+# These keys are under the folio: namespace and are ignored by yapper.
+folio:
+  font: EB Garamond
+  font-size: 11pt
+  margin: 25mm
+  page: a4
+  indent: 5em
+  dialogue-spacing: 1.1em
+  direction-spacing: 1.6em
+  direction-italic: true
+  direction-center: false
+  default-format: pdf
+
+# --- Yapper (TTS) configuration ---
+# Everything below is silently ignored by First Folio.
+auto-assign-voices: true
+character-voices:
+  KEVIN: af_alloy
+  NESSA: af_heart
+  CÁIT: bf_isabella
+  BEN: bm_lewis
+  MARIE: bf
+  GDA CONLON: am_michael
+  DERMOT: bm_daniel
+narrator-voice: bf_alice
+intro-voice: bf_alice
+
+render-stage-directions: true
+render-intro: true
+render-footnotes: true
+
+dialogue-speed: 1.0
+stage-direction-speed: 0.9
+gap-after-dialogue: 0.3
+gap-after-stage-direction: 0.5
+gap-after-scene: 1.0
+
+threads: 3
+
+speech-substitution:
+  Cáit: Kawch
+  Marie: Mawree
+  Gda: Garda

@@ -1,4 +1,3 @@
-sanitize: defaulting to oed + symbols
 <!-- Version: 0.1 | Last updated: 2026-04-26 -->
 
 # Format Overview
@@ -62,4 +61,17 @@ Fountain is the format with the most fidelity concerns. See [format-fountain.md 
 - **Footnotes** map to Fountain Notes (`[[text]]`), which are not numbered and are invisible in formatted output. The name/number of the footnote is lost.
 
 Markdown's only fidelity gap is arbitrary front matter keys - Markdown output includes only title and author.
+
+### Rendering toggles
+
+Individual event types can be suppressed via [configuration](config.md). The `render-*` keys control whether certain elements appear in output:
+
+| Config key | Events suppressed when `false` |
+|------------|-------------------------------|
+| `render-stage-directions` | `stage_direction` |
+| `render-intro` | Title page / opening block |
+| `render-footnotes` | `footnote_def` |
+| `render-character-table` | `character_table_start`, `character_table_row`, `character_table_end` |
+
+Suppression is applied between the parser and emitter - the parser always emits all events, and the emitter always handles all events it receives. The config layer filters the event stream.
 8 symbol replacements

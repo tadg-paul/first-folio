@@ -9,9 +9,11 @@ use open ':std', ':encoding(UTF-8)';
 use FindBin;
 use lib "$FindBin::RealBin/lib";
 
+use File::Basename qw(dirname);
 use Getopt::Long qw(:config no_ignore_case bundling);
 
 use OrgPlay::Parser;
+use Folio::Config;
 
 our $VERSION = '0.1.0';
 
@@ -48,6 +50,10 @@ if (defined $input_file) {
 } else {
     $fh = \*STDIN;
 }
+
+# Load config
+my $source_dir = defined $input_file ? dirname($input_file) : undef;
+my $config = Folio::Config->load(source_dir => $source_dir);
 
 # Determine output destination
 my $out_fh;
@@ -157,9 +163,20 @@ my $emitter = {
     },
 };
 
-OrgPlay::Parser->parse($fh, $emitter);
+# Apply render-* filtering
+my $filtered_emitter = _filter_emitter_by_config($emitter, $config);
+
+OrgPlay::Parser->parse($fh, $filtered_emitter);
 
 close $fh if defined $input_file;
+
+# Apply config metadata overrides (config overrides source document)
+for my $key (qw(title subtitle author draft-date)) {
+    my $cfg_val = $config->get($key);
+    if (defined $cfg_val) {
+        $front_matter{$key} = $cfg_val;
+    }
+}
 
 # Post-process: convert org footnote references to markdown format
 if (%footnotes) {
@@ -214,6 +231,26 @@ sub _convert_org_markup {
     # Org italic /text/ -> Markdown *text*
     $text =~ s{(?<!\w)/([^/\n]+?)/(?!\w)}{*${1}*}g;
     return $text;
+}
+
+# Filter emitter callbacks based on render-* config keys.
+sub _filter_emitter_by_config {
+    my ($base, $cfg) = @_;
+    my %filtered = %$base;
+
+    if (!$cfg->get('render-stage-directions')) {
+        $filtered{stage_direction} = sub {};
+    }
+    if (!$cfg->get('render-character-table')) {
+        $filtered{character_table_start} = sub {};
+        $filtered{character_table_row}   = sub {};
+        $filtered{character_table_end}   = sub {};
+    }
+    if (!$cfg->get('render-footnotes')) {
+        $filtered{footnote_def} = sub {};
+    }
+
+    return \%filtered;
 }
 
 sub print_usage {

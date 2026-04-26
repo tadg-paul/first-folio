@@ -17,7 +17,11 @@ uninstall:
 	done
 
 test:
-	@bash tests/regression/test_org_play_export.sh
+	@for t in tests/regression/test_*.sh; do \
+		echo ""; \
+		echo ">>> Running $$t"; \
+		bash "$$t" || exit 1; \
+	done
 
 ifdef ISSUE
 test-one-off:
