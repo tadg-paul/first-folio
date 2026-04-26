@@ -1,0 +1,379 @@
+#!/usr/bin/env perl
+# ABOUTME: Convert org-mode play to PDF via Typst, using British stage play formatting.
+# ABOUTME: Supports configurable fonts, margins, page size, and dialogue indent depth.
+use strict;
+use warnings;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+
+use FindBin;
+use lib "$FindBin::RealBin/lib";
+
+use File::Temp qw(tempfile);
+use File::Basename qw(basename dirname fileparse);
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use OrgPlay::Parser;
+use OrgPlay::TypstTemplate;
+
+our $VERSION = '0.1.0';
+
+# Hardcoded defaults — overridden by config file, then by CLI flags
+my $font              = 'New Computer Modern';
+my $font_size         = '12pt';
+my $margin            = '25mm';
+my $page              = 'a4';
+my $indent            = '4em';
+my $dialogue_spacing  = '1.6em';
+my $direction_spacing = '1.6em';
+my $direction_italic  = 1;
+my $direction_center  = 0;
+my $output            = '';
+my $keep_typ          = 0;
+my $typ_only          = 0;
+my $help              = 0;
+my $version           = 0;
+
+# Load config file defaults (CLI flags override these)
+_load_config();
+
+GetOptions(
+    'font=s'              => \$font,
+    'font-size=s'         => \$font_size,
+    'margin=s'            => \$margin,
+    'page=s'              => \$page,
+    'indent=s'            => \$indent,
+    'dialogue-spacing=s'  => \$dialogue_spacing,
+    'direction-spacing=s' => \$direction_spacing,
+    'direction-italic!'   => \$direction_italic,
+    'direction-center!'   => \$direction_center,
+    'output|o=s'          => \$output,
+    'keep-typ'            => \$keep_typ,
+    'typ-only'            => \$typ_only,
+    'help|h'              => \$help,
+    'version'             => \$version,
+) or do { print_usage(); exit 2; };
+
+if ($version) {
+    print "org-play-to-pdf $VERSION\n";
+    exit 0;
+}
+
+if ($help) {
+    print_usage();
+    exit 0;
+}
+
+# Determine input source
+my $input_file = shift @ARGV;
+my $fh;
+
+if (defined $input_file) {
+    if (! -f $input_file) {
+        die "Error: file not found: $input_file\n";
+    }
+    open($fh, '<:encoding(UTF-8)', $input_file)
+        or die "Error: cannot open $input_file: $!\n";
+} else {
+    $fh = \*STDIN;
+}
+
+# Determine output path
+if ($output eq '' && defined $input_file) {
+    my ($name, $dir, $ext) = fileparse($input_file, qr/\.[^.]*/);
+    if ($typ_only) {
+        $output = "${dir}${name}.typ";
+    } else {
+        $output = "${dir}${name}.pdf";
+    }
+} elsif ($output eq '') {
+    if ($typ_only) {
+        $output = 'output.typ';
+    } else {
+        $output = 'output.pdf';
+    }
+}
+
+# If --typ-only and output ends in .pdf, change to .typ
+if ($typ_only && $output =~ /\.pdf$/) {
+    $output =~ s/\.pdf$/.typ/;
+}
+
+# Collect front matter, then generate Typst
+my %front_matter;
+my @typst_body;
+my $in_dialogue = 0;
+my %footnotes;  # name => definition text
+
+my $emitter = {
+    front_matter => sub {
+        my ($key, $value) = @_;
+        $front_matter{$key} = $value;
+    },
+    act_header => sub {
+        my ($title) = @_;
+        push @typst_body, "#act-header[${title}]";
+    },
+    scene_header => sub {
+        my ($title) = @_;
+        push @typst_body, "#scene-header[${title}]";
+    },
+    stage_direction => sub {
+        my ($text) = @_;
+        # Escape Typst special chars in text
+        my $escaped = _escape_typst($text);
+        push @typst_body, "#stage-direction[${escaped}]";
+    },
+    character => sub {
+        my ($name, $direction) = @_;
+        $in_dialogue = 1;
+        my $dir_arg = '';
+        if (defined $direction) {
+            my $escaped_dir = _escape_typst($direction);
+            $dir_arg = ", direction: \"${escaped_dir}\"";
+        }
+        push @typst_body, "#dialogue(\"${name}\"${dir_arg})[";
+    },
+    dialogue => sub {
+        my ($line) = @_;
+        my $escaped = _escape_typst($line);
+        if ($in_dialogue) {
+            push @typst_body, "${escaped}";
+        } else {
+            # Prose text under H1/H2 headers (outline, setting, themes, etc.)
+            push @typst_body, "${escaped}\n";
+        }
+    },
+    character_table_start => sub {
+        push @typst_body, '#align(center)[';
+        push @typst_body, '#table(';
+        push @typst_body, '  columns: 2,';
+        push @typst_body, '  align: (left, left),';
+        push @typst_body, '  stroke: 0.5pt,';
+    },
+    character_table_row => sub {
+        my ($name, $desc) = @_;
+        my $esc_name = _escape_typst($name);
+        my $esc_desc = _escape_typst($desc);
+        push @typst_body, "  [*${esc_name}*], [${esc_desc}],";
+    },
+    character_table_end => sub {
+        push @typst_body, ')';
+        push @typst_body, ']';
+    },
+    prop_text => sub {
+        my ($text) = @_;
+        my $escaped = _escape_typst($text);
+        push @typst_body, "#prop-text[${escaped}]";
+    },
+    footnote_def => sub {
+        my ($name, $text) = @_;
+        $footnotes{$name} = $text;
+    },
+    end => sub {
+        # Close any open dialogue block
+        if ($in_dialogue) {
+            push @typst_body, ']';
+            $in_dialogue = 0;
+        }
+    },
+};
+
+# We need to close dialogue blocks before new events
+# Wrap the emitter to auto-close dialogue
+my $wrapped_emitter = _wrap_emitter_with_dialogue_close($emitter);
+
+OrgPlay::Parser->parse($fh, $wrapped_emitter);
+
+# Post-process: substitute footnote references with Typst footnotes
+if (%footnotes) {
+    for my $i (0 .. $#typst_body) {
+        $typst_body[$i] =~ s/\[fn:(\S+?)\]/
+            exists $footnotes{$1}
+                ? '#footnote[' . _escape_typst($footnotes{$1}) . ']'
+                : "[fn:$1]"
+        /ge;
+    }
+}
+
+close $fh if defined $input_file;
+
+# Assemble full Typst document
+my $preamble = OrgPlay::TypstTemplate->preamble(
+    font              => $font,
+    font_size         => $font_size,
+    margin            => $margin,
+    page              => $page,
+    indent            => $indent,
+    dialogue_spacing  => $dialogue_spacing,
+    direction_spacing => $direction_spacing,
+    direction_italic  => $direction_italic,
+    direction_center  => $direction_center,
+);
+
+my $title_page = OrgPlay::TypstTemplate->title_page(
+    title    => $front_matter{title}    // '',
+    subtitle => $front_matter{subtitle} // '',
+    author   => $front_matter{author}   // '',
+);
+
+my $typst_doc = $preamble . $title_page . join("\n", @typst_body) . "\n";
+
+if ($typ_only) {
+    # Write .typ file directly
+    open(my $out_fh, '>:encoding(UTF-8)', $output)
+        or die "Error: cannot write to $output: $!\n";
+    print $out_fh $typst_doc;
+    close $out_fh;
+} else {
+    # Write to temp .typ, compile to PDF
+    my ($tmp_fh, $tmp_path) = tempfile('org-play-XXXX', SUFFIX => '.typ', TMPDIR => 1);
+    binmode($tmp_fh, ':encoding(UTF-8)');
+    print $tmp_fh $typst_doc;
+    close $tmp_fh;
+
+    my @cmd = ('typst', 'compile', $tmp_path, $output);
+    system(@cmd) == 0
+        or die "Error: typst compile failed (exit $?)\n";
+
+    if ($keep_typ) {
+        my $typ_output = $output;
+        $typ_output =~ s/\.pdf$/.typ/;
+        require File::Copy;
+        File::Copy::copy($tmp_path, $typ_output)
+            or die "Error: cannot copy .typ file: $!\n";
+    }
+
+    unlink $tmp_path;
+}
+
+exit 0;
+
+# --- Helpers ---
+
+sub _escape_typst {
+    my ($text) = @_;
+
+    # Convert org inline markup to placeholders before escaping.
+    # /italic/ -> Typst _italic_, *bold* -> Typst *bold*
+    # Use null bytes as placeholders since they won't appear in text.
+    my @markup_slots;
+    # Org italic: /text/ (not preceded/followed by space or at path boundaries)
+    $text =~ s{(?<!\w)/([^/\n]+?)/(?!\w)}{
+        push @markup_slots, "_${1}_";
+        "\x00MARKUP" . $#markup_slots . "\x00"
+    }ge;
+    # Org bold: *text*
+    $text =~ s{(?<!\w)\*([^*\n]+?)\*(?!\w)}{
+        push @markup_slots, "*${1}*";
+        "\x00MARKUP" . $#markup_slots . "\x00"
+    }ge;
+
+    # Escape Typst special characters in content text.
+    # Order matters: backslash first, then others.
+    $text =~ s/\\/\\\\/g;
+    $text =~ s/_/\\_/g;
+    $text =~ s/\*/\\*/g;
+    $text =~ s/\$/\\\$/g;
+    $text =~ s/@/\\@/g;
+    # Don't escape # at start of function calls
+    $text =~ s/(?<!^)#/\\#/g if $text !~ /^#/;
+
+    # Restore markup placeholders (unescaped)
+    $text =~ s/\x00MARKUP(\d+)\x00/$markup_slots[$1]/g;
+
+    return $text;
+}
+
+sub _wrap_emitter_with_dialogue_close {
+    my ($base) = @_;
+    my $wrapped = {};
+
+    # Events that close a dialogue block
+    my @closers = qw(act_header scene_header stage_direction character
+                      character_table_start prop_text end);
+
+    for my $event (keys %$base) {
+        if (grep { $_ eq $event } @closers) {
+            $wrapped->{$event} = sub {
+                if ($in_dialogue) {
+                    push @typst_body, ']';
+                    $in_dialogue = 0;
+                }
+                $base->{$event}->(@_);
+            };
+        } else {
+            $wrapped->{$event} = $base->{$event};
+        }
+    }
+
+    return $wrapped;
+}
+
+sub _load_config {
+    my $config_path = "$ENV{HOME}/.config/org-play/config";
+    return unless -f $config_path;
+
+    open(my $fh, '<:encoding(UTF-8)', $config_path)
+        or return;  # silently skip if unreadable
+
+    my %bool_true  = map { $_ => 1 } qw(1 true yes on);
+    my %bool_false = map { $_ => 1 } qw(0 false no off);
+
+    my %setters = (
+        'font'              => sub { $font              = $_[0] },
+        'font-size'         => sub { $font_size         = $_[0] },
+        'margin'            => sub { $margin            = $_[0] },
+        'page'              => sub { $page              = $_[0] },
+        'indent'            => sub { $indent            = $_[0] },
+        'dialogue-spacing'  => sub { $dialogue_spacing  = $_[0] },
+        'direction-spacing' => sub { $direction_spacing = $_[0] },
+        'direction-italic'  => sub { $direction_italic  = $bool_true{lc $_[0]}  ? 1 : $bool_false{lc $_[0]} ? 0 : $_[0] },
+        'direction-center'  => sub { $direction_center  = $bool_true{lc $_[0]}  ? 1 : $bool_false{lc $_[0]} ? 0 : $_[0] },
+    );
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next if $line eq '' || $line =~ /^#/;
+
+        if ($line =~ /^(\S+(?:-\S+)?)\s*=\s*(.+)$/) {
+            my ($key, $value) = ($1, $2);
+            $value =~ s/^\s+//;
+            $value =~ s/\s+$//;
+            if (my $setter = $setters{$key}) {
+                $setter->($value);
+            }
+        }
+    }
+    close $fh;
+}
+
+sub print_usage {
+    print <<'USAGE';
+Usage: org-play-to-pdf [OPTIONS] [FILE]
+
+Convert an org-mode play to PDF via Typst.
+Reads from FILE or stdin if no file given.
+
+Config file: ~/.config/org-play/config (key = value, one per line)
+CLI flags override config file values.
+
+Options:
+  --font FONT              Body font family (default: "New Computer Modern")
+  --font-size SIZE         Body font size (default: 12pt)
+  --margin SIZE            Page margins (default: 25mm)
+  --page SIZE              Page size (default: a4)
+  --indent SIZE            Dialogue indent depth (default: 4em)
+  --dialogue-spacing SIZE  Space before dialogue blocks (default: 1em)
+  --direction-spacing SIZE Space before stage directions (default: 1em)
+  --[no-]direction-italic  Italicise stage directions (default: on)
+  --[no-]direction-center  Centre stage directions (default: off)
+  -o, --output FILE        Output path (default: <input>.pdf)
+  --keep-typ               Retain the intermediate .typ file
+  --typ-only               Emit .typ only, do not compile to PDF
+  -h, --help               Show this help message
+  --version                Show version
+USAGE
+}
