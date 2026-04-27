@@ -19,6 +19,16 @@ sub preamble {
     my $margin    = $config->get('folio.margin')     // '25mm';
     my $page      = $config->get('folio.page')       // 'a4';
 
+    # Per-element font/size helper — falls back to global folio.font / folio.font-size
+    my $efont = sub {
+        my ($path) = @_;
+        return $config->get("folio.positioning.${path}.font") // $font;
+    };
+    my $efsize = sub {
+        my ($path) = @_;
+        return $config->get("folio.positioning.${path}.font-size") // $font_size;
+    };
+
     # Speech positioning
     my $speech_space   = $config->get('folio.positioning.speech.space-before')     // '1.6em';
     my $spk_bold       = $config->get('folio.positioning.speech.speaker.bold')     // 1;
@@ -91,6 +101,20 @@ sub preamble {
     my $instr_open  = $instr_italic ? '_' : '';
     my $instr_close = $instr_italic ? '_' : '';
 
+    # Per-element font overrides — wrap in #text(font: "...") only if different from global
+    my $dir_font = $efont->('stage-direction');
+    my $dir_font_open  = ($dir_font ne $font) ? "#text(font: \"${dir_font}\")[" : '';
+    my $dir_font_close = ($dir_font ne $font) ? ']' : '';
+
+    # Build text attribute strings for headers (include font if overridden)
+    my $act_font = $efont->('act-header');
+    my $act_text_attrs = "size: ${act_fsize}, weight: ${act_weight}";
+    $act_text_attrs = "font: \"${act_font}\", ${act_text_attrs}" if $act_font ne $font;
+
+    my $scn_font = $efont->('scene-header');
+    my $scn_text_attrs = "size: ${scn_fsize}, weight: ${scn_weight}";
+    $scn_text_attrs = "font: \"${scn_font}\", ${scn_text_attrs}" if $scn_font ne $font;
+
     # Dialogue block: British (same-line) vs American (new-line) layout
     my $dialogue_fn;
     if ($dial_place eq 'same-line') {
@@ -136,21 +160,21 @@ ${dialogue_fn}
 // Stage direction
 #let stage-direction(body) = {${dir_align_set}
   block(above: ${dir_space}, below: 0.6em)[
-    ${dir_open}#body${dir_close}
+    ${dir_font_open}${dir_open}#body${dir_close}${dir_font_close}
   ]
 }
 
 // Act header
 #let act-header(title) = {
   v(${act_space})
-  align(${act_align})[#text(size: ${act_fsize}, weight: ${act_weight})[${act_content}]]
+  align(${act_align})[#text(${act_text_attrs})[${act_content}]]
   v(0.8em)
 }
 
 // Scene header
 #let scene-header(title) = {
   v(${scn_space})
-  align(${scn_align})[#text(size: ${scn_fsize}, weight: ${scn_weight})[${scn_content}]]
+  align(${scn_align})[#text(${scn_text_attrs})[${scn_content}]]
   v(${scn_after})
 }
 
