@@ -15,14 +15,17 @@
 title: "About Time"
 subtitle: "A Play in Two Acts"
 author: "Tadhg Paul"
-draft-date: "2026-04-26"
+date: "2026-04-26"
+version: "Draft v3"
 
 # --- Shared rendering options ---
 # Read by both First Folio and yapper. Control which elements appear in output.
-render-stage-directions: true
-render-intro: true
-render-footnotes: true
-render-character-table: true
+render:
+  stage-directions: true
+  frontmatter: true
+  footnotes: true
+  character-table: true
+  transitions: true
 
 # --- First Folio PDF rendering ---
 # These keys are under the folio: namespace and are ignored by yapper.
@@ -31,12 +34,6 @@ folio:
   font-size: 11pt
   margin: 25mm
   page: a4
-  indent: 5em
-  dialogue-spacing: 1.1em
-  direction-spacing: 1.6em
-  direction-italic: true
-  direction-center: false
-  default-format: pdf
 
 # --- Yapper (TTS) configuration ---
 # Everything below is silently ignored by First Folio.
@@ -51,10 +48,6 @@ character-voices:
   DERMOT: bm_daniel
 narrator-voice: bf_alice
 intro-voice: bf_alice
-
-render-stage-directions: true
-render-intro: true
-render-footnotes: true
 
 dialogue-speed: 1.0
 stage-direction-speed: 0.9

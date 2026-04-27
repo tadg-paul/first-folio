@@ -196,7 +196,8 @@ sub title_page {
     my $v_fsize  = $config ? ($config->get('folio.title-page.version.font-size') // '10pt')         : '10pt';
 
     # Build footer from date/version positions
-    my ($footer_left, $footer_right) = ('none', 'none');
+    # When both items share the same position, combine them with a separator
+    my %footer_slots;
 
     my @footer_items = (
         [$version, $v_pos, $v_fsize],
@@ -206,12 +207,16 @@ sub title_page {
         my ($val, $pos, $fsize) = @$item;
         next unless $val;
         my $typst_text = "text(size: ${fsize})[${val}]";
-        if ($pos eq 'bottom-left') {
-            $footer_left = $typst_text;
-        } elsif ($pos eq 'bottom-right') {
-            $footer_right = $typst_text;
+        if (exists $footer_slots{$pos}) {
+            # Combine with line break
+            $footer_slots{$pos} .= " + linebreak() + ${typst_text}";
+        } else {
+            $footer_slots{$pos} = $typst_text;
         }
     }
+
+    my $footer_left  = $footer_slots{'bottom-left'}  // 'none';
+    my $footer_right = $footer_slots{'bottom-right'} // 'none';
 
     my $has_footer = ($footer_left ne 'none' || $footer_right ne 'none');
 
@@ -254,9 +259,9 @@ TYPST
 
     if ($author) {
         my $a_style = $a_italic ? ', style: "italic"' : '';
-        # Handle prefix with \n (e.g. "Written by\n")
-        if ($a_prefix =~ /\\n/) {
-            my @parts = split /\\n/, $a_prefix;
+        # Handle prefix with newline (e.g. "Written by\n")
+        if ($a_prefix =~ /\n/) {
+            my @parts = split /\n/, $a_prefix;
             for my $part (@parts) {
                 next unless $part =~ /\S/;
                 $out .= <<"TYPST";

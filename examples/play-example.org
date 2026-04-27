@@ -1,0 +1,47 @@
+#+TITLE: One Day
+#+AUTHOR: Taḋg Paul
+#+SUBTITLE: A Play in Two Acts
+#+DATE: June 2026
+#+VERSION: Draft v3
+
+* Introduction
+*One Day* is a play that delves into the complexities of family dynamics, the passage of time, and the impact of unexpected events on relationships.
+
+* CHARACTERS
+|----------+---------------------------------------------------------------------|
+| BOB      | An ordinary man who drives an ordinary van and roams the land.      |
+| CÁIT     | His neighbour who goes into labour then things get much stranger    |
+| MAIRÉAD  | Bob's sister she's brilliant at twister but it gives her a blister. |
+|----------+---------------------------------------------------------------------|
+
+* Synopsis
+A play about the passage of time and the small moments that define us. Set in a suburban kitchen over the course of a single morning.
+
+* Setting
+A kitchen in a semi-detached house in Galway. The room is warm and cluttered. A window looks out onto a small garden. Morning light.
+
+* Scene List
+- Act I, Scene 1: Morning Tea
+- Act I, Scene 2: The Revelation
+
+* Act I
+** Scene 1 — Morning Tea
+*** A kitchen. Morning. Sunlight through the window. A kettle sits on the counter.
+**** BOB
+Good morning.
+
+*** BOB crosses to the kettle.
+
+**** CÁIT (entering)
+Is the kettle on?
+
+***** CUT TO
+
+**** BOB cheerfully
+Just boiled.
+
+** Scene 2 — The Revelation
+*** Later. The kitchen table is covered with papers.
+**** MAIRÉAD
+I'll have a cup too, thanks.
+I've something to tell you both.
