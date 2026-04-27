@@ -107,7 +107,7 @@ sub new {
                 push @typst_body, '  align: (left, left),';
                 push @typst_body, '  stroke: none,';
                 for my $row (@char_table_rows) {
-                    my $esc_name = _escape_typst($row->[0]);
+                    my $esc_name = _escape_typst(uc($row->[0]));
                     my $esc_desc = _escape_typst($row->[1]);
                     push @typst_body, "  [*${esc_name}*], [${esc_desc}],";
                 }

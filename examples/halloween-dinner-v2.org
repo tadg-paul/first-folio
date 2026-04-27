@@ -16,12 +16,12 @@ Lights flicker on and off for sinister effect at numerous points in the play. So
 
 * CHARACTERS
 |-------------+-----------------------------------------------------------------------|
-| MAM         | Mother, middle-aged                                                   |
+| Mam         | Mother, middle-aged                                                   |
 | DAD         | Father, middle-aged                                                   |
-| SEÁN        | Son, late teens                                                       |
-| LEAH        | Seán's girlfriend, late teens                                         |
-| NAN         | Seán's grandmother, elderly woman                                     |
-| ELECTRICIAN | Tradesperson                                                          |
+| Seán        | Son, late teens                                                       |
+| Leah        | Seán's girlfriend, late teens                                         |
+| Nan         | Seán's grandmother, elderly woman                                     |
+| Electrician | Tradesperson                                                          |
 | SARAH       | Seán's ex-girlfriend, one line at the end                             |
 |-------------+-----------------------------------------------------------------------|
 
@@ -46,198 +46,198 @@ Samhain, or Saṁain (silent 'm') is the Irish Gaelic word for Halloween. It mar
 *** A dining room. Halloween decorations - nothing too elaborate, but clearly Oíche Shamhna: a few paper bats, a pumpkin, maybe fake cobwebs.
 *** Centre stage: a dining table laid for five, though only four chairs are occupied. One chair, with a full place setting (plate, cutlery, glass, napkin), is empty.
 *** A door upstage/SL leads to the front hall and front door (offstage).
-*** A door SR leads to the rest of the house. Somewhere out of sight, an ELECTRICIAN is "working" on the fusebox.
-*** At the table: MAM, DAD, SEÁN and LEAH. They are mid-meal, with that awkward "meeting the parents for the first time" energy.
-**** MAM
+*** A door SR leads to the rest of the house. Somewhere out of sight, an Electrician is "working" on the fusebox.
+*** At the table: Mam, DAD, Seán and Leah. They are mid-meal, with that awkward "meeting the parents for the first time" energy.
+**** Mam
 So Leah, Seán tells us you're doing your Leaving Cert next year as well?
-**** LEAH
+**** Leah
 Yeah, that's right.
-**** MAM
+**** Mam
 And what subjects are you taking?
-**** LEAH
+**** Leah
 Um... well, English, Irish, Maths obviously, then French, Biology, Chemistry, History.
-**** MAM
+**** Mam
 Any honours-level?
-**** SEÁN mortified
+**** Seán mortified
 Mam!
-**** LEAH
+**** Leah
 It's okay, Seán. Yes, all seven honours, actually.
 **** DAD impressed despite himself
 Very ambitious! And Chemistry? That's a tough one.
-**** LEAH
+**** Leah
 I'm managing so far.
-**** SEÁN a bit defensive, proud
+**** Seán a bit defensive, proud
 She's top of the class.
-**** MAM delighted
+**** Mam delighted
 Oh, wonderful! And what are you thinking for college?
-**** LEAH
+**** Leah
 Maybe medicine? I'm not completely sure yet.
-**** MAM
+**** Mam
 Medicine! Did you hear that, love? A doctor.
 **** DAD
 A six-hundred pointer, near enough. I tell you, at this rate they're just churning out pure academics for doctors. No bedside manner any more.
-**** MAM
+**** Mam
 A tad better than your table-side manner, I must say.
-*** They share a small laugh. SEÁN squirms.
+*** They share a small laugh. Seán squirms.
 **** DAD mock-offended
 Well, quite. I'm sorry, Leah. I'm just impressed. Medicine! You'd have to go to one of the big ones.
-*** As LEAH reaches for her water glass, she notices the empty chair opposite her. Full place setting. No person.
-**** LEAH
+*** As Leah reaches for her water glass, she notices the empty chair opposite her. Full place setting. No person.
+**** Leah
 Um... are we expecting someone else?
-*** MAM and DAD both soften slightly.
-**** MAM
+*** Mam and DAD both soften slightly.
+**** Mam
 Oh! No, love. That's just a little ritual we do on Oíche Shamhna.
 **** DAD
 Old Irish custom. You set a place for those who've passed on.
-**** MAM
-We started doing it last year, after Seán's nan died. She'd have loved to meet you, Leah. Always teasing Seán about bringing home a nice girl.
-**** SEÁN mortified
+**** Mam
+We started doing it last year, after Seán's Nan died. She'd have loved to meet you, Leah. Always teasing Seán about bringing home a nice girl.
+**** Seán mortified
 Mam...
-**** MAM
+**** Mam
 She'd have been most impressed with you, Leah.
-**** LEAH
+**** Leah
 That's really sweet. I'm sorry for your loss.
 **** DAD
 Eighty-seven she was. Sharp as a tack right to the end.
-**** MAM
+**** Mam
 Fierce tongue on her.
 **** DAD laughing
 Beat me at cards every Sunday.
-**** MAM
+**** Mam
 Robbed you blind, more like.
-**** SEÁN fond, embarrassed
+**** Seán fond, embarrassed
 The OG hustler.
 *** The DOORBELL rings.
-**** MAM brightening
+**** Mam brightening
 Oh! First trick-or-treaters!
 *** She gets up, exits towards the front door (offstage). We hear her in the hall.
-**** MAM offstage, delighted
+**** Mam offstage, delighted
 Oh, look at you all! A vampire and two zombies! Brilliant! So realistic! Those teeth... are they real?
 *** A tiny pause. A small sound from a child, quickly cut off.
-**** MAM offstage, smoothing it over
+**** Mam offstage, smoothing it over
 Here you go, love. Hold out your bag. And for you. Come closer to me now.
 *** Another small pause.
-**** MAM offstage, cheerfully
+**** Mam offstage, cheerfully
 Happy Halloween!
-*** Sound of the door closing. MAM returns to the table, slightly more colour in her cheeks, a bit energized.
-**** MAM
+*** Sound of the door closing. Mam returns to the table, slightly more colour in her cheeks, a bit energized.
+**** Mam
 Gorgeous costumes. The effort they go to.
 **** DAD
 The effort their mammies go to, more like.
-**** MAM
+**** Mam
 Oh, stop that now.
 **** DAD
 Still though, back in our day we used have to do something when we rocked up to a house. Sing a party piece, tell a joke, recite a poem...
-**** MAM
-You did no such thing. My mam would answer the door and you'd be there with Dicky Kavanagh, potato sacks over your scrawny frames, looking like scarecrows and begging for sweets.
-**** SEÁN to LEAH, sotto
+**** Mam
+You did no such thing. My Mam would answer the door and you'd be there with Dicky Kavanagh, potato sacks over your scrawny frames, looking like scarecrows and begging for sweets.
+**** Seán to Leah, sotto
 They go on about this every year.
-**** LEAH trying to be gracious
+**** Leah trying to be gracious
 It's nice that people care.
-**** MAM
+**** Mam
 Exactly. Nice little tradition.
 *** The LIGHTS FLICKER once.
 *** Everyone pauses. Forks suspended mid-air.
-**** SEÁN
+**** Seán
 What was that?
 **** DAD vaguely
 Electrician's in there fiddling. Been at it for ages.
 *** The LIGHTS FLICKER again - then go completely out for two or three seconds. In the darkness: clinking cutlery halts, maybe a small nervous laugh. Then the lights snap fully back on.
-*** LEAH blinks. Something feels wrong. She looks to the empty chair.
-*** The empty chair is no longer empty. NAN is sitting there, mid-chew, fork in hand. Dark formal dress, carefully set white hair, like someone's beloved grandmother. She has clearly been eating. No-one reacts.
-*** LEAH drops her fork with a clatter.
-**** NAN
+*** Leah blinks. Something feels wrong. She looks to the empty chair.
+*** The empty chair is no longer empty. Nan is sitting there, mid-chew, fork in hand. Dark formal dress, carefully set white hair, like someone's beloved grandmother. She has clearly been eating. No-one reacts.
+*** Leah drops her fork with a clatter.
+**** Nan
 Bit dry, this chicken.
-**** MAM without missing a beat
+**** Mam without missing a beat
 I told you I should've basted it more.
 **** DAD
 It's fine.
-**** NAN
+**** Nan
 You always were too impatient with the oven.
-*** LEAH stares at NAN, then at SEÁN, then back at the supposedly dead grandmother.
-**** LEAH
+*** Leah stares at Nan, then at Seán, then back at the supposedly dead grandmother.
+**** Leah
 I... when did you...?
-*** The door SR opens. The ELECTRICIAN steps in, with toolbox, wiping his hands. The timing almost tramples LEAH's question.
-**** ELECTRICIAN
+*** The door SR opens. The Electrician steps in, with toolbox, wiping his hands. The timing almost tramples Leah's question.
+**** Electrician
 Right. I've sorted that dodgy fusebox. You really should replace it with modern trip switches, but it'll hold.
 **** DAD standing up, relieved
 What was it?
-**** ELECTRICIAN
+**** Electrician
 Old wiring. Loose neutral.
 **** DAD
 What do I owe you?
-**** ELECTRICIAN
+**** Electrician
 Seventy-five euro.
 *** DAD pulls out his wallet, counts notes, hands them over.
 **** DAD
 There you go. Cheers.
-**** ELECTRICIAN
+**** Electrician
 No bother.
-*** ELECTRICIAN exits. DAD sits again.
-**** NAN
+*** Electrician exits. DAD sits again.
+**** Nan
 Seventy-five euro to tighten a fuse. Daylight robbery.
-*** LEAH stares at NAN. Everyone else just keeps eating.
-**** LEAH quietly, to SEÁN
+*** Leah stares at Nan. Everyone else just keeps eating.
+**** Leah quietly, to Seán
 I thought you said she - 
-**** SEÁN instantly, overlapping
+**** Seán instantly, overlapping
 So, Leah, how are you finding the potatoes?
-**** LEAH still staring at NAN, then realizing, flustered
+**** Leah still staring at Nan, then realizing, flustered
 They're... eh... potatoey.
-*** NAN reaches across towards LEAH.
-**** NAN
+*** Nan reaches across towards Leah.
+**** Nan
 Pass us that, would you, love?
-*** Automatically, LEAH passes the gravy boat. NAN pours generously over her plate.
-*** The LIGHTS FLICKER briefly as NAN does this.
-**** NAN
+*** Automatically, Leah passes the gravy boat. Nan pours generously over her plate.
+*** The LIGHTS FLICKER briefly as Nan does this.
+**** Nan
 Thank you. Manners on this one.
-**** MAM to NAN
+**** Mam to Nan
 We like her very much.
 **** DAD
 Sensible girl.
-*** NAN eyes LEAH appraisingly.
-**** NAN
+*** Nan eyes Leah appraisingly.
+**** Nan
 Better than that last one, anyway.
-**** SEÁN tensing
+**** Seán tensing
 Nan...
-**** LEAH
+**** Leah
 Last one?
-**** NAN
+**** Nan
 What was her name... Sarah?
-*** SEÁN goes rigid.
-**** SEÁN
+*** Seán goes rigid.
+**** Seán
 We don't need to - 
-**** NAN
+**** Nan
 Lovely girl. Came for dinner on Oíche Shamhna.
-*** A faint chill in the room. LEAH glances between them.
-**** LEAH
+*** A faint chill in the room. Leah glances between them.
+**** Leah
 Oh. Your ex?
 **** DAD firmly, smoothing
 Her family relocated. Very sudden.
-**** NAN
+**** Nan
 Is that what happened? And here's me thinking - 
-**** MAM quickly
+**** Mam quickly
 Mother.
-**** NAN
+**** Nan
 Her parents made an awful fuss. Knocking every evening for a month. All those questions.
 **** DAD
 Very disruptive.
-**** MAM
+**** Mam
 We had to ask them to stop. It was getting ridiculous.
-**** NAN mimicking with relish
+**** Nan mimicking with relish
 "Where's our daughter? When did you last see her?" On and on.
-*** LEAH swallows.
-**** LEAH
+*** Leah swallows.
+**** Leah
 They... didn't know where she was?
-**** MAM dismissive, brittle
+**** Mam dismissive, brittle
 Teenagers. They run off. She was probably chasing some fella.
-**** NAN leaning towards LEAH, enjoying herself
+**** Nan leaning towards Leah, enjoying herself
 You might see her yourself, love. Snooping about the house at night. In the dark.
-*** LEAH looks straight at SEÁN.
-**** LEAH
+*** Leah looks straight at Seán.
+**** Leah
 What does she mean?
-**** SEÁN
+**** Seán
 Nan, don't - 
-**** LEAH louder
+**** Leah louder
 What does she mean, Seán? Your ex-girlfriend is... what, in your house? At night?
 *** The DOORBELL rings again. It undercuts the tension.
 **** DAD half-rising, eager
@@ -251,123 +251,123 @@ That's it now. There, there. That wasn't so bad, was it. Off you go now. On your
 *** Door closes. DAD returns. His colour is higher, his movements a little too energetic. Something faintly off about his expression.
 **** DAD
 Quite committed this year.
-*** LEAH barely registers him, still focused on SEÁN.
-**** LEAH
+*** Leah barely registers him, still focused on Seán.
+**** Leah
 I can't believe this. You brought me here while your ex is... what, hiding upstairs?
-**** SEÁN
+**** Seán
 Leah, it's not - 
 *** LIGHTS FLICKER once, then steady.
 *** Blackout.
 
 ** Scene 2
-*** Same dining room, a little later but continuous. The remains of dinner are still on the table. The atmosphere has noticeably darkened. LEAH is on edge, half-standing in her chair, ready to bolt. SEÁN is tense. MAM and DAD are a little too bright. NAN looks increasingly solid, less ghostly.
-**** SEÁN
+*** Same dining room, a little later but continuous. The remains of dinner are still on the table. The atmosphere has noticeably darkened. Leah is on edge, half-standing in her chair, ready to bolt. Seán is tense. Mam and DAD are a little too bright. Nan looks increasingly solid, less ghostly.
+**** Seán
 Leah, you've barely touched your dinner.
-**** LEAH
+**** Leah
 I'm not very hungry any more.
-**** NAN
+**** Nan
 That's a shame. You'll need your strength.
-**** LEAH
+**** Leah
 For what?
-**** NAN
+**** Nan
 For the rest of the evening, of course.
 *** Beat.
-**** MAM forced brightness
+**** Mam forced brightness
 Who's for dessert? I made apple tart.
-**** LEAH
+**** Leah
 I'm fine, thanks.
-*** The door SR opens again. The ELECTRICIAN appears, same toolbox, same posture.
-**** ELECTRICIAN
+*** The door SR opens again. The Electrician appears, same toolbox, same posture.
+**** Electrician
 Right. I've sorted that dodgy fusebox. You really should replace it with modern trip switches, but it'll hold.
-*** LEAH stares at him.
+*** Leah stares at him.
 **** DAD already getting to his feet
 What was it?
-**** ELECTRICIAN
+**** Electrician
 Old wiring. Loose neutral.
 **** DAD
 What do I owe you?
-**** ELECTRICIAN
+**** Electrician
 Seventy-five euro.
 *** DAD pulls out his wallet again. Hands over notes in the exact same way as before.
 **** DAD
 There you go.
-**** ELECTRICIAN
+**** Electrician
 No bother.
-*** ELECTRICIAN exits. DAD sits.
-**** LEAH
+*** Electrician exits. DAD sits.
+**** Leah
 Didn't he just... do that?
-**** MAM
+**** Mam
 Do what, love?
-**** LEAH
+**** Leah
 That whole thing. Word for word.
 **** DAD
 Anyone want more chicken?
-**** NAN dry
+**** Nan dry
 No one wants more of that dry chicken.
 *** The DOORBELL rings.
-**** MAM
+**** Mam
 My turn.
 *** She goes to the door. This time, the voices of the children are louder, closer.
-**** MAM offstage
+**** Mam offstage
 Oh, hello! A clown? Very realistic make-up. Are those real teeth?
 *** A pause. A small, frightened sound.
-**** MAM offstage, voice dropping slightly
+**** Mam offstage, voice dropping slightly
 Well. Here's your sweets then.
 *** There is the faintest suggestion of something more - a gasp, a cut-off cry - then the door closes.
-*** MAM returns. There is a faint flush high on her cheeks, an odd brightness in her eyes. She touches her lips absently.
+*** Mam returns. There is a faint flush high on her cheeks, an odd brightness in her eyes. She touches her lips absently.
 **** DAD
 Feeling alright, love?
-**** MAM
+**** Mam
 Never better. So many children. All so... hungry.
-*** LEAH pushes back her chair.
-**** LEAH
+*** Leah pushes back her chair.
+**** Leah
 Okay. No. I'm going. Right now. I've had enough of all this.
-**** SEÁN
+**** Seán
 You can't leave in the middle of dinner.
-**** LEAH
-You told me your nan is dead, that electrician keeps saying the exact same thing, and your parents are - 
-*** She can't finish. She gestures helplessly at MAM and DAD.
-**** SEÁN suddenly uneasy
+**** Leah
+You told me your Nan is dead, that Electrician keeps saying the exact same thing, and your parents are - 
+*** She can't finish. She gestures helplessly at Mam and DAD.
+**** Seán suddenly uneasy
 You can see her?
-**** LEAH
+**** Leah
 Who?
-**** SEÁN
+**** Seán
 Nan.
-**** LEAH incredulous
+**** Leah incredulous
 Of course I can see her!
-*** The LIGHTS FLICKER. The door SR bursts open as if on cue. The ELECTRICIAN steps out, movement a bit more mechanical this time.
-**** ELECTRICIAN slightly sped-up
+*** The LIGHTS FLICKER. The door SR bursts open as if on cue. The Electrician steps out, movement a bit more mechanical this time.
+**** Electrician slightly sped-up
 Right, I've sorted that dodgy fusebox. Old wiring, loose neutral. Seventy-five euro.
 *** DAD is already half-standing, fumbling out his card this time, barely looking.
 **** DAD
 Here. Just tap it.
-*** ELECTRICIAN produces a card reader. Beep. He exits.
-**** LEAH
+*** Electrician produces a card reader. Beep. He exits.
+**** Leah
 Does no one else think this is weird?
-**** MAM
+**** Mam
 Language, Leah. "Odd", maybe. Or "unusual".
-**** NAN
+**** Nan
 We prefer "unconventional".
-**** LEAH to SEÁN
-What is going on? And what did your nan mean about Sarah being here, at night?
-**** SEÁN cornered
+**** Leah to Seán
+What is going on? And what did your Nan mean about Sarah being here, at night?
+**** Seán cornered
 Look, there are... things about my family that are just a little different.
-**** LEAH
+**** Leah
 Different how?
-**** SEÁN
+**** Seán
 Unconventional. If you ask too many questions... If you really want to understand, I can try to explain. But once you're in the circle, you're committed. There's no going back.
 *** The words hang.
-**** LEAH horrified
+**** Leah horrified
 Are you asking me to be in some kind of polyamorous relationship with you and Sarah?
-**** SEÁN appalled
+**** Seán appalled
 What? No! Nothing romantic like that, I swear!
-**** LEAH
+**** Leah
 Then what is it?
-**** SEÁN
+**** Seán
 She can't leave.
-**** LEAH
+**** Leah
 Because she stays over? Because she's here all the time? In your house? At night?
-**** SEÁN
+**** Seán
 Because she literally can't leave, Leah.
 *** The DOORBELL rings again.
 **** DAD almost eager
@@ -385,88 +385,88 @@ Shhh. It's alright. It won't hurt for long.
 *** Then only muffled sounds, unpleasant. The door closes. DAD returns, changed: movements too fluid, too quick. His smile is wide. His teeth - if the production can manage it - seem sharper.
 **** DAD
 Lovely costumes this year.
-*** LEAH, pale now
+*** Leah, pale now
 I'm leaving. Right now.
-*** She moves towards the hall. SEÁN grabs her arm, holding her back.
-**** LEAH
+*** She moves towards the hall. Seán grabs her arm, holding her back.
+**** Leah
 Let go of me!
-**** NAN conversational
+**** Nan conversational
 Sarah tried to run too. Made it as far as the front door.
-**** LEAH
+**** Leah
 What happened to her?
 *** The LIGHTS FLICKER, rapid. For an instant, in a flash, we might glimpse a GIRL'S SHAPE in the hall, out of fashion clothes, vacant stare. Then darkness again.
-*** The door SR bangs open. The ELECTRICIAN appears, now almost glitching, jerky.
-**** ELECTRICIAN very fast, almost looped
+*** The door SR bangs open. The Electrician appears, now almost glitching, jerky.
+**** Electrician very fast, almost looped
 Right-sorted-fusebox-seventy-five-seventy-five-loose-neutral-seventy-five.
-*** DAD thrusts his card at him without looking. Beep. ELECTRICIAN exits like a puppet yanked offstage.
-**** MAM
+*** DAD thrusts his card at him without looking. Beep. Electrician exits like a puppet yanked offstage.
+**** Mam
 Honestly, the service these days.
 *** The DOORBELL rings again. It is a rapid succession now: ding-dong, ding-dong, ding-dong. A crowd of children.
-**** MAM rising, a little unsteady, almost drunk on it
+**** Mam rising, a little unsteady, almost drunk on it
 I'll get it.
 *** Offstage, overlapping children's voices.
 **** CHILDREN offstage, overlapping
 Trick or treat! / Look at mine! / I want more - 
-**** MAM offstage, voice changing, lower
+**** Mam offstage, voice changing, lower
 Shhh. One at a time. That's it. Come closer. It's alright. It won't hurt for long.
-*** Then: cries, abruptly cut. A dropped plastic bucket. Silence. The door closes. When MAM returns, she moves differently - glides rather than walks.
-**** MAM voice lower, inhuman edge
+*** Then: cries, abruptly cut. A dropped plastic bucket. Silence. The door closes. When Mam returns, she moves differently - glides rather than walks.
+**** Mam voice lower, inhuman edge
 Dessert is served.
 *** She glides towards the table.
-**** LEAH
+**** Leah
 Mrs -  Mrs...?
-**** MAM
+**** Mam
 Call me Mam. We're going to be very close.
 **** DAD
 Your mother made apple tart. It would be rude to leave before dessert.
-*** NAN rises. She seems fully solid now, predatory.
-**** NAN
+*** Nan rises. She seems fully solid now, predatory.
+**** Nan
 Once you understand, you can't leave.
-**** LEAH to SEÁN, desperate
+**** Leah to Seán, desperate
 Please.
-**** SEÁN
+**** Seán
 I did warn you earlier. About asking questions.
-**** LEAH
+**** Leah
 Warn me about what?
-**** SEÁN
+**** Seán
 That it's not easy to leave. Once you're in, once you understand, you're part of it. Part of the family.
 *** He lets go of her arm. For a moment, it seems like release.
-*** LEAH bolts. She runs for the hall door, wrenches it open, disappears offstage.
-*** No one at the table moves to follow. They simply watch. NAN picks up her fork again.
-**** NAN calmly
+*** Leah bolts. She runs for the hall door, wrenches it open, disappears offstage.
+*** No one at the table moves to follow. They simply watch. Nan picks up her fork again.
+**** Nan calmly
 Sarah tried that too.
-*** We hear LEAH offstage, rattling the front door.
-**** LEAH offstage
+*** We hear Leah offstage, rattling the front door.
+**** Leah offstage
 It won't — why won't it —
 *** The LIGHTS FLICKER once.
-*** LEAH backs into view from the hall, slowly, as if pushed by something unseen. She stops in the doorway.
+*** Leah backs into view from the hall, slowly, as if pushed by something unseen. She stops in the doorway.
 *** SARAH stands behind her, having appeared from nowhere. Vacant eyes. Two small puncture marks on her neck. She blocks the way back to the hall.
-*** LEAH turns, sees her, gasps.
+*** Leah turns, sees her, gasps.
 **** SARAH flat, almost gentle
 There's always a place for you.
-*** LEAH spins back towards the dining room. MAM and DAD have risen from their chairs. They stand very still, watching her. Their smiles are too wide.
+*** Leah spins back towards the dining room. Mam and DAD have risen from their chairs. They stand very still, watching her. Their smiles are too wide.
 *** The DOORBELL rings — bright, innocent, insistent.
-*** LEAH looks from SARAH to the family. There is nowhere to go.
-**** MAM warmly, as if nothing were wrong
+*** Leah looks from SARAH to the family. There is nowhere to go.
+**** Mam warmly, as if nothing were wrong
 Sit down, love. You'll catch your death.
 *** The LIGHTS SNAP OFF.
-*** In the darkness: a single, sharp intake of breath from LEAH. Then silence.
+*** In the darkness: a single, sharp intake of breath from Leah. Then silence.
 *** The DOORBELL rings again.
 
 *** The LIGHTS come back up to a warm, cosy level.
-*** The dining room is neat. The table is laid for six. All seats are occupied: MAM, DAD, NAN, SEÁN, SARAH, and LEAH.
-*** SARAH and LEAH sit side by side, motionless, staring ahead. Each has two small puncture marks on her neck. Forks raised, frozen mid-gesture.
-*** MAM rises, cheerful.
-**** MAM
+*** The dining room is neat. The table is laid for six. All seats are occupied: Mam, DAD, Nan, Seán, SARAH, and Leah.
+*** SARAH and Leah sit side by side, motionless, staring ahead. Each has two small puncture marks on her neck. Forks raised, frozen mid-gesture.
+*** Mam rises, cheerful.
+**** Mam
 Oh! First trick-or-treaters of the night!
 *** She moves towards the hall, exactly as at the start.
-**** MAM offstage, bright
+**** Mam offstage, bright
 Oh, look at you all! A vampire and two zombies! Brilliant! So realistic!
-*** At the table, NAN reaches over and pats LEAH's hand. LEAH does not respond.
-**** NAN content
+*** At the table, Nan reaches over and pats Leah's hand. Leah does not respond.
+**** Nan content
 Isn't this lovely. All together for Oíche Shamhna.
 *** She looks out at the audience.
-**** NAN
+**** Nan
 We always set a place for those who've passed on.
 *** She smiles.
 *** BLACKOUT.

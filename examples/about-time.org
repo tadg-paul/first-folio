@@ -8,99 +8,99 @@
 #+OPTIONS: toc:nil
 
 * Characters
-|------------+-----------------------------------------------------|
-| KEVIN      | 11yo boy. The returner. Quiet, sensitive kid.       |
-| NESSA      | Kevin's sister, 13yo in Act I, 22yo in Act II.      |
-| CÁIT       | Mother. 40-50ish, struggling with circumstances.    |
-| BEN        | Father. 40-50ish, means well but bumbling at times. |
-| MARIE      | Ben's partner in Act II, 30s.                       |
-| GDA CONLON | Garda. Fifties. Knew the original case.             |
-| DERMOT     | Tusla (State agency for children) social worker.    |
-|------------+-----------------------------------------------------|
+|------------+-------------------------------------------------------|
+| Kevin        | 11yo boy. The returner. Quiet, sensitive kid.       |
+| Nessa        | Kevin's sister, 13yo in Act I, 22yo in Act II.      |
+| Cáit         | Mother. 40-50ish, struggling with circumstances.    |
+| Ben          | Father. 40-50ish, means well but bumbling at times. |
+| Marie        | Ben's partner in Act II, 30s.                       |
+| Garda Conlon | Garda. Fifties. Knew the original case.             |
+| Dermot       | Tusla (State agency for children) social worker.    |
+|------------+-------------------------------------------------------|
 
 * Outline
 A missing boy returns to his family after an unexplained absence. The play explores the impact of his disappearance and return on the family, particularly on Kevin and his sister Nessa.
 
-* ACT I
+* Act I
 ** Scene 1: Moving Day
 *** Kitchen and hall. Afternoon. Moving day. Mid-afternoon light. Front door open. Boxes in hall and kitchen. The house not yet lived in.
-*** BEN enters through the front door carrying a box and a rolled rug.
-**** BEN
+*** Ben enters through the front door carrying a box and a rolled rug.
+**** Ben
 Right. Where are we putting everything.
-*** CÁIT in the kitchen, unwrapping plates.
-**** CÁIT
+*** Cáit in the kitchen, unwrapping plates.
+**** Cáit
 Not there.
-**** BEN
+**** Ben
 I’ve only come in.
-**** CÁIT
+**** Cáit
 Then don’t stop there.
-*** BEN drops the box just inside the door.
-**** BEN
+*** Ben drops the box just inside the door.
+**** Ben
 Temporary.
-*** KEVIN enters behind him dragging a duvet.
-**** KEVIN
+*** Kevin enters behind him dragging a duvet.
+**** Kevin
 Which one’s mine.
-**** BEN
+**** Ben
 The small one.
-**** KEVIN
+**** Kevin
 That’s not fair.
-**** BEN
+**** Ben
 It’s character building.
-**** KEVIN
+**** Kevin
 I don’t want character.
-**** BEN
+**** Ben
 You’ll thank me.
-**** KEVIN
+**** Kevin
 I won’t.
-*** NESSA crosses the hall with a backpack, heading straight upstairs.
-**** CÁIT
+*** Nessa crosses the hall with a backpack, heading straight upstairs.
+**** Cáit
 Hold on now.
-**** NESSA
+**** Nessa
 I’m only looking.
-**** CÁIT
+**** Cáit
 Looking with your bag.
-**** NESSA
+**** Nessa
 In case I find one.
-**** BEN
+**** Ben
 Nobody’s claiming rooms.
-**** NESSA
+**** Nessa
 Too late.
-*** NESSA exits upstairs.
-**** KEVIN
+*** Nessa exits upstairs.
+**** Kevin
 I’m going.
-**** CÁIT
+**** Cáit
 You’re not.
-**** KEVIN
+**** Kevin
 She'll take the best one.
-**** BEN
+**** Ben
 There is no best one.
-**** KEVIN
+**** Kevin
 There always is.
-*** BEN considers this.
-**** BEN
+*** Ben considers this.
+**** Ben
 Fair.
-**** CÁIT gives him a look.
-**** BEN
+**** Cáit gives him a look.
+**** Ben
 Go on so. But no fighting.
-*** KEVIN runs upstairs.
-**** CÁIT
+*** Kevin runs upstairs.
+**** Cáit
 Why do you let them.
-**** BEN
+**** Ben
 It’s a house, Cáit. Let them run in it.
-**** CÁIT
+**** Cáit
 It’s too big.
-**** BEN
+**** Ben
 It’s grand.
-**** CÁIT
+**** Cáit
 It’s too big.
-**** BEN
+**** Ben
 We’ll grow into it.
-**** CÁIT
+**** Cáit
 We’re not growing any more.
-**** BEN
+**** Ben
 Speak for yourself.
 *** Beat.
-*** CÁIT looks around the kitchen, taking it in.
+*** Cáit looks around the kitchen, taking it in.
 *** The kettle begins to boil.
 ***** Lights shift.
 
@@ -108,196 +108,196 @@ Speak for yourself.
 ** Scene 2: The attic
 *** An attic. Pitched roof, gabled. A few dusty boxes and artefacts left by the previous occupants — shapes under sheets, a trunk, the dark bulk of a dress form. A small stained window high in the gable end lets in a weak, uneven light — enough to see by, not enough to make out detail. The floor is boarded. Downstage, a square hatch set into the floor allows a tiny peak of brighter light.
 *** From below, through the hatch, muffled: sound of doors opening and closing. The kids hunting for bedrooms.
-**** KEVIN offstage
+**** Kevin offstage
 This one's bigger.
-**** NESSA offstage
+**** Nessa offstage
 They're all the same.
-**** KEVIN offstage
+**** Kevin offstage
 That one has a better window.
-**** NESSA offstage
+**** Nessa offstage
 It’s the same window.
-**** KEVIN offstage
+**** Kevin offstage
 It’s not.
-**** NESSA offstage
+**** Nessa offstage
 You don’t know what you’re talking about.
-**** KEVIN offstage
+**** Kevin offstage
 I do.
 *** a beat
-**** KEVIN offstage
+**** Kevin offstage
 What’s is it?
-**** NESSA offstage
+**** Nessa offstage
 Don’t touch it.
-**** KEVIN
+**** Kevin
 Why?
-**** NESSA
+**** Nessa
 Because.
 *** Muffled effort. Then the thud of the ladder dropping.
 *** A shaft of landing-light falls through the hatch into the attic, catching dust. The space brightens unevenly — corners still dark, shapes along the eaves beginning to separate themselves from the shadow.
-**** KEVIN offstage
+**** Kevin offstage
 Jesus, that nearly hit me in the head!
-**** NESSA offstage
+**** Nessa offstage
 Told you!
 *** Beat.
-**** NESSA offstage
+**** Nessa offstage
 No, I'll check it out. You stay put, god only knows what you'd do.
-*** NESSA appears through the hatch, hands on the rim, pulling herself up. She stands in the light. Looks around.
-**** NESSA
+*** Nessa appears through the hatch, hands on the rim, pulling herself up. She stands in the light. Looks around.
+**** Nessa
 Jesus.
-**** KEVIN
+**** Kevin
 What.
-**** NESSA
+**** Nessa
 It's mad up here.
-**** KEVIN
+**** Kevin
 Let me up.
-**** NESSA
+**** Nessa
 I said wait.
-**** KEVIN
+**** Kevin
 I don't want to wait.
-**** NESSA
+**** Nessa
 Wait.
 *** She moves further in, her shadow crossing the light. A box label visible where a moment ago it wasn't.
-**** KEVIN
+**** Kevin
 What's up there.
-**** NESSA
+**** Nessa
 Stuff.
-**** KEVIN
+**** Kevin
 What stuff.
-**** NESSA
+**** Nessa
 Stuff.
 *** Beat.
-**** NESSA
+**** Nessa
 Come up. Slowly.
-*** KEVIN climbs. His head appears, caught in the light. He looks around without moving the rest of him.
-**** KEVIN
+*** Kevin climbs. His head appears, caught in the light. He looks around without moving the rest of him.
+**** Kevin
 Woah.
-**** NESSA
+**** Nessa
 I know.
 *** He pulls himself up and stands. The two of them in the shaft now — everything else still half-dark.
-**** KEVIN
+**** Kevin
 Who's stuff is it.
-**** NESSA
+**** Nessa
 Whose.
-**** KEVIN
+**** Kevin
 Whose stuff is it.
-**** NESSA
+**** Nessa
 The people who lived here.
-**** KEVIN
+**** Kevin
 Before us.
-**** NESSA
+**** Nessa
 Yeah.
-**** KEVIN
+**** Kevin
 Why'd they leave it.
-**** NESSA
+**** Nessa
 I don't know.
-**** KEVIN
+**** Kevin
 Maybe they died.
-**** NESSA
+**** Nessa
 Kevin.
-**** KEVIN
+**** Kevin
 What.
-**** NESSA
+**** Nessa
 Don't.
 *** He wanders further. Touches a box.
-**** KEVIN
+**** Kevin
 Carstairs.
-**** NESSA
+**** Nessa
 What.
-**** KEVIN
+**** Kevin
 It's written on the box. Carstairs.
-**** NESSA
+**** Nessa
 That was their name.
-**** KEVIN
+**** Kevin
 Weird name.
-**** NESSA
+**** Nessa
 It's a name.
-*** KEVIN has reached the stack of comics. He crouches.
-**** KEVIN
+*** Kevin has reached the stack of comics. He crouches.
+**** Kevin
 Look.
-**** NESSA
+**** Nessa
 Leave them.
-**** KEVIN
+**** Kevin
 They're class.
 *** He sits, already opening one.
-**** KEVIN
+**** Kevin
 Carstairs.
-**** NESSA
+**** Nessa
 What.
-**** KEVIN
+**** Kevin
 The comic. It's called Carstairs as well.
-**** NESSA
+**** Nessa
 It's not.
-**** KEVIN
+**** Kevin
 It is.
 *** He shows her. She glances. Turns away.
-**** NESSA
+**** Nessa
 Weird.
-*** NESSA moves about the space, restless. Opens a trunk. Closes it. Lifts a corner of a sheet draped over something. Drops it.
-*** KEVIN reads, half to himself.
-**** KEVIN
+*** Nessa moves about the space, restless. Opens a trunk. Closes it. Lifts a corner of a sheet draped over something. Drops it.
+*** Kevin reads, half to himself.
+**** Kevin
 "Carstairs stepped into the--"
-*** NESSA stops moving. Stands with her back to him.
-**** KEVIN
+*** Nessa stops moving. Stands with her back to him.
+**** Kevin
 "--into the chamber and the--"
-**** NESSA
+**** Nessa
 Kevin.
 *** He doesn't hear her.
-**** KEVIN
+**** Kevin
 "--and the door shut behind him--"
 *** Beat.
-**** NESSA
+**** Nessa
 Like a dog.
-*** KEVIN stops.
+*** Kevin stops.
 *** He looks up.
-**** KEVIN
+**** Kevin
 What.
-*** NESSA does not turn.
-**** KEVIN
+*** Nessa does not turn.
+**** Kevin
 What did you say.
 *** She still does not turn.
-*** KEVIN looks back at the comic.
+*** Kevin looks back at the comic.
 *** He does not read it.
-*** NESSA waits a second longer than she should.
-*** KEVIN does not look up.
-*** NESSA goes to the hatch. Steps onto the ladder. Descends.
+*** Nessa waits a second longer than she should.
+*** Kevin does not look up.
+*** Nessa goes to the hatch. Steps onto the ladder. Descends.
 *** a beat
 *** The hatch swings shut. We are left with only the murky light from the stained glass window.
-*** KEVIN alone. The comic open on his lap. He looks toward the hatch, audibly sighs, and goes back to the comic, flipping through pages.
+*** Kevin alone. The comic open on his lap. He looks toward the hatch, audibly sighs, and goes back to the comic, flipping through pages.
 *** He closes it, goes over to the hatch, tries to open it.
-**** KEVIN shouts
+**** Kevin shouts
 Nessa!
 *** a beat
-**** KEVIN shouts again, impatiently
-NESSA! Come on!
+**** Kevin shouts again, impatiently
+Nessa! Come on!
 *** a beat
-*** KEVIN returns to the comic, flips it open, starts reading again. The light through the window dims a little.
-*** KEVIN returns to the hatch, shakes it, it does not budge.
-**** KEVIN shouting louder
-MAM! NESSA! COME ON!
+*** Kevin returns to the comic, flips it open, starts reading again. The light through the window dims a little.
+*** Kevin returns to the hatch, shakes it, it does not budge.
+**** Kevin shouting louder
+MAM! Nessa! COME ON!
 *** He gives the hatch one more shake, the hatch opens, he descends down the ladder.
 ***** Lights fade.
 
 
 ** Scene 3: Reunion
-*** In the darkness the set changes. When the lights come up the house is the same house, but lived in. A table and chairs in the kitchen. Books on the shelves. A coat on the bannister. Nessa's schoolbag dropped at the foot of the stairs. A pile of post[fn:post] on the hall table. Dishes in the sink. Cáit's coats hang doubled on a single hook. A child's jacket — Kevin's — is folded carefully on a chair. On the hall table, a torch[fn:torch], spare batteries, and a clipboard thick with damp flyers. The top one a school photograph of KEVIN.
+*** In the darkness the set changes. When the lights come up the house is the same house, but lived in. A table and chairs in the kitchen. Books on the shelves. A coat on the bannister. Nessa's schoolbag dropped at the foot of the stairs. A pile of post[fn:post] on the hall table. Dishes in the sink. Cáit's coats hang doubled on a single hook. A child's jacket — Kevin's — is folded carefully on a chair. On the hall table, a torch[fn:torch], spare batteries, and a clipboard thick with damp flyers. The top one a school photograph of Kevin.
 *** The hall is empty. Evening light fading.
 *** From upstairs, offstage:
-**** KEVIN offstage
+**** Kevin offstage
 Mam?
 *** Nothing.
-**** KEVIN offstage
+**** Kevin offstage
 Nessa?
 *** Beat.
-**** KEVIN offstage, sounding closer
+**** Kevin offstage, sounding closer
 Dad?
 *** Silence. He starts back up.
-**** KEVIN calling as he goes
+**** Kevin calling as he goes
 Nessa took the double room! How did she get all her stuff in already?
 *** He disappears again into the upstairs.
-**** KEVIN offstage, farther away
+**** Kevin offstage, farther away
 Hello?
-*** Sounds of KEVIN walking around upstairs.
+*** Sounds of Kevin walking around upstairs.
 *** A key in the front door.
-*** CÁIT enters. Torch. Runners. Clipboard and flyers in hand. She shuts the door with the backward push of habit.
+*** Cáit enters. Torch. Runners. Clipboard and flyers in hand. She shuts the door with the backward push of habit.
 *** She places the clipboard on the hall table on top of the pile. We see that Kevin's face is prominent on the flyer.
 *** She walks past the kitchen doorway.
 *** Stops.
@@ -306,77 +306,77 @@ Hello?
 *** She exhales.
 *** She removes her coat, comes back into the hall, reaches to hang it.
 *** Looks up.
-*** KEVIN is halfway down the stairs. Comic in hand.
-*** CÁIT's hand falls loose at her side. The glass tips upside down but does not fall. Wine spills across the floor.
-*** CÁIT makes a sound that is not a word.
-**** KEVIN casually
+*** Kevin is halfway down the stairs. Comic in hand.
+*** Cáit's hand falls loose at her side. The glass tips upside down but does not fall. Wine spills across the floor.
+*** Cáit makes a sound that is not a word.
+**** Kevin casually
 Nessa's gone mad.
 *** Beat.
-**** KEVIN impatiently
+**** Kevin impatiently
 She's been hours.
-*** CÁIT drops to her knees before him.
+*** Cáit drops to her knees before him.
 *** Her hands to his face. His hair. His shoulders. Checking and touching and not believing touch.
-**** KEVIN
+**** Kevin
 Mam.
-**** CÁIT
+**** Cáit
 Jesus Christ.
-**** KEVIN
+**** Kevin
 What.
-**** CÁIT
+**** Cáit
 Jesus Christ.
 *** She pulls him towards her.
-**** KEVIN
+**** Kevin
 Mam, you're hurting me.
 *** The front door opens hard.
-*** BEN enters mid-call, mobile to ear.
-**** BEN
+*** Ben enters mid-call, mobile to ear.
+**** Ben
 I've been round the shelters again. Nothing, as if he'd turn up at one at this stage. The Guards don't even answer the phone to me any more.
 *** He sees them. Stops. The phone lowers from his hand.
-**** BEN
+**** Ben
 Cáit.
-*** CÁIT cannot answer.
-**** BEN
+*** Cáit cannot answer.
+**** Ben
 Kevin?
-**** KEVIN
+**** Kevin
 Everyone's acting thick[fn:thick].
-*** BEN crosses to them slowly, then quickly, then is there.
-*** He kneels. Takes KEVIN by the arms.
-**** BEN
+*** Ben crosses to them slowly, then quickly, then is there.
+*** He kneels. Takes Kevin by the arms.
+**** Ben
 Look at me.
-**** KEVIN
+**** Kevin
 I am looking at you.
-**** BEN
+**** Ben
 Look at me.
-*** KEVIN looks at BEN.
-*** BEN pulls the boy into him.
-*** On the landing above, NESSA stands in the half-dark. Barefoot. Motionless.
-*** KEVIN sees her.
-**** KEVIN
+*** Kevin looks at Ben.
+*** Ben pulls the boy into him.
+*** On the landing above, Nessa stands in the half-dark. Barefoot. Motionless.
+*** Kevin sees her.
+**** Kevin
 There she is.
 *** He points.
-**** KEVIN
+**** Kevin
 She locked me up there.
 *** Nobody hears him.
-*** CÁIT is crying openly now.
-**** BEN
+*** Cáit is crying openly now.
+**** Ben
 Ring someone. Jesus. Ring everyone.
-**** CÁIT
+**** Cáit
 He's freezing.
-**** BEN
+**** Ben
 Get a blanket.
-**** CÁIT pleading
+**** Cáit pleading
 He's here.
-**** KEVIN
+**** Kevin
 I wasn't gone /that/ long.
-**** BEN
+**** Ben
 It's alright. It's alright.
-**** KEVIN
+**** Kevin
 I kept shouting.
-*** NESSA grips the bannister but does not descend.
-**** KEVIN flatly
+*** Nessa grips the bannister but does not descend.
+**** Kevin flatly
 Nessa.
 *** She does not answer.
-**** KEVIN to Nessa, more urgently
+**** Kevin to Nessa, more urgently
 Why didn't you come back.
 *** Nobody hears that either.
 *** The family closes round him.
@@ -387,482 +387,482 @@ Why didn't you come back.
 *** Kitchen. Some weeks after the return. Light neither bright nor late, ambiguous time of day.
 *** The kitchen is tidier than it was in the reunion. But only just. Dishes drying by the sink. A wash on the back of a chair. The clipboard of flyers still on the hall table but pushed to one side, as if it has lost its urgency without being quite disposable.
 *** On the kitchen table: an open sewing kit. Thread, scissors, a pincushion. The packaging of a small plastic device torn open beside it — the tracker's box. The jacket — Kevin's, the small one from the hall table in Scene 3 — laid flat on the table.
-*** CÁIT at the table. Glasses on. A small flat disc in her hand. A wine glass beside her, half full. The bottle open on the counter.
+*** Cáit at the table. Glasses on. A small flat disc in her hand. A wine glass beside her, half full. The bottle open on the counter.
 *** She is not sewing. She is studying the inside of the jacket's lining. Turning it over. Deciding where the device should go.
 *** A beat.
-*** KEVIN enters from the hall. He has a book or a handheld or nothing — director's call. He stops in the doorway. He sees her. He sees the jacket. He sees the packaging on the table.
-*** CÁIT does not look up.
-**** KEVIN
+*** Kevin enters from the hall. He has a book or a handheld or nothing — director's call. He stops in the doorway. He sees her. He sees the jacket. He sees the packaging on the table.
+*** Cáit does not look up.
+**** Kevin
 What are you doing.
-**** CÁIT
+**** Cáit
 Sit down a second.
-**** KEVIN
+**** Kevin
 What is that.
-*** CÁIT does look up now. Over the glasses.
-**** CÁIT
+*** Cáit does look up now. Over the glasses.
+**** Cáit
 Sit down, Kevin.
 *** He sits. Slowly.
-*** CÁIT holds up the device between thumb and forefinger. Not ceremoniously. Just — here it is.
-**** CÁIT
+*** Cáit holds up the device between thumb and forefinger. Not ceremoniously. Just — here it is.
+**** Cáit
 It's a tracker.
 *** Beat.
-**** KEVIN
+**** Kevin
 A tracker.
-**** CÁIT
+**** Cáit
 So I know where you are.
 *** Long beat.
-**** KEVIN
+**** Kevin
 Okay.
-**** CÁIT
+**** Cáit
 I'm going to put it in your jacket.
-**** KEVIN
+**** Kevin
 Okay.
-*** CÁIT waits. For him to object. He doesn't.
+*** Cáit waits. For him to object. He doesn't.
 *** She nods once. Takes up the scissors. Cuts a small slit in the lining, with care. Slides the device in. Picks up the needle. Begins to stitch.
-*** KEVIN watches her hands.
+*** Kevin watches her hands.
 *** A beat.
-**** KEVIN
+**** Kevin
 Is it going to be lumpy.
-**** CÁIT
+**** Cáit
 No.
-**** KEVIN
+**** Kevin
 It'll show through.
-**** CÁIT firmly
+**** Cáit firmly
 It won't.
-**** KEVIN
+**** Kevin
 Conor will see.
-*** CÁIT pauses. Looks at him over the glasses.
-**** CÁIT
+*** Cáit pauses. Looks at him over the glasses.
+**** Cáit
 Kids don't notice a thing.
 *** She goes back to stitching.
 *** A beat.
-**** KEVIN
+**** Kevin
 What kind of a tracker.
-**** CÁIT
+**** Cáit
 The kind you can see on a phone.
-**** KEVIN
+**** Kevin
 Your phone.
-**** CÁIT
+**** Cáit
 My phone.
-**** KEVIN
+**** Kevin
 All the time.
-**** CÁIT
+**** Cáit
 All the time.
 *** Beat.
-**** KEVIN
+**** Kevin
 Even in school.
-**** CÁIT
+**** Cáit
 Especially in school.
-*** KEVIN looks at the jacket.
-**** KEVIN
+*** Kevin looks at the jacket.
+**** Kevin
 What about when I'm in the shower.
-**** CÁIT
+**** Cáit
 Your jacket won't be in the shower, Kevin.
-**** KEVIN
+**** Kevin
 But—
-**** CÁIT
+**** Cáit
 You'll be in the house. I'll know you're in the house.
-*** KEVIN considers this.
-**** KEVIN
+*** Kevin considers this.
+**** Kevin
 What if I go to Conor's.
-**** CÁIT
+**** Cáit
 Then I'll know you're at Conor's.
-**** KEVIN
+**** Kevin
 What if I go to the shop.
-**** CÁIT
+**** Cáit
 Then I'll know you're at the shop.
-**** KEVIN
+**** Kevin
 What if—
-**** CÁIT
+**** Cáit
 Kevin.
 *** Beat. He stops.
-*** CÁIT finishes the stitching. Smooths the lining with her thumb. Ties off the thread. Snips it. Puts the needle carefully into the pincushion.
+*** Cáit finishes the stitching. Smooths the lining with her thumb. Ties off the thread. Snips it. Puts the needle carefully into the pincushion.
 *** She holds the jacket out to him.
-**** CÁIT
+**** Cáit
 Try it on.
-*** KEVIN takes it. Stands. Puts it on.
-*** CÁIT stands too. Turns him by the shoulders. Checks the back. Checks the sides. Runs a thumb along the seam where she stitched. Satisfied.
-**** CÁIT
+*** Kevin takes it. Stands. Puts it on.
+*** Cáit stands too. Turns him by the shoulders. Checks the back. Checks the sides. Runs a thumb along the seam where she stitched. Satisfied.
+**** Cáit
 Good.
 *** She sits back down. Takes her glasses off. Picks up the wine glass. Drinks.
-*** KEVIN remains standing. Jacket on.
-**** CÁIT
+*** Kevin remains standing. Jacket on.
+**** Cáit
 You don't take that off.
-**** KEVIN
+**** Kevin
 Mam.
-**** CÁIT
+**** Cáit
 Not at school. Not at Conor's. Not if it's roasting.
-**** KEVIN
+**** Kevin
 It'll be roasting in June.
-**** CÁIT
+**** Cáit
 Tie it round your waist.
-**** KEVIN
+**** Kevin
 Alright.
-**** CÁIT
+**** Cáit
 Do you hear me.
-**** KEVIN
+**** Kevin
 Yeah.
-**** CÁIT
+**** Cáit
 Say it.
-**** KEVIN
+**** Kevin
 I won't take it off.
-**** CÁIT
+**** Cáit
 Say it properly.
-**** KEVIN
+**** Kevin
 I won't take the jacket off. I'll keep it with me.
-**** CÁIT softly
+**** Cáit softly
 Good boy.
 *** Beat.
-*** KEVIN stands in the jacket. Hand against the outside of it, over the spot where the device is sewn in. He doesn't press. He just rests his hand there.
-*** CÁIT watches him. Drinks.
-*** KEVIN watches her drink.
+*** Kevin stands in the jacket. Hand against the outside of it, over the spot where the device is sewn in. He doesn't press. He just rests his hand there.
+*** Cáit watches him. Drinks.
+*** Kevin watches her drink.
 ***** Lights fade.
 
 
 ** Scene 5: Friction
 *** Split stage: left side (dark) the living room, right side (lit) the kitchen/hall, which is lit. Scene 5 takes place entirely in the kitchen/hall.
 *** The set has drifted further. The sink has more dishes. The clipboard of flyers is gone from the hall table, pushed somewhere out of sight. The sewing kit has migrated to the counter, half open. There is an opened bottle of wine and a half-full glass on the table.
-*** CÁIT at the kitchen table. Her phone flat in front of her. She is not doing anything. She is watching the screen. Every ten or fifteen seconds she reaches out and taps it, refreshing the display.
+*** Cáit at the kitchen table. Her phone flat in front of her. She is not doing anything. She is watching the screen. Every ten or fifteen seconds she reaches out and taps it, refreshing the display.
 *** A long beat of this.
-*** KEVIN enters from the hall. He is wearing the jacket. He has a schoolbook or a game or nothing. He sees her with the phone. He is used to this.
+*** Kevin enters from the hall. He is wearing the jacket. He has a schoolbook or a game or nothing. He sees her with the phone. He is used to this.
 *** He goes to the kettle. Fills it. Flicks it on. Stands waiting for it.
-*** CÁIT does not look up.
-**** CÁIT
+*** Cáit does not look up.
+**** Cáit
 Where were you.
-**** KEVIN
+**** Kevin
 My room.
-**** CÁIT
+**** Cáit
 All afternoon.
-**** KEVIN
+**** Kevin
 Yeah.
 *** A beat.
-**** CÁIT
+**** Cáit
 You weren't in the garden.
-**** KEVIN
+**** Kevin
 I wasn't in the garden, Mam.
-**** CÁIT
+**** Cáit
 The app said you were in the garden for a minute.
-**** KEVIN
+**** Kevin
 I don't know what to tell you.
 *** She refreshes the phone.
-**** CÁIT
+**** Cáit
 It's moving again.
-**** KEVIN
+**** Kevin
 I'm standing at the kettle.
-**** CÁIT
+**** Cáit
 It has you by the back door.
-**** KEVIN softly
+**** Kevin softly
 It's probably just — they do that, you know, they jump about.
 *** She looks up to him accusatorily, then back to her phone.
 *** The kettle clicks.
-*** KEVIN pours tea for himself. Does not pour one for her.
+*** Kevin pours tea for himself. Does not pour one for her.
 *** He sits at the table. Not opposite her — at the end. Leaves a chair between them.
 *** A long beat.
-**** KEVIN
+**** Kevin
 Mam.
 *** She does not look up.
-**** KEVIN
+**** Kevin
 Mam, can I ask you something.
-**** CÁIT
+**** Cáit
 What.
-**** KEVIN
+**** Kevin
 You look at that a lot.
-**** CÁIT
+**** Cáit
 The app.
-**** KEVIN
+**** Kevin
 Yeah.
-**** CÁIT
+**** Cáit
 Sometimes.
-**** KEVIN
+**** Kevin
 A lot a lot.
 *** She does not answer. She refreshes.
-**** KEVIN
+**** Kevin
 I was only only upstairs. And now I'm in the kitchen, funnily enough.
-**** CÁIT
+**** Cáit
 I know.
-**** KEVIN
+**** Kevin
 So why do you keep looking.
-*** CÁIT looks up. Over the phone. At him.
+*** Cáit looks up. Over the phone. At him.
 *** A beat.
-**** CÁIT
+**** Cáit
 You're a curious fellow today.
-**** KEVIN
+**** Kevin
 I'm only asking.
-**** CÁIT
+**** Cáit
 Well don't.
-**** KEVIN
+**** Kevin
 Why not.
-**** CÁIT
+**** Cáit
 Because I'm asking you not to.
-*** KEVIN looks thoughtful.
-**** KEVIN
+*** Kevin looks thoughtful.
+**** Kevin
 Mam.
-**** CÁIT
+**** Cáit
 Don't start.
-**** KEVIN
+**** Kevin
 I haven't said anything.
-**** CÁIT
+**** Cáit
 I know the face.
-**** KEVIN
+**** Kevin
 What face.
-**** CÁIT
+**** Cáit
 That face. Don't.
-*** A beat. KEVIN puts his tea down.
-**** KEVIN quietly
+*** A beat. Kevin puts his tea down.
+**** Kevin quietly
 It was only a few hours.
-*** CÁIT freezes. Her hand stops mid-air above the phone.
-**** CÁIT
+*** Cáit freezes. Her hand stops mid-air above the phone.
+**** Cáit
 Kevin.
-**** KEVIN
+**** Kevin
 I was in the attic. I came down. It was a few hours.
-**** CÁIT
+**** Cáit
 Stop.
-**** KEVIN
+**** Kevin
 I know you don't believe me—
-**** CÁIT
+**** Cáit
 I said stop, Kevin.
-**** KEVIN
+**** Kevin
 —and I know it makes you sad. I know that. But—
-**** CÁIT
+**** Cáit
 Kevin—
-**** KEVIN, continuing through her
+**** Kevin, continuing through her
 —I'm not trying to upset you mam, it's just—
-**** CÁIT looks up, sharply
+**** Cáit looks up, sharply
 That's enough now.
-**** KEVIN
+**** Kevin
 If you believed me.
 *** A beat.
-**** KEVIN stands, approaches her.
+**** Kevin stands, approaches her.
 Mam.
-**** CÁIT, not looking up from her phone
+**** Cáit, not looking up from her phone
 Sit down Kevin.
-*** KEVIN takes the phone from her hand, puts it down on the table.
-**** KEVIN
+*** Kevin takes the phone from her hand, puts it down on the table.
+**** Kevin
 You wouldn't have to look at that thing all the time.
-*** CÁIT slaps Kevin across the face.
+*** Cáit slaps Kevin across the face.
 *** A long beat
-*** CÁIT freezes, examines her hand as if it belonged to someone else.
+*** Cáit freezes, examines her hand as if it belonged to someone else.
 *** After a brief beat, Kevin marches out of the room.
 ***** Lights down
 
 
 ** Scene 6: In Theory
 *** Living room. A lamp on. TV muted. The room looks lived-in, tea cups on side tables, a clutter of unopened letters, school books, a newspaper.
-*** BEN on the sofa with a folder. NESSA in the armchair, on her phone.
+*** Ben on the sofa with a folder. Nessa in the armchair, on her phone.
 *** A long beat.
-**** BEN
+**** Ben
 Did you eat.
-**** NESSA
+**** Nessa
 Yeah.
-**** BEN
+**** Ben
 What.
-**** NESSA
+**** Nessa
 Toast.
-**** BEN
+**** Ben
 That's not eating, Nessa.
-**** NESSA
+**** Nessa
 It is though.
-**** BEN
+**** Ben
 There's chicken in the fridge.
-**** NESSA
+**** Nessa
 I'll have it tomorrow.
-*** Beat. BEN turns a page. Doesn't read it.
-**** BEN
+*** Beat. Ben turns a page. Doesn't read it.
+**** Ben
 I was thinking.
-**** NESSA
+**** Nessa
 About what.
-**** BEN
+**** Ben
 That case in Austria.
-**** NESSA
+**** Nessa
 Dad.
-**** BEN
+**** Ben
 The girl in the basement.
-**** NESSA
+**** Nessa
 I know the one.
-**** BEN
+**** Ben
 Years, Nessa. In a house. Neighbours either side.
-**** NESSA
+**** Nessa
 I know.
-**** BEN
+**** Ben
 Nobody knew.
-**** NESSA
+**** Nessa
 I know they didn't.
-**** BEN
+**** Ben
 That's the bit. It's right there and nobody sees it.
-**** NESSA
+**** Nessa
 Are we doing this again.
-**** BEN
+**** Ben
 I'm only saying —
-**** NESSA
+**** Nessa
 You're not only saying.
-**** BEN
+**** Ben
 It happens.
-**** NESSA
+**** Nessa
 Not like that.
-**** BEN
+**** Ben
 You don't know that.
-**** NESSA
+**** Nessa
 He came back.
-**** BEN
+**** Ben
 He came back and told us nothing.
-**** NESSA
+**** Nessa
 He doesn't remember.
-**** BEN
+**** Ben
 He does.
-**** NESSA
+**** Nessa
 The doctor said —
-**** BEN
+**** Ben
 The doctor told us what we wanted to hear.
 *** Beat.
-**** NESSA
+**** Nessa
 Mam wanted that version.
-**** BEN
+**** Ben
 I know she did.
-**** NESSA
+**** Nessa
 You don't.
-**** BEN
+**** Ben
 I do.
-**** NESSA
+**** Nessa
 No, you don't. You want the other one.
-**** BEN
+**** Ben
 What other one.
-**** NESSA
+**** Nessa
 The one where something happened. Where there's a reason. A person. A place you can point at.
-**** BEN
+**** Ben
 Because that makes sense.
-**** NESSA
+**** Nessa
 It makes it worse.
 *** Beat.
-**** NESSA sitting forward now
+**** Nessa sitting forward now
 He was gone six months, Dad. Six. You think a kid comes back from that and just — sits down, has his tea, goes to school, doesn't say a word about it?
-**** BEN
+**** Ben
 He's not saying because he was told not to.
-**** NESSA
+**** Nessa
 Or because there's nothing there.
-**** BEN
+**** Ben
 There's something there.
-**** NESSA
+**** Nessa
 There mightn't be. That's what I'm saying.
-**** BEN
+**** Ben
 You think he just... forgot six months.
-**** NESSA
+**** Nessa
 Yeah.
-**** BEN
+**** Ben
 Just like that.
-**** NESSA
+**** Nessa
 Not just like that.
 *** Beat.
-**** NESSA
+**** Nessa
 They told us — when something happens and it's too big, your head just... puts it somewhere else. It doesn't let you have it.
-**** BEN
+**** Ben
 Convenient.
-**** NESSA
+**** Nessa
 It's not convenient. It's how he's still standing.
 *** Beat.
-**** NESSA
+**** Nessa
 He's eleven. If something actually happened — properly happened — he wouldn't be like this. He wouldn't be walking around like nothing's wrong. He'd be —
 *** She stops. Can't finish it.
-**** BEN
+**** Ben
 So what, then.
-**** NESSA
+**** Nessa
 So maybe his head is doing him a favour.
-**** BEN
+**** Ben
 A favour.
-**** NESSA
+**** Nessa
 Yeah.
-**** BEN
+**** Ben
 By pretending nothing happened.
-**** NESSA
+**** Nessa
 By letting him be eleven.
 *** Beat.
-**** NESSA quieter
+**** Nessa quieter
 Maybe one day something'll set it off. A smell. A song. Something stupid. And it'll all come back.
-*** BEN watches her.
-**** NESSA
+*** Ben watches her.
+**** Nessa
 And when it does — that's when he'll need us. Not now. Not while he's... like this.
 *** Beat.
-**** BEN
+**** Ben
 He's protecting somebody.
-**** NESSA
+**** Nessa
 He's not.
-**** BEN
+**** Ben
 Or he was told to keep his mouth shut.
-**** NESSA
+**** Nessa
 He's eleven.
-**** BEN
+**** Ben
 Eleven-year-olds do what they're told.
-**** NESSA
+**** Nessa
 You're scaring yourself.
-**** BEN
+**** Ben
 I'm trying to think it through.
-**** NESSA
+**** Nessa
 You're scaring me.
 *** Beat. It lands.
-**** BEN
+**** Ben
 Sorry, love.
 *** A small beat.
-**** BEN
+**** Ben
 I just want to know.
-**** NESSA
+**** Nessa
 One day. One day we'll know.
-*** Sound heard offstage: a loud slap. /This is CÁIT slapping KEVIN across the face, concurrently with Scene 5./
-*** Both look at each other. Neither speaks. They stand. Exit BEN and NESSA.
+*** Sound heard offstage: a loud slap. /This is Cáit slapping Kevin across the face, concurrently with Scene 5./
+*** Both look at each other. Neither speaks. They stand. Exit Ben and Nessa.
 **** Split stage: Lights shift focus
 
 ** Scene 7: Out
-*** Kitchen. We see CÁIT sitting where we left her at the end of Scene 5, wine glass in front of her, looking at her hands. Bottle of wine on the table. She notices BEN and NESSA enter, looks down to her glass of wine, and takes a large gulp of it.
+*** Kitchen. We see Cáit sitting where we left her at the end of Scene 5, wine glass in front of her, looking at her hands. Bottle of wine on the table. She notices Ben and Nessa enter, looks down to her glass of wine, and takes a large gulp of it.
 *** A long beat.
-*** BEN and NESSA approach.
-**** NESSA
+*** Ben and Nessa approach.
+**** Nessa
 Mam.
-*** CÁIT starts looking at her phone.
-**** NESSA
+*** Cáit starts looking at her phone.
+**** Nessa
 Everything okay?
 *** A beat.
-*** CÁIT takes another sip from her wine glass, and returns attention to her phone.
-**** BEN
+*** Cáit takes another sip from her wine glass, and returns attention to her phone.
+**** Ben
 Cáit, love.
 *** Nothing.
-*** NESSA approaches CÁIT, puts a hand on her shoulder. CÁIT does not look up.
-**** NESSA
+*** Nessa approaches Cáit, puts a hand on her shoulder. Cáit does not look up.
+**** Nessa
 Mam, what happened.
 *** A beat.
-*** CÁIT drinks down the rest of her wine glass and pours out another from the bottle.
-**** NESSA
+*** Cáit drinks down the rest of her wine glass and pours out another from the bottle.
+**** Nessa
 Where's Kevin.
-*** CÁIT taps her phone, silently gesturing to NESSA the phone's display of Kevin's location.
+*** Cáit taps her phone, silently gesturing to Nessa the phone's display of Kevin's location.
 *** A beat. Nessa lets out an exasperated sigh.
-**** NESSA
+**** Nessa
 I'm going out, Mam.
-**** CÁIT without looking up
+**** Cáit without looking up
 Alright, love.
-*** NESSA turns to leave, takes a few paces, stops, then looks back.
-**** NESSA
+*** Nessa turns to leave, takes a few paces, stops, then looks back.
+**** Nessa
 I said I'm going out. To a party.
-**** CÁIT
+**** Cáit
 That's nice love.
-**** NESSA
+**** Nessa
 With boys.
-**** CÁIT
+**** Cáit
 Don't be late.
 *** Beat.
-**** NESSA
+**** Nessa
 And drinking.
-**** BEN
+**** Ben
 Nessa.
-*** CÁIT does not react.
-**** NESSA
+*** Cáit does not react.
+**** Nessa
 And drugs. Lots of lovely drugs.
-**** BEN
+**** Ben
 That is enough.
-**** NESSA at the door
+**** Nessa at the door
 Sure, I'll give you a bell if I get arrested.
-**** BEN
+**** Ben
 Where are you really going. Who are you with. Nessa—
 *** She opens the door.
-**** NESSA
+**** Nessa
 Don't wait up.
-*** NESSA exits front door, slamming it behind her.
+*** Nessa exits front door, slamming it behind her.
 
 
 * To be continued:
