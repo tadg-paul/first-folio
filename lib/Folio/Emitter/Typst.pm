@@ -150,17 +150,6 @@ sub finish {
         $fm{$key} = $overrides{$key} if defined $overrides{$key};
     }
 
-    # Resolve config values
-    my $font              = $config ? $config->get('folio.font')              : 'New Computer Modern';
-    my $font_size         = $config ? $config->get('folio.font-size')         : '12pt';
-    my $margin            = $config ? $config->get('folio.margin')            : '25mm';
-    my $page              = $config ? $config->get('folio.page')              : 'a4';
-    my $indent            = $config ? $config->get('folio.indent')            : '4em';
-    my $dialogue_spacing  = $config ? $config->get('folio.dialogue-spacing')  : '1.6em';
-    my $direction_spacing = $config ? $config->get('folio.direction-spacing') : '1.6em';
-    my $direction_italic  = $config ? $config->get('folio.direction-italic')  : 1;
-    my $direction_center  = $config ? $config->get('folio.direction-center')  : 0;
-
     # Post-process footnotes
     my %fn = %{$self->{footnotes}};
     my @body = @{$self->{typst_body}};
@@ -174,24 +163,15 @@ sub finish {
         }
     }
 
-    my $preamble = OrgPlay::TypstTemplate->preamble(
-        font              => $font,
-        font_size         => $font_size,
-        margin            => $margin,
-        page              => $page,
-        indent            => $indent,
-        dialogue_spacing  => $dialogue_spacing,
-        direction_spacing => $direction_spacing,
-        direction_italic  => $direction_italic,
-        direction_center  => $direction_center,
-    );
+    my $preamble = OrgPlay::TypstTemplate->preamble(config => $config);
 
     my $title_page = OrgPlay::TypstTemplate->title_page(
-        title      => $fm{title}        // '',
-        subtitle   => $fm{subtitle}     // '',
-        author     => $fm{author}       // '',
-        date       => $fm{date}         // '',
-        version    => $fm{version}      // '',
+        config   => $config,
+        title    => $fm{title}        // '',
+        subtitle => $fm{subtitle}     // '',
+        author   => $fm{author}       // '',
+        date     => $fm{date}         // '',
+        version  => $fm{version}      // '',
     );
 
     my $typst_doc = $preamble . $title_page . join("\n", @body) . "\n";

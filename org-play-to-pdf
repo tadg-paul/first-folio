@@ -220,24 +220,15 @@ for my $key (qw(title subtitle author date version)) {
 }
 
 # Assemble full Typst document
-my $preamble = OrgPlay::TypstTemplate->preamble(
-    font              => $font,
-    font_size         => $font_size,
-    margin            => $margin,
-    page              => $page,
-    indent            => $indent,
-    dialogue_spacing  => $dialogue_spacing,
-    direction_spacing => $direction_spacing,
-    direction_italic  => $direction_italic,
-    direction_center  => $direction_center,
-);
+my $preamble = OrgPlay::TypstTemplate->preamble(config => $config);
 
 my $title_page = OrgPlay::TypstTemplate->title_page(
-    title      => $front_matter{title}        // '',
-    subtitle   => $front_matter{subtitle}     // '',
-    author     => $front_matter{author}       // '',
-    date       => $front_matter{date}    // '',
-    version    => $front_matter{version} // '',
+    config   => $config,
+    title    => $front_matter{title}        // '',
+    subtitle => $front_matter{subtitle}     // '',
+    author   => $front_matter{author}       // '',
+    date     => $front_matter{date}         // '',
+    version  => $front_matter{version}      // '',
 );
 
 my $typst_doc = $preamble . $title_page . join("\n", @typst_body) . "\n";
