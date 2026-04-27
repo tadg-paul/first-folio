@@ -5,8 +5,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-TO_PDF="$PROJECT_DIR/org-play-to-pdf"
-TO_MD="$PROJECT_DIR/org-play-to-markdown"
+FOLIO="$PROJECT_DIR/bin/folio"
 PASS=0
 FAIL=0
 FAILURES=()
@@ -113,7 +112,7 @@ folio:
 YAML
 
 remove_global_config
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt21.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt21.typ" 2>/dev/null; then
     found_font=false
     found_margin=false
     if grep -q "Georgia" "$TMPDIR_TEST/rt21.typ"; then found_font=true; fi
@@ -141,9 +140,9 @@ cp "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/bad_yaml_dir/play.org"
 cp "$TMPDIR_TEST/bad_script.yaml" "$TMPDIR_TEST/bad_yaml_dir/script.yaml"
 
 remove_global_config
-stderr_output=$("$TO_PDF" --typ-only -o "$TMPDIR_TEST/bad_out.typ" "$TMPDIR_TEST/bad_yaml_dir/play.org" 2>&1 1>/dev/null || true)
+stderr_output=$("$FOLIO" convert "$TMPDIR_TEST/bad_out.typ" "$TMPDIR_TEST/bad_yaml_dir/play.org" 2>&1 1>/dev/null || true)
 exit_code=0
-"$TO_PDF" --typ-only -o "$TMPDIR_TEST/bad_out2.typ" "$TMPDIR_TEST/bad_yaml_dir/play.org" 2>/dev/null || exit_code=$?
+"$FOLIO" convert "$TMPDIR_TEST/bad_out2.typ" "$TMPDIR_TEST/bad_yaml_dir/play.org" 2>/dev/null || exit_code=$?
 if [[ "$exit_code" -ne 0 ]] && [[ -n "$stderr_output" ]]; then
     pass "RT-2.2: Malformed YAML halts with descriptive error on stderr and non-zero exit"
 else
@@ -163,7 +162,7 @@ folio:
 YAML
 
 remove_global_config
-if "$TO_PDF" --typ-only --font "Palatino" -o "$TMPDIR_TEST/rt23.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt23.typ" --font "Palatino" 2>/dev/null; then
     if grep -q "Palatino" "$TMPDIR_TEST/rt23.typ"; then
         if ! grep -q '"Georgia"' "$TMPDIR_TEST/rt23.typ"; then
             pass "RT-2.3: CLI flag overrides the same key set in local script.yaml"
@@ -192,7 +191,7 @@ folio:
   font: "Times New Roman"
 YAML
 
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt24.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt24.typ" 2>/dev/null; then
     if grep -q "Helvetica" "$TMPDIR_TEST/rt24.typ" && ! grep -q "Times New Roman" "$TMPDIR_TEST/rt24.typ"; then
         pass "RT-2.4: Local script.yaml overrides the same key set in global script.yaml"
     else
@@ -213,7 +212,7 @@ folio:
   font: "Courier New"
 YAML
 
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt25.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt25.typ" 2>/dev/null; then
     if grep -q "Courier New" "$TMPDIR_TEST/rt25.typ"; then
         pass "RT-2.5: Global script.yaml overrides built-in defaults"
     else
@@ -240,7 +239,7 @@ folio:
   font: "Georgia"
 YAML
 
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt26.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt26.typ" 2>/dev/null; then
     found_local_font=false
     found_global_page=false
     found_global_margin=false
@@ -275,7 +274,7 @@ YAML
 remove_global_config
 
 # Test with markdown (easier to inspect than Typst)
-if "$TO_MD" "$TMPDIR_TEST/minimal.org" > "$TMPDIR_TEST/rt27.md" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" --to md > "$TMPDIR_TEST/rt27.md" 2>/dev/null; then
     has_stage_dir=false
     has_char_table=false
     has_dialogue=false
@@ -310,9 +309,9 @@ folio:
 YAML
 
 remove_global_config
-stderr_out=$("$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt28.typ" "$TMPDIR_TEST/minimal.org" 2>&1 1>/dev/null)
+stderr_out=$("$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt28.typ" 2>&1 1>/dev/null)
 exit_code=0
-"$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt28b.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null || exit_code=$?
+"$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt28b.typ" 2>/dev/null || exit_code=$?
 if [[ "$exit_code" -eq 0 ]] && [[ -z "$stderr_out" ]]; then
     pass "RT-2.8: Unknown top-level keys (character-voices, narrator-voice, etc.) cause no errors or warnings"
 else
@@ -335,7 +334,7 @@ cat > "$HOME/.config/org-script/config" <<'CONF'
 font = Zapfino
 CONF
 
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt29.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt29.typ" 2>/dev/null; then
     if grep -q "Zapfino" "$TMPDIR_TEST/rt29.typ"; then
         fail "RT-2.10: Deprecated flat config has no effect on output when no script.yaml exists" \
              "Zapfino found — deprecated config is still being read"
@@ -353,7 +352,7 @@ else
 fi
 
 # RT-2.11: No warning or error emitted about deprecated config
-stderr_out=$("$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt211.typ" "$TMPDIR_TEST/minimal.org" 2>&1 1>/dev/null || true)
+stderr_out=$("$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt211.typ" 2>&1 1>/dev/null || true)
 if [[ -z "$stderr_out" ]]; then
     pass "RT-2.11: No warning or error is emitted about the deprecated config location"
 else
@@ -377,7 +376,7 @@ YAML
 remove_global_config
 
 # Test in both PDF and Markdown output
-if "$TO_MD" "$TMPDIR_TEST/minimal.org" > "$TMPDIR_TEST/rt212.md" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" --to md > "$TMPDIR_TEST/rt212.md" 2>/dev/null; then
     if grep -q "Override Title" "$TMPDIR_TEST/rt212.md" && ! grep -q "Test Play" "$TMPDIR_TEST/rt212.md"; then
         pass "RT-2.12: Config title overrides source file #+TITLE in Markdown output"
     else
@@ -390,7 +389,7 @@ else
 fi
 
 # Also verify in Typst output
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt212.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt212.typ" 2>/dev/null; then
     if grep -q "Override Title" "$TMPDIR_TEST/rt212.typ" && ! grep -q "Test Play" "$TMPDIR_TEST/rt212.typ"; then
         # Additional PDF check passes (not counted separately, supplements RT-2.12)
         :
@@ -408,7 +407,7 @@ folio:
 YAML
 
 remove_global_config
-if "$TO_MD" "$TMPDIR_TEST/minimal.org" > "$TMPDIR_TEST/rt213.md" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" --to md > "$TMPDIR_TEST/rt213.md" 2>/dev/null; then
     if grep -q "Test Play" "$TMPDIR_TEST/rt213.md"; then
         pass "RT-2.13: Source file #+TITLE is used when config has no title key"
     else
@@ -427,7 +426,7 @@ subtitle: "Override Subtitle"
 YAML
 
 remove_global_config
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt214.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt214.typ" 2>/dev/null; then
     if grep -q "Override Subtitle" "$TMPDIR_TEST/rt214.typ" && ! grep -q "Test Subtitle" "$TMPDIR_TEST/rt214.typ"; then
         pass "RT-2.14: Config subtitle overrides source file #+SUBTITLE in PDF output"
     else
@@ -447,7 +446,7 @@ version: "Draft v3"
 YAML
 
 remove_global_config
-if "$TO_PDF" --typ-only -o "$TMPDIR_TEST/rt215.typ" "$TMPDIR_TEST/minimal.org" 2>/dev/null; then
+if "$FOLIO" convert "$TMPDIR_TEST/minimal.org" "$TMPDIR_TEST/rt215.typ" 2>/dev/null; then
     found_date=false; found_version=false
     if grep -q "2026-04-26" "$TMPDIR_TEST/rt215.typ"; then found_date=true; fi
     if grep -q "Draft v3" "$TMPDIR_TEST/rt215.typ"; then found_version=true; fi

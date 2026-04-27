@@ -1,20 +1,15 @@
 INSTALL_DIR := $(HOME)/.local/bin
-SCRIPTS := org-play-to-pdf org-play-to-markdown
 PROJECT_DIR := $(shell cd "$(dir $(lastword $(MAKEFILE_LIST)))" && pwd)
 
 .PHONY: install uninstall test test-one-off
 
 install:
-	@for script in $(SCRIPTS); do \
-		ln -sf "$(PROJECT_DIR)/$$script" "$(INSTALL_DIR)/$$script"; \
-		echo "Linked $$script -> $(INSTALL_DIR)/$$script"; \
-	done
+	@ln -sf "$(PROJECT_DIR)/bin/folio" "$(INSTALL_DIR)/folio"
+	@echo "Linked folio -> $(INSTALL_DIR)/folio"
 
 uninstall:
-	@for script in $(SCRIPTS); do \
-		rm -f "$(INSTALL_DIR)/$$script"; \
-		echo "Removed $(INSTALL_DIR)/$$script"; \
-	done
+	@rm -f "$(INSTALL_DIR)/folio"
+	@echo "Removed $(INSTALL_DIR)/folio"
 
 test:
 	@for t in tests/regression/test_*.sh; do \

@@ -13,6 +13,7 @@ my %EXT_TO_FORMAT = (
     '.fountain' => 'fountain',
     '.ftn'      => 'fountain',
     '.pdf'      => 'pdf',
+    '.typ'      => 'pdf',
 );
 
 my %NAME_TO_FORMAT = (

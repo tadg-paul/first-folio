@@ -62,7 +62,8 @@ sub preamble {
     my $scn_fsize   = $config->get('folio.positioning.scene-header.font-size')    // '12pt';
     my $scn_bold    = $config->get('folio.positioning.scene-header.bold')         // 1;
     my $scn_case    = $config->get('folio.positioning.scene-header.case-transform') // 'as-written';
-    my $scn_space   = $config->get('folio.positioning.scene-header.space-before') // '2.5em';
+    my $scn_space   = $config->get('folio.positioning.scene-header.space-before') // '2em';
+    my $scn_after   = $config->get('folio.positioning.scene-header.space-after')  // '0.5em';
 
     # Frontmatter header
     my $fm_align    = $config->get('folio.positioning.frontmatter.header.align')     // 'left';
@@ -147,7 +148,7 @@ ${dialogue_fn}
 #let scene-header(title) = {
   v(${scn_space})
   align(${scn_align})[#text(size: ${scn_fsize}, weight: ${scn_weight})[${scn_content}]]
-  v(0.5em)
+  v(${scn_after})
 }
 
 // Prop text (signs, placards)
