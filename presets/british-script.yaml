@@ -14,7 +14,7 @@ render:
   transitions: true
 
 folio:
-  font: New Computer Modern
+  font: Libertinus Serif
   font-size: 12pt
   page: a4
   margin: 25mm
@@ -146,7 +146,7 @@ folio:
       prefix: ""
       suffix: ""
       page-break-before: true
-      space-before: 2em
+      space-before: 0em
 
     scene-header:
       align: left

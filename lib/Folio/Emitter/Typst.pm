@@ -76,7 +76,7 @@ sub new {
             my ($line) = @_;
             my $escaped = _escape_typst($line);
             if ($in_dialogue) {
-                push @typst_body, "${escaped}";
+                push @typst_body, "${escaped} \\";
             } else {
                 push @typst_body, "${escaped}\n";
             }
@@ -226,10 +226,17 @@ sub _escape_typst {
     my ($text) = @_;
 
     my @markup_slots;
+    # Org underline: _text_ -> Typst #underline[text]
+    $text =~ s{(?<!\w)_([^_\n]+?)_(?!\w)}{
+        push @markup_slots, "#underline[${1}]";
+        "\x00MARKUP" . $#markup_slots . "\x00"
+    }ge;
+    # Org italic: /text/ -> Typst _text_
     $text =~ s{(?<!\w)/([^/\n]+?)/(?!\w)}{
         push @markup_slots, "_${1}_";
         "\x00MARKUP" . $#markup_slots . "\x00"
     }ge;
+    # Org bold: *text* -> Typst *text*
     $text =~ s{(?<!\w)\*([^*\n]+?)\*(?!\w)}{
         push @markup_slots, "*${1}*";
         "\x00MARKUP" . $#markup_slots . "\x00"

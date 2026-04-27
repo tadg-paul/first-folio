@@ -96,15 +96,18 @@ sub preamble {
     if ($dial_place eq 'same-line') {
         $dialogue_fn = <<"TYPST";
 #let dialogue(name, direction: none, body) = {
-  block(above: ${speech_space}, below: 0.2em)[
-    #if direction != none [
-      #box(width: ${dial_wrap})[#text(weight: ${spk_weight})[${spk_content}]]${instr_open}${instr_prefix}#direction${instr_suffix}${instr_close}
-      #block(inset: (left: ${dial_wrap}))[#body]
-    ] else [
-      #par(hanging-indent: ${dial_wrap})[
-        #box(width: ${dial_wrap})[#text(weight: ${spk_weight})[${spk_content}]]#body
-      ]
-    ]
+  block(above: ${speech_space}, below: 0.2em, breakable: true)[
+    #grid(
+      columns: (${dial_wrap}, 1fr),
+      gutter: 0pt,
+      [#text(weight: ${spk_weight})[${spk_content}]],
+      [
+        #if direction != none [
+          ${instr_open}${instr_prefix}#direction${instr_suffix}${instr_close} \\
+        ]
+        #body
+      ],
+    )
   ]
 }
 TYPST
@@ -112,12 +115,12 @@ TYPST
         # American: speaker centred, instruction below, dialogue indented
         $dialogue_fn = <<"TYPST";
 #let dialogue(name, direction: none, body) = {
-  block(above: ${speech_space}, below: 0.2em)[
+  block(above: ${speech_space}, below: 0.2em, breakable: true)[
     #align(${spk_align})[#text(weight: ${spk_weight})[${spk_content}]]
     #if direction != none [
       #align(${spk_align})[${instr_open}${instr_prefix}#direction${instr_suffix}${instr_close}]
     ]
-    #block(inset: (left: ${dial_indent}))[#body]
+    #block(inset: (left: ${dial_indent}), breakable: true)[#body]
   ]
 }
 TYPST
