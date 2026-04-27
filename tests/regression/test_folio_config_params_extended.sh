@@ -300,6 +300,36 @@ typ_has "RT-3.52: config version overrides source in PDF" "Final"
 
 clear_config
 
+# --- Style-specific config files ---
+echo ""
+echo "Style-specific config files (script-{style}.yaml)"
+
+# Global script-us.yaml should apply when style=us
+mkdir -p "$HOME/.config/first-folio"
+printf 'folio:\n  font: Courier Prime\n' > "$HOME/.config/first-folio/script-us.yaml"
+set_config 'folio:
+  style: us'
+typ_has "RT-3.53: global script-us.yaml applies when style=us" "Courier Prime"
+trash "$HOME/.config/first-folio/script-us.yaml" 2>/dev/null
+
+# Local script-british.yaml should apply when style=british
+printf 'folio:\n  margin: 40mm\n' > "$TMPDIR_TEST/script-british.yaml"
+clear_config
+typ_has "RT-3.54: local script-british.yaml applies for british style" "40mm"
+rm -f "$TMPDIR_TEST/script-british.yaml"
+
+# Style-specific overrides style-agnostic: local script-us.yaml overrides global script.yaml
+mkdir -p "$HOME/.config/first-folio"
+printf 'folio:\n  font: Georgia\n' > "$HOME/.config/first-folio/script.yaml"
+printf 'folio:\n  font: Courier Prime\n' > "$TMPDIR_TEST/script-us.yaml"
+set_config 'folio:
+  style: us'
+typ_has "RT-3.55: local script-us.yaml overrides global script.yaml font" "Courier Prime"
+trash "$HOME/.config/first-folio/script.yaml" 2>/dev/null
+rm -f "$TMPDIR_TEST/script-us.yaml"
+
+clear_config
+
 # ====================================================================
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="

@@ -97,12 +97,29 @@ sub load {
         _deep_merge($base, $global_data);
     }
 
-    # Layer 4: local config (source file directory)
+    # Layer 4: global style-specific config (e.g. script-us.yaml or script-british.yaml)
+    my $style_suffix = $style eq 'american' ? 'us' : 'british';
+    my $global_style_path = "$ENV{HOME}/.config/first-folio/script-${style_suffix}.yaml";
+    if (-f $global_style_path) {
+        my $global_style = _load_yaml_file($global_style_path);
+        _deep_merge($base, $global_style) if $global_style;
+    }
+
+    # Layer 5: local config (source file directory)
     if ($local_data) {
         _deep_merge($base, $local_data);
     }
 
-    # Layer 5: CLI flags (mapped into folio: namespace)
+    # Layer 6: local style-specific config (e.g. script-us.yaml alongside source)
+    if (defined $source_dir && $source_dir ne '') {
+        my $local_style_path = "$source_dir/script-${style_suffix}.yaml";
+        if (-f $local_style_path) {
+            my $local_style = _load_yaml_file($local_style_path);
+            _deep_merge($base, $local_style) if $local_style;
+        }
+    }
+
+    # Layer 7: CLI flags (mapped into folio: namespace)
     if (%$cli) {
         for my $key (keys %$cli) {
             next if !defined $cli->{$key};
