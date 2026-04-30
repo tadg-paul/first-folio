@@ -78,7 +78,7 @@ folio:
         indent: 0
         bold: true
         italic: false
-        case-transform: small-caps
+        case-transform: upper
         prefix: ""
         suffix: ":"
 

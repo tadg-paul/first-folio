@@ -123,7 +123,7 @@ printf "folio:\n  positioning:\n    speech:\n      speaker:\n        case-transf
 test_typ "RT-3.6: speaker.case-transform: upper produces #upper" "#upper"
 
 rm -f "$TMPDIR_TEST/script.yaml"
-test_typ "RT-3.7: speaker.case-transform defaults to small-caps" "smallcaps"
+test_typ "RT-3.7: speaker.case-transform defaults to upper" "#upper"
 
 printf "folio:\n  positioning:\n    speech:\n      speaker:\n        suffix: \"\"\n" > "$TMPDIR_TEST/script.yaml"
 test_typ "RT-3.8: speaker.suffix: empty removes colon" "#name"
