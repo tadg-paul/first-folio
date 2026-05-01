@@ -415,8 +415,8 @@ sub cmd_letter {
     for my $letter (@$letters) {
         # Filter by recipient org if --to given
         if (defined $to_filter) {
-            next unless lc($letter->{org}) eq lc($to_filter)
-                     || $letter->{recipient} =~ /\Q$to_filter\E/i;
+            next unless $letter->{org}       =~ /$to_filter/i
+                     || $letter->{recipient} =~ /$to_filter/i;
         }
 
         # Generate output filename from org name or recipient
