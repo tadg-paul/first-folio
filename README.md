@@ -45,7 +45,15 @@ make uninstall  # removes the symlink
 
 Org-mode uses heading levels to encode play structure. Markdown uses headers, bold, and italic conventions. Fountain follows the [Fountain spec](https://fountain.io/syntax). See the schema docs for full element mappings, and [docs/formats.md](docs/formats.md) for the event stream and fidelity matrix.
 
-**Intro sections** (Synopsis, Setting, Scene List, etc.) are automatically distinguished from the play proper. Any headers and prose before the first character dialogue are treated as intro material and can be toggled on/off via `render-intro` in config.
+**Intro sections** (Synopsis, Setting, Scene List, etc.) are automatically distinguished from the play proper. Any headers and prose before the first character dialogue are treated as intro material and can be toggled on/off via `render.frontmatter` in config.
+
+## Canonical Examples
+
+Each format has a complete reference example demonstrating all supported features:
+
+- [about-time.org](about-time.org) — org-mode (master authoring format, includes cover letter structure)
+- [one-day.md](one-day.md) — Markdown
+- [one-day.fountain](one-day.fountain) — Fountain
 
 ## Configuration
 
