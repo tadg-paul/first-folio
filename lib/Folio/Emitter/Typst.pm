@@ -31,8 +31,13 @@ sub new {
             my ($text) = @_;
             if ($in_dialogue) { push @typst_body, ']'; $in_dialogue = 0; }
             my $escaped = _escape_typst($text);
-            push @typst_body, "#v(1.6em)";
-            push @typst_body, "#align(right)[${escaped}]";
+            # Case transform applied at render time from config
+            my $trans_case = $opts{config} ? ($opts{config}->get('folio.positioning.transition.case-transform') // 'upper') : 'upper';
+            my $trans_align = $opts{config} ? ($opts{config}->get('folio.positioning.transition.align') // 'right') : 'right';
+            my $trans_space = $opts{config} ? ($opts{config}->get('folio.positioning.transition.space-before') // '1.6em') : '1.6em';
+            my $content = _case_wrap_typst($trans_case, $escaped);
+            push @typst_body, "#v(${trans_space})";
+            push @typst_body, "#align(${trans_align})[${content}]";
         },
         intro_header => sub {
             my ($title) = @_;
@@ -229,6 +234,15 @@ sub finish_to_stdout {
 }
 
 # Uppercase known character names in stage direction text using word boundaries.
+# Wrap content with a Typst case transform function
+sub _case_wrap_typst {
+    my ($case, $content) = @_;
+    return "#upper[${content}]"     if $case eq 'upper';
+    return "#smallcaps[${content}]" if $case eq 'small-caps';
+    return "#lower[${content}]"     if $case eq 'lower';
+    return $content;
+}
+
 sub _uppercase_character_names {
     my ($text, $characters) = @_;
     for my $name (keys %$characters) {

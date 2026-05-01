@@ -79,7 +79,7 @@ sub new {
         },
         prop_text => sub {
             my ($text) = @_;
-            push @lines, "- *\"${text}\"*";
+            push @lines, "*** ${text}" . ' ' x 40 . ":prop:";
         },
         footnote_def => sub {
             my ($name, $text) = @_;
@@ -87,7 +87,7 @@ sub new {
         },
         transition => sub {
             my ($text) = @_;
-            push @lines, "***** $text";
+            push @lines, "*** ${text}" . ' ' x 40 . ":transition:";
         },
         intro_header => sub {
             my ($title) = @_;

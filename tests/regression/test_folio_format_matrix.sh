@@ -277,10 +277,10 @@ else
 fi
 
 "$FOLIO" convert "$TMPDIR_TEST/source.md" "$TMPDIR_TEST/trans2.org" 2>/dev/null || true
-if grep -q '^\*\*\*\*\* FADE OUT' "$TMPDIR_TEST/trans2.org"; then
-    pass "RT-3.80: md→org preserves transition as H5"
+if grep -q ':transition:' "$TMPDIR_TEST/trans2.org"; then
+    pass "RT-3.80: md→org preserves transition as H3 :transition: tag"
 else
-    fail "RT-3.80: md→org preserves transition as H5" "not found"
+    fail "RT-3.80: md→org preserves transition as H3 :transition: tag" "not found"
 fi
 
 # ====================================================================

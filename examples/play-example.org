@@ -35,13 +35,13 @@ Good morning.
 **** Cáit (entering)
 Is the kettle on?
 
-***** CUT TO
-
 **** Bob, cheerfully
 Just boiled.
+*** Lights down                                                     :transition:
 
 ** Scene 2 — The Revelation
 *** Later. The kitchen table is covered with papers.
+*** WELCOME HOME                                                    :prop:
 **** Mairéad
 I'll have a cup too, thanks.
 I've something to tell you both.

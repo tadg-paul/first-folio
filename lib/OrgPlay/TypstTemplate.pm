@@ -137,15 +137,16 @@ sub preamble {
 }
 TYPST
     } else {
-        # American: speaker centred, instruction below, dialogue indented
+        # American/new-line: speaker above, instruction below, dialogue below
         $dialogue_fn = <<"TYPST";
 #let dialogue(name, direction: none, body) = {
-  block(above: ${speech_space}, below: 0.2em, breakable: true)[
+  block(above: ${speech_space}, below: 0.2em, breakable: true, spacing: 0em)[
+    #set par(spacing: 0.6em)
     #align(${spk_align})[#text(weight: ${spk_weight})[${spk_content}]]
     #if direction != none [
-      #align(${spk_align})[${instr_open}${instr_prefix}#direction${instr_suffix}${instr_close}]
+      ${instr_open}${instr_prefix}#direction${instr_suffix}${instr_close}
     ]
-    #block(inset: (left: ${dial_indent}), breakable: true)[#body]
+    #body
   ]
 }
 TYPST
@@ -169,7 +170,7 @@ ${dialogue_fn}
 #let act-header(title) = {
   v(${act_space})
   align(${act_align})[#text(${act_text_attrs})[${act_content}]]
-  v(0.8em)
+  v(0.3em)
 }
 
 // Scene header
