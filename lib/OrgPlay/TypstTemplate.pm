@@ -181,7 +181,9 @@ ${dialogue_fn}
 
 // Prop text (signs, placards)
 #let prop-text(body) = {
+  v(1.6em)
   align(center)[#text(style: "italic", weight: "bold")[#body]]
+  v(0.6em)
 }
 
 TYPST

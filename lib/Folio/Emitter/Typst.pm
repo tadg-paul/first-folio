@@ -31,7 +31,8 @@ sub new {
             my ($text) = @_;
             if ($in_dialogue) { push @typst_body, ']'; $in_dialogue = 0; }
             my $escaped = _escape_typst($text);
-            push @typst_body, "#align(right)[#text(style: \"normal\")[${escaped}]]";
+            push @typst_body, "#v(1.6em)";
+            push @typst_body, "#align(right)[${escaped}]";
         },
         intro_header => sub {
             my ($title) = @_;

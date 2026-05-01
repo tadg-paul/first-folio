@@ -94,7 +94,14 @@ sub parse {
                 $emit->('scene_header', $text);
                 $after_h4 = 0;
             } elsif ($level == 3) {
-                $emit->('stage_direction', $text);
+                # Check for element-type tags on H3
+                if ($text =~ s/\s*:prop:\s*$//) {
+                    $emit->('prop_text', $text);
+                } elsif ($text =~ s/\s*:transition:\s*$//) {
+                    $emit->('transition', $text);
+                } else {
+                    $emit->('stage_direction', $text);
+                }
                 $after_h4 = 0;
             } elsif ($level == 4) {
                 my ($name, $direction) = _parse_character_line($text);

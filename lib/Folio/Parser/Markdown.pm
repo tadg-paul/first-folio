@@ -128,6 +128,7 @@ sub parse {
         # Blank line
         if ($line =~ /^\s*$/) {
             $prev_blank = 1;
+            $after_character = 0;
             next;
         }
 
