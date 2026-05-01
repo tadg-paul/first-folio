@@ -83,13 +83,17 @@ sub load {
     }
 
     # Normalise style names
-    $style = 'american' if $style eq 'us' || $style eq 'american';
-    $style = 'british'  if $style eq 'uk' || $style eq 'british';
+    $style = 'american'   if $style eq 'us' || $style eq 'american';
+    $style = 'british'    if $style eq 'uk' || $style eq 'british';
+    $style = 'screenplay' if $style eq 'screenplay';
 
-    # Layer 2: American overrides if style is american (sits above British, below user config)
+    # Layer 2: Style overrides (sits above British, below user config)
     if ($style eq 'american') {
         my $us = _load_yaml_file("$PRESET_DIR/us-overrides-script.yaml");
         _deep_merge($base, $us) if $us;
+    } elsif ($style eq 'screenplay') {
+        my $sp = _load_yaml_file("$PRESET_DIR/us-screenplay-overrides.yaml");
+        _deep_merge($base, $sp) if $sp;
     }
 
     # Layer 3: global config
@@ -98,7 +102,8 @@ sub load {
     }
 
     # Layer 4: global style-specific config (e.g. script-us.yaml or script-british.yaml)
-    my $style_suffix = $style eq 'american' ? 'us' : 'british';
+    my %style_suffixes = (american => 'us', british => 'british', screenplay => 'screenplay');
+    my $style_suffix = $style_suffixes{$style} // $style;
     my $global_style_path = "$ENV{HOME}/.config/first-folio/script-${style_suffix}.yaml";
     if (-f $global_style_path) {
         my $global_style = _load_yaml_file($global_style_path);

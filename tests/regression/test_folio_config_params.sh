@@ -173,7 +173,7 @@ echo ""
 echo "folio.style presets"
 
 printf "folio:\n  style: us\n" > "$TMPDIR_TEST/script.yaml"
-test_typ "RT-3.17: folio.style: us loads American overrides (Courier Prime)" "Courier Prime"
+test_typ "RT-3.17: folio.style: us loads American overrides (us-letter)" "us-letter"
 
 rm -f "$TMPDIR_TEST/script.yaml"
 test_typ "RT-3.18: default style is British (Libertinus Serif)" "Libertinus Serif"
