@@ -35,9 +35,9 @@ if (grep { $_ eq '--help' || $_ eq '-h' } @ARGV) {
         print_convert_usage();
         exit 0;
     }
-    if ($subcommand eq 'cover') {
+    if ($subcommand eq 'letter') {
         shift @ARGV;
-        print_cover_usage();
+        print_letter_usage();
         exit 0;
     }
     print_usage();
@@ -53,9 +53,9 @@ if (grep { $_ eq '--version' } @ARGV) {
 if ($subcommand eq 'convert') {
     shift @ARGV;  # remove 'convert'
     cmd_convert();
-} elsif ($subcommand eq 'cover') {
-    shift @ARGV;  # remove 'cover'
-    cmd_cover();
+} elsif ($subcommand eq 'letter') {
+    shift @ARGV;  # remove 'letter'
+    cmd_letter();
 } elsif ($subcommand eq '') {
     print STDERR "Error: no subcommand given.\n";
     print STDERR "Usage: folio <command> [options]\n";
@@ -329,7 +329,7 @@ A format converter for stage plays.
 
 Commands:
   convert    Convert a play between formats
-  cover      Generate cover letters from :letter: tagged sections
+  letter     Generate letters from :letter: tagged sections
 
 Options:
   -h, --help     Show this help message
@@ -371,7 +371,7 @@ USAGE
 
 # --- cover subcommand ---
 
-sub cmd_cover {
+sub cmd_letter {
     require Folio::CoverLetter;
     require Folio::Config;
 
@@ -383,16 +383,16 @@ sub cmd_cover {
         'to=s'     => \$to_filter,
         'dir=s'    => \$output_dir,
         'help|h'   => \$help,
-    ) or do { print_cover_usage(); exit 2; };
+    ) or do { print_letter_usage(); exit 2; };
 
     if ($help) {
-        print_cover_usage();
+        print_letter_usage();
         exit 0;
     }
 
     my $source_path = shift @ARGV;
     if (!defined $source_path) {
-        die "Error: no source file specified.\nUsage: folio cover <source.org> [--to RECIPIENT]\n";
+        die "Error: no source file specified.\nUsage: folio letter <source.org> [--to RECIPIENT]\n";
     }
     if (! -f $source_path) {
         die "Error: file not found: $source_path\n";
@@ -440,9 +440,9 @@ sub cmd_cover {
     print "$count cover letter(s) generated.\n" if $count > 1;
 }
 
-sub print_cover_usage {
+sub print_letter_usage {
     print <<'USAGE';
-Usage: folio cover <source.org> [options]
+Usage: folio letter <source.org> [options]
 
 Generate cover letters from :letter: tagged sections in an org file.
 One PDF is generated per recipient.

@@ -20,6 +20,10 @@ folio convert play.org --to md
 # Convert between any supported formats
 folio convert play.fountain play.md
 folio convert play.md play.org
+
+# Generate letters from :letter: tagged sections
+folio letter play.org              # all recipients
+folio letter play.org --to Abbey   # specific recipient
 ```
 
 ## Installation
