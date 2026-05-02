@@ -55,7 +55,7 @@ endif
 	@echo "Creating release $(RELEASE_VERSION) (current: $(CURRENT_VERSION))..."
 	@echo ""
 	@echo "Stamping version..."
-	@perl -pi -e "s/VERSION = '[^']*'/VERSION = '$(RELEASE_VERSION)'/" bin/folio
+	@perl -pi -e "s/VERSION = '[^']*'/VERSION = '$(shell echo $(RELEASE_VERSION) | sed 's/^v//')'/" bin/folio
 	@git add -A
 	@git commit -m "release: $(RELEASE_VERSION)" || true
 	@git tag -a "$(RELEASE_VERSION)" -m "$(RELEASE_VERSION)"
