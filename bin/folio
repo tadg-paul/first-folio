@@ -377,11 +377,13 @@ sub cmd_letter {
 
     my $to_filter;
     my $output_dir;
+    my $output_prefix;
     my $help = 0;
 
     Getopt::Long::GetOptions(
         'to=s'     => \$to_filter,
         'dir=s'    => \$output_dir,
+        'prefix=s' => \$output_prefix,
         'help|h'   => \$help,
     ) or do { print_letter_usage(); exit 2; };
 
@@ -426,7 +428,8 @@ sub cmd_letter {
         $slug = lc $slug;
         $slug = "letter-$count" unless $slug;
 
-        my $output = "$output_dir/cover-${slug}.pdf";
+        my $prefix = $output_prefix // 'letter';
+        my $output = "$output_dir/${prefix}-${slug}.pdf";
 
         Folio::CoverLetter->render_pdf($letter, output => $output, config => $config);
         print "Generated: $output\n";
@@ -444,21 +447,29 @@ sub print_letter_usage {
     print <<'USAGE';
 Usage: folio letter <source.org> [options]
 
-Generate cover letters from :letter: tagged sections in an org file.
+Generate letters from :letter: tagged sections in an org file.
 One PDF is generated per recipient.
 
 Options:
-  --to RECIPIENT     Generate only for this recipient (matches org name or address)
+  --to RECIPIENT     Generate only for matching recipients (regex substring)
   --dir DIR          Output directory (default: same as source file)
+  --prefix PREFIX    Output filename prefix (default: "letter")
   -h, --help         Show this help message
 
-Placeholders in letter body:
-  [org]       Recipient's short org name (:org: tag)
-  [moniker]   Recipient's informal name (:moniker: tag)
-  [title]     Play title from #+TITLE
-  [subtitle]  Play subtitle from #+SUBTITLE
-  [version]   Play version from #+VERSION
-  [date]      Play date from #+DATE
-  [author]    Author from #+AUTHOR
+Placeholders:
+  Any [keyword] in the letter body is replaced from two sources:
+
+  1. Recipient tags (H4 under :to:) — highest priority:
+       **** The Abbey                :org:       -> [org]
+       **** Dave                     :moniker:   -> [moniker]
+       **** Friday                   :deadline:  -> [deadline]
+     Any tag name works. Define your own as needed.
+
+  2. Document front matter — fallback:
+       #+TITLE:    -> [title]      #+AUTHOR:   -> [author]
+       #+SUBTITLE: -> [subtitle]   #+DATE:     -> [date]
+       #+VERSION:  -> [version]
+
+  Unresolved placeholders pass through as [name].
 USAGE
 }
