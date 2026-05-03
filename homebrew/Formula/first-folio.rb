@@ -1,13 +1,13 @@
 # ABOUTME: Homebrew formula for First Folio.
-# ABOUTME: Copy this file to tigger04/homebrew-tap/Formula/ after tagging a release.
+# ABOUTME: Copy this file to tadg-paul/homebrew-tap/Formula/ after tagging a release.
 
 class FirstFolio < Formula
   desc "Format converter for stage plays — org, markdown, fountain, PDF"
-  homepage "https://github.com/tigger04/first-folio"
-  url "https://github.com/tigger04/first-folio/archive/refs/tags/v0.4.3.tar.gz"
+  homepage "https://github.com/tadg-paul/first-folio"
+  url "https://github.com/tadg-paul/first-folio/archive/refs/tags/v0.4.3.tar.gz"
   sha256 "f27a5d4caf984b01170ccddefa8f948e4d9c7f62108ddec8b0c31a2e9c06da9a"
   license "MIT"
-  head "https://github.com/tigger04/first-folio.git", branch: "master"
+  head "https://github.com/tadg-paul/first-folio.git", branch: "master"
 
   depends_on "typst"
 

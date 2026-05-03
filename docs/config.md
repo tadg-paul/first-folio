@@ -4,7 +4,7 @@
 
 First Folio reads configuration from YAML files named `script.yaml`. It never creates, modifies, or writes to config files - they are maintained by the user or by other tools.
 
-The config file is designed to be shared with [yapper](https://github.com/tigger04/yapper) (a TTS rendering tool for play scripts). Each tool reads shared top-level keys and its own namespace, silently ignoring everything else.
+The config file is designed to be shared with [yapper](https://github.com/tadg-paul/yapper) (a TTS rendering tool for play scripts). Each tool reads shared top-level keys and its own namespace, silently ignoring everything else.
 
 See [examples/script.yaml](../examples/script.yaml) for a complete annotated example.
 
@@ -75,7 +75,7 @@ All `folio:` keys correspond to CLI flags of the same name. CLI flags override c
 
 ### Yapper-specific keys
 
-The following keys are examples of yapper configuration. First Folio silently ignores them. See [yapper documentation](https://github.com/tigger04/yapper) for the full reference.
+The following keys are examples of yapper configuration. First Folio silently ignores them. See [yapper documentation](https://github.com/tadg-paul/yapper) for the full reference.
 
 - `auto-assign-voices`, `character-voices`, `narrator-voice`, `intro-voice`
 - `dialogue-speed`, `stage-direction-speed`, `gap-after-dialogue`, `gap-after-stage-direction`, `gap-after-scene`

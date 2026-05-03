@@ -75,7 +75,7 @@ folio:
   page: a4
 ```
 
-All config sources are merged in precedence order: CLI flags > local `script.yaml` > global `script.yaml` > built-in defaults. The config file is shared with [yapper](https://github.com/tigger04/yapper) (TTS rendering).
+All config sources are merged in precedence order: CLI flags > local `script.yaml` > global `script.yaml` > built-in defaults. The config file is shared with [yapper](https://github.com/tadg-paul/yapper) (TTS rendering).
 
 See [docs/config.md](docs/config.md) for the full schema and [examples/script.yaml](examples/script.yaml) for a complete annotated example.
 

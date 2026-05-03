@@ -16,7 +16,7 @@ if [[ ! -f "$FORMULA_FILE" ]]; then
 fi
 
 # Compute SHA256 from the GitHub tarball
-TAR_URL="https://github.com/tigger04/first-folio/archive/refs/tags/v${VERSION}.tar.gz"
+TAR_URL="https://github.com/tadg-paul/first-folio/archive/refs/tags/v${VERSION}.tar.gz"
 echo "Downloading tarball to compute SHA256..."
 SHA256=$(curl -sL "$TAR_URL" | shasum -a 256 | awk '{print $1}')
 
