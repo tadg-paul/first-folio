@@ -39,9 +39,22 @@ Playwrights and dramaturgs work across multiple tools and workflows. A play may 
 
 The direction of travel is toward full read/write support for all text-based formats (org, Markdown, Fountain). PDF remains write-only as it is a final-output format.
 
+## Future: a gentle interface
+
+First Folio is CLI-first, but many playwrights are not comfortable with terminals, markup syntax, or YAML configuration. A lightweight graphical interface could bridge this gap without compromising the power of the underlying tools.
+
+The vision is not a full IDE or editor — org-mode and Emacs already serve that role beautifully. Instead, a simple companion app that:
+
+- Opens an org or Fountain file and shows a live-rendered preview
+- Provides a "Convert to..." menu (PDF, Markdown, Fountain) with one click
+- Exposes style selection (British / American / Screenplay) as a dropdown
+- Generates cover letters from the embedded `:letter:` section with a recipient picker
+- Wraps the CLI — the app calls `folio convert` and `folio letter` under the hood
+
+The interface should feel approachable to a writer who has never used a terminal. The underlying format remains plain text — the app is a window onto it, not a replacement for it.
+
 ## Non-goals
 
 - **Word processor formats.** DOCX, ODT, and similar formats are out of scope. Use pandoc to convert Markdown output if needed.
-- **Screenplay-specific features.** First Folio targets stage plays, not screenplays. Fountain's screenplay-specific elements (camera directions, transitions) are accepted on input but may not be preserved on output.
-- **GUI.** First Folio is a CLI tool. There are no plans for a graphical interface.
-- **Content editing.** First Folio converts between formats. It does not provide editing, linting, or structural validation of play content.
+- **Full screenplay tooling.** First Folio supports screenplay formatting via `--style=screenplay` but is optimised for stage plays. Dedicated screenplay software (Final Draft, Highland) serves that market.
+- **Content editing.** First Folio converts between formats and renders to PDF. It does not provide editing, linting, or structural validation of play content.
