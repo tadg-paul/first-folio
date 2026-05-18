@@ -297,31 +297,41 @@ sub _escape_typst {
     # Convert org/markdown markup to Typst before escaping special chars
     my @markup_slots;
 
+    # Helper: escape Typst special chars inside markup content
+    my $esc_inner = sub {
+        my $s = shift;
+        $s =~ s/\\/\\\\/g;
+        $s =~ s/\$/\\\$/g;
+        $s =~ s/#/\\#/g;
+        $s =~ s/@/\\@/g;
+        return $s;
+    };
+
     # Markdown bold italic: ***text***
     $text =~ s{\*\*\*([^*\n]+?)\*\*\*}{
-        push @markup_slots, "*_${1}_*";
+        push @markup_slots, "*_" . $esc_inner->($1) . "_*";
         "\x00MARKUP" . $#markup_slots . "\x00"
     }ge;
     # Markdown bold: **text**
     $text =~ s{\*\*([^*\n]+?)\*\*}{
-        push @markup_slots, "*${1}*";
+        push @markup_slots, "*" . $esc_inner->($1) . "*";
         "\x00MARKUP" . $#markup_slots . "\x00"
     }ge;
     # Org underline: _text_
     $text =~ s{(?<!\w)_([^_\n]+?)_(?!\w)}{
         my $inner = $1;
         $inner =~ s/\x00MARKUP(\d+)\x00/$markup_slots[$1]/g;
-        push @markup_slots, "#underline[${inner}]";
+        push @markup_slots, "#underline[" . $esc_inner->($inner) . "]";
         "\x00MARKUP" . $#markup_slots . "\x00"
     }ge;
     # Org italic: /text/
     $text =~ s{(?<!\w)/([^/\n]+?)/(?!\w)}{
-        push @markup_slots, "_${1}_";
+        push @markup_slots, "_" . $esc_inner->($1) . "_";
         "\x00MARKUP" . $#markup_slots . "\x00"
     }ge;
     # Org bold: *text*
     $text =~ s{(?<!\w)\*([^*\n]+?)\*(?!\w)}{
-        push @markup_slots, "*${1}*";
+        push @markup_slots, "*" . $esc_inner->($1) . "*";
         "\x00MARKUP" . $#markup_slots . "\x00"
     }ge;
 
