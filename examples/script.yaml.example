@@ -8,55 +8,131 @@
 # CLI flags override everything.
 #
 # First Folio only reads this file — it never modifies or creates it.
+#
+# Everything below is commented out by default — uncomment only what you
+# want to override. Defaults come from presets/british-script.yaml.
+# See presets/ for full reference values.
 
 # --- Shared metadata ---
-# These override the source document if set. In most cases, leave title/author
-# in the source doc (#+TITLE, #+AUTHOR) and only set date/version here.
+# Override #+TITLE, #+AUTHOR, etc. from the source. Usually leave these
+# in the source doc and only set date/version here per-project.
 # title: About Time
 # author: Taḋg Paul
-date: "2026-04-26"
-version: "Draft v3"
+# date: "2026-04-26"
+# version: "Draft v3"
 
-# --- Shared rendering options ---
-# Read by both First Folio and yapper. Control which elements appear in output.
-render:
-  stage-directions: true
-  frontmatter: true
-  footnotes: true
-  character-table: true
-  transitions: true
+# --- Shared rendering toggles ---
+# Read by both First Folio and yapper.
+# render:
+#   stage-directions: true
+#   frontmatter: true
+#   footnotes: true
+#   character-table: true
+#   transitions: true
 
 # --- First Folio PDF rendering ---
-# These keys are under the folio: namespace and are ignored by yapper.
-folio:
-  font: EB Garamond
-  font-size: 11pt
-  margin: 25mm
-  page: a4
+# folio:
+#   font: Libertinus Serif       # any installed font; e.g. EB Garamond, Asap
+#   font-size: 12pt
+#   font-weight: regular         # optional: thin, light, regular, bold, black, or 100-900
+#   font-stretch: 100%           # optional: 75%, 100%, 125% — pin a variant (e.g. avoid Asap Condensed fallback)
+#   margin: 25mm
+#   page: a4                     # or us-letter
+#   default-format: pdf
+
+  # --- Title page ---
+  # title-page:
+  #   page-number: false
+  #   title:
+  #     align: center            # left | center | right
+  #     font-size: 24pt
+  #     bold: true
+  #     italic: false
+  #     case-transform: as-written   # upper | lower | as-written | small-caps
+  #     position: third          # third | top | center | bottom
+  #     space-before: 0
+  #   subtitle:
+  #     align: center
+  #     font-size: 14pt
+  #     italic: true
+  #     space-before: 1em
+  #   author:
+  #     align: center
+  #     prefix: "by "
+  #     space-before: 2em
+  #   date:
+  #     position: bottom-left
+  #     font-size: 10pt
+  #   version:
+  #     position: bottom-right
+  #     font-size: 10pt
+
+  # --- Per-element positioning ---
+  # positioning:
+  #   speech:
+  #     space-before: 1.6em
+  #     speaker:
+  #       case-transform: upper        # how speaker name appears
+  #       suffix: ":"                  # or "" for new-line style
+  #       bold: true
+  #     dialogue:
+  #       placement: same-line         # same-line | new-line
+  #       wrap-indent: 7em
+  #     speech-instruction:
+  #       prefix: "("
+  #       suffix: ")"
+  #       italic: true
+  #
+  #   stage-direction:
+  #     italic: true
+  #     space-before: 1.6em
+  #
+  #   transition:
+  #     align: right
+  #     case-transform: upper
+  #     space-before: 1.6em
+  #
+  #   act-header:
+  #     align: center
+  #     bold: true
+  #     page-break-before: true
+  #
+  #   scene-header:
+  #     align: left
+  #     bold: true
+  #     space-before: 2em
+
+  # --- Cover letter rendering (folio letter) ---
+  # letter:
+  #   font: Libertinus Serif       # may differ from script body font
+  #   font-size: 11pt
+  #   font-weight: regular         # optional: thin, light, regular, bold, black, or 100-900
+  #   font-stretch: 100%           # optional: pin a variant (e.g. avoid Asap Condensed fallback)
+  #   page: a4
+  #   margin-top: 25mm
+  #   margin-bottom: 25mm
+  #   margin-left: 30mm
+  #   margin-right: 25mm
+  #   space-after-sender: 2em
+  #   space-after-recipient: 1em
+  #   space-after-date: 1em
+  #   space-after-subject: 0.5em
+  #   space-before-closing: 0.8em
+  #   space-before-signoff: 1.5em
 
 # --- Yapper (TTS) configuration ---
-# Everything below is silently ignored by First Folio.
-auto-assign-voices: true
-character-voices:
-  KEVIN: af_alloy
-  NESSA: af_heart
-  CÁIT: bf_isabella
-  BEN: bm_lewis
-  MARIE: bf
-  GDA CONLON: am_michael
-  DERMOT: bm_daniel
-narrator-voice: bf_alice
-intro-voice: bf_alice
-
-dialogue-speed: 1.0
-stage-direction-speed: 0.9
-gap-after-dialogue: 0.3
-gap-after-stage-direction: 0.5
-gap-after-scene: 1.0
-
-threads: 3
-
-speech-substitution:
-  Cáit: Kawch
-  Marie: Mawree
-  Gda: Garda
+# Silently ignored by First Folio. See: github.com/tadg-paul/yapper
+# auto-assign-voices: true
+# character-voices:
+#   KEVIN: af_alloy
+#   NESSA: af_heart
+# narrator-voice: bf_alice
+# intro-voice: bf_alice
+# dialogue-speed: 1.0
+# stage-direction-speed: 0.9
+# gap-after-dialogue: 0.3
+# gap-after-stage-direction: 0.5
+# gap-after-scene: 1.0
+# threads: 3
+# speech-substitution:
+#   Cáit: Kawch

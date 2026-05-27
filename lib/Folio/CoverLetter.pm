@@ -172,6 +172,8 @@ sub render_pdf {
 
     my $font         = $g->('font', 'Libertinus Serif');
     my $font_size    = $g->('font-size', '11pt');
+    my $font_weight  = $g->('font-weight', undef);
+    my $font_stretch = $g->('font-stretch', undef);
     my $page         = $g->('page', 'a4');
     my $m_top        = $g->('margin-top', '25mm');
     my $m_bot        = $g->('margin-bottom', '25mm');
@@ -208,9 +210,18 @@ sub render_pdf {
     my $closing_escaped = _escape_typst($letter->{closing});
     my $signoff_escaped = _escape_typst($letter->{signoff});
 
+    # Build text attribute string with optional weight/stretch
+    my $text_attrs = qq{font: "${font}", size: ${font_size}};
+    if (defined $font_weight && $font_weight ne '') {
+        $text_attrs .= qq{, weight: } . _typst_weight($font_weight);
+    }
+    if (defined $font_stretch && $font_stretch ne '') {
+        $text_attrs .= qq{, stretch: } . _typst_stretch($font_stretch);
+    }
+
     my $typst = <<"TYPST";
 #set page(paper: "${page}", margin: (top: ${m_top}, bottom: ${m_bot}, left: ${m_left}, right: ${m_right}))
-#set text(font: "${font}", size: ${font_size})
+#set text(${text_attrs})
 #set par(leading: 0.8em, spacing: 1.2em)
 
 // Sender — positioned right, text left-aligned within block
@@ -259,7 +270,11 @@ TYPST
     system(@cmd) == 0
         or die "Error: typst compile failed (exit $?)\n";
 
-    unlink $tmp_path;
+    if ($ENV{FOLIO_KEEP_TYPST}) {
+        warn "Typst source kept at: $tmp_path\n";
+    } else {
+        unlink $tmp_path;
+    }
     return $output;
 }
 
@@ -290,6 +305,25 @@ sub _format_address {
     # Split on " / " (space-slash-space) only — so "27/29" stays intact
     my @parts = split /\s+\/\s+/, $addr;
     return join("\\\n", map { _escape_typst($_) } @parts);
+}
+
+# Convert a weight value (string, number, or Typst keyword) into a Typst weight literal.
+# Accepts: "thin", "light", "regular", "medium", "bold", "black", numeric (100-900),
+# or any other string passed through as a quoted name.
+sub _typst_weight {
+    my ($w) = @_;
+    $w =~ s/^\s+|\s+$//g;
+    return $w =~ /^\d+$/ ? $w : qq{"$w"};
+}
+
+# Convert a stretch value into a Typst stretch literal.
+# Accepts: "75%", "100%", or plain number (treated as percentage).
+sub _typst_stretch {
+    my ($s) = @_;
+    $s =~ s/^\s+|\s+$//g;
+    return $s if $s =~ /%$/;
+    return "${s}%" if $s =~ /^\d+(\.\d+)?$/;
+    return $s;   # pass through anything else as-is
 }
 
 sub _escape_typst {
