@@ -9,6 +9,8 @@ render:
 folio:
   # Courier Prime is the screenwriting standard
   font: Courier Prime
+  # font-weight: regular   # explicit pinning if needed; Courier Prime is usually unambiguous
+  # font-stretch: 100%
   # Standard US paper size
   page: us-letter
   # American convention uses inch margins

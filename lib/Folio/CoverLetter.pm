@@ -313,7 +313,8 @@ sub _format_address {
 sub _typst_weight {
     my ($w) = @_;
     $w =~ s/^\s+|\s+$//g;
-    return $w =~ /^\d+$/ ? $w : qq{"$w"};
+    return $w if $w =~ /^\d+$/;
+    return qq{"\L$w\E"};   # Typst keywords must be lowercase
 }
 
 # Convert a stretch value into a Typst stretch literal.

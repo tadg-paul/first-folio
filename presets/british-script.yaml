@@ -16,6 +16,12 @@ render:
 folio:
   font: Libertinus Serif
   font-size: 12pt
+  # font-weight and font-stretch are optional. Useful for fonts whose
+  # family name groups multiple variants (e.g. Asap bundles Asap Condensed
+  # and Asap Expanded under "Asap"). Without these, Typst may select a
+  # nearest-neighbour variant instead of the regular one.
+  # font-weight: regular   # thin, light, regular, medium, bold, black, or 100-900
+  # font-stretch: 100%     # 75%, 100%, 125% — pins the stretch axis
   page: a4
   margin: 25mm
   default-format: pdf
@@ -163,6 +169,9 @@ folio:
   letter:
     font: Libertinus Serif
     font-size: 11pt
+    # See note above re: font-weight / font-stretch for multi-variant fonts.
+    # font-weight: regular
+    # font-stretch: 100%
     page: a4
     margin-top: 25mm
     margin-bottom: 25mm

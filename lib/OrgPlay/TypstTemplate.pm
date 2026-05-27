@@ -28,7 +28,7 @@ sub preamble {
     if (defined $font_weight && $font_weight ne '') {
         my $w = $font_weight;
         $w =~ s/^\s+|\s+$//g;
-        $global_text_attrs .= ", weight: " . ($w =~ /^\d+$/ ? $w : qq{"$w"});
+        $global_text_attrs .= ", weight: " . ($w =~ /^\d+$/ ? $w : qq{"\L$w\E"});
     }
     if (defined $font_stretch && $font_stretch ne '') {
         my $s = $font_stretch;
