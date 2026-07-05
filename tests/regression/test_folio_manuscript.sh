@@ -116,20 +116,6 @@ not_has_text() {
     fi
 }
 
-has_text_count() {
-    local file="$1"
-    local needle="$2"
-    local expected="$3"
-    local desc="$4"
-    local count
-    count="$(grep -F -c "$needle" "$file")"
-    if [[ "$count" == "$expected" ]]; then
-        pass "$desc"
-    else
-        fail "$desc" "expected $expected occurrence(s) of '$needle', found $count"
-    fi
-}
-
 write_markdown_fixtures() {
     local dir="$1"
     mkdir -p "$dir/part1" "$dir/part2"
@@ -417,7 +403,7 @@ run_ok "RT-9.52-RT-9.57: TOC and paragraph layout config applies" \
 has_text "$TMPDIR_TEST/toc-config.typ" "TOC Font" "RT-9.52: TOC entry font appears"
 has_text "$TMPDIR_TEST/toc-config.typ" "TOC Heading" "RT-9.53: TOC heading font appears"
 has_text "$TMPDIR_TEST/toc-config.typ" "Chapter 1" "RT-9.54: TOC includes chapter heading"
-has_text_count "$TMPDIR_TEST/toc-config.typ" "PART ONE" 1 "RT-9.54: TOC part inclusion can be disabled"
+not_has_text "$TMPDIR_TEST/toc-config.typ" "PART ONE" "RT-9.54: TOC part inclusion can be disabled"
 has_text "$TMPDIR_TEST/british.typ" "line-spacing: 1.5" "RT-9.55: British line spacing appears"
 has_text "$TMPDIR_TEST/british.typ" "paragraph-indent: 10mm" "RT-9.55: British paragraph indent appears"
 has_text "$TMPDIR_TEST/british.typ" "paragraph-spacing: 0" "RT-9.55: British paragraph spacing appears"

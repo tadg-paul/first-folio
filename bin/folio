@@ -401,7 +401,6 @@ sub cmd_manuscript {
         'title=s'              => \$metadata{'title'},
         'subtitle=s'           => \$metadata{'subtitle'},
         'author=s'             => \$metadata{'author'},
-        'author-attribution=s' => \$cli_overrides{'author-attribution'},
         'date=s'               => \$metadata{'date'},
         'wordcount=s'          => \$metadata{'wordcount'},
         'version=s'            => \$metadata{'version'},
