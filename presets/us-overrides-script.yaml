@@ -3,8 +3,9 @@
 # Only specifies values that differ; everything else inherits.
 
 folio:
-  # Page size remains inherited from the root default unless explicitly configured.
-  margin: 25mm
+  # US letter, inch margins
+  page: us-letter
+  margin: 1in
 
   title-page:
     author:

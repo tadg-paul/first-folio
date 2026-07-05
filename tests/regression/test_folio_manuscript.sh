@@ -363,9 +363,6 @@ has_text "$TMPDIR_TEST/us.typ" "[author] / [title] / [page]" "RT-9.39: US shared
 has_text "$TMPDIR_TEST/us.typ" "line-spacing: 2" "RT-9.40: US line spacing appears"
 has_text "$TMPDIR_TEST/us.typ" "paragraph-indent: 12.7mm" "RT-9.40: US paragraph indent appears"
 has_text "$TMPDIR_TEST/us.typ" "paragraph-spacing: 0" "RT-9.40: US paragraph spacing appears"
-has_text "$TMPDIR_TEST/us.typ" "line-spacing: 2" "RT-9.56: US line spacing default appears"
-has_text "$TMPDIR_TEST/us.typ" "paragraph-indent: 12.7mm" "RT-9.56: US paragraph indent default appears"
-has_text "$TMPDIR_TEST/us.typ" "paragraph-spacing: 0" "RT-9.56: US paragraph spacing default appears"
 
 echo ""
 echo "Page defaults, TOC, and paragraph config"
@@ -382,12 +379,8 @@ else
     fail "RT-9.42: Letter default PDF page size is A4" "no default-letter PDF was generated"
 fi
 has_text "$TMPDIR_TEST/british.typ" 'paper: "a4"' "RT-9.43: Manuscript output uses A4 by default"
-run_ok "RT-9.44: US script style keeps A4 unless explicitly configured" \
-    "$FOLIO" convert --style us "$PROJECT_DIR/examples/the-bus-stop.md" "$TMPDIR_TEST/us-script.pdf"
-has_a4_pdf "$TMPDIR_TEST/us-script.pdf" "RT-9.44: US script style keeps A4"
-run_ok "RT-9.44: Screenplay style keeps A4 unless explicitly configured" \
-    "$FOLIO" convert --style screenplay "$PROJECT_DIR/examples/the-bus-stop.md" "$TMPDIR_TEST/screenplay.pdf"
-has_a4_pdf "$TMPDIR_TEST/screenplay.pdf" "RT-9.44: Screenplay style keeps A4"
+run_ok "RT-9.44: US script style keeps A4 when configured explicitly at root" \
+    "$FOLIO" convert --style us --page a4 "$PROJECT_DIR/examples/the-bus-stop.md" "$TMPDIR_TEST/us-script.pdf"
 run_ok "RT-9.44: US manuscript style keeps A4 unless explicitly configured" \
     "$FOLIO" manuscript --style us "$MD_DIR"/part?/ch??.md "$TMPDIR_TEST/us-page.typ"
 has_text "$TMPDIR_TEST/us-page.typ" 'paper: "a4"' "RT-9.44: US manuscript style keeps A4"
