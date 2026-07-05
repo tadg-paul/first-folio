@@ -109,8 +109,8 @@ test_typ "RT-3.2: folio.font-size overrides default size" "14pt"
 printf "folio:\n  page: us-letter\n" > "$TMPDIR_TEST/script.yaml"
 test_typ "RT-3.3: folio.page overrides default paper" "us-letter"
 
-printf "folio:\n  margin: 1in\n" > "$TMPDIR_TEST/script.yaml"
-test_typ "RT-3.4: folio.margin overrides default margin" "1in"
+printf "folio:\n  margin: 30mm\n" > "$TMPDIR_TEST/script.yaml"
+test_typ "RT-3.4: folio.margin overrides default margin" "30mm"
 
 # --- Speaker positioning ---
 echo ""
@@ -173,7 +173,7 @@ echo ""
 echo "folio.style presets"
 
 printf "folio:\n  style: us\n" > "$TMPDIR_TEST/script.yaml"
-test_typ "RT-3.17: folio.style: us loads American overrides (us-letter)" "us-letter"
+test_typ "RT-3.17: folio.style: us loads American overrides without changing A4 default" 'paper: "a4"'
 
 rm -f "$TMPDIR_TEST/script.yaml"
 test_typ "RT-3.18: default style is British (Libertinus Serif)" "Libertinus Serif"
