@@ -18,6 +18,7 @@ sub render {
 
     my @paths = _resolve_inputs(@$inputs);
     my $format = _validate_input_formats(@paths);
+    _validate_text_files(@paths);
     my $source = _read_joined_files(@paths);
     my $doc = $format eq 'markdown' ? _parse_markdown($source) : _parse_org($source);
 
@@ -38,8 +39,11 @@ sub render {
     close $tmp_fh;
 
     my @cmd = ('typst', 'compile', $tmp_path, $output);
-    system(@cmd) == 0
-        or die "Error: typst compile failed (exit $?)\n";
+    if (system(@cmd) != 0) {
+        my $exit = $?;
+        unlink $tmp_path if -e $tmp_path;
+        die "Error: typst compile failed (exit $exit)\n";
+    }
 
     unlink $tmp_path;
     return $output;
@@ -91,6 +95,37 @@ sub _validate_input_formats {
     }
 
     return (keys %formats)[0];
+}
+
+sub _validate_text_files {
+    my (@paths) = @_;
+
+    for my $path (@paths) {
+        open(my $raw_fh, '<:raw', $path)
+            or die "Error: cannot open $path: $!\n";
+        my $buf;
+        read($raw_fh, $buf, 8192);
+        close $raw_fh;
+
+        if ($buf =~ /\x00/) {
+            die "Error: $path appears to be a binary file, not a text document.\n";
+        }
+
+        open(my $utf8_fh, '<:encoding(UTF-8)', $path)
+            or die "Error: cannot open $path as UTF-8: $!\n";
+        eval {
+            local $SIG{__WARN__} = sub {
+                die "encoding warning: $_[0]";
+            };
+            while (<$utf8_fh>) {
+                # read through to trigger decoding warnings
+            }
+        };
+        close $utf8_fh;
+        if ($@) {
+            die "Error: $path has invalid encoding: $@\n";
+        }
+    }
 }
 
 sub _read_joined_files {
@@ -218,7 +253,7 @@ sub _markdown_heading {
 
     my $type = $level == 2 ? 'part' : $level == 3 ? 'chapter' : 'section';
     push @{$doc->{elements}}, { type => $type, title => $title };
-    push @{$doc->{toc}}, { type => $type, title => $title } if $type ne 'section';
+    push @{$doc->{toc}}, { type => $type, title => $title };
 }
 
 sub _parse_org {
@@ -256,7 +291,7 @@ sub _parse_org {
             }
             my $type = $level == 1 ? 'part' : $level == 2 ? 'chapter' : 'section';
             push @{$doc->{elements}}, { type => $type, title => $title };
-            push @{$doc->{toc}}, { type => $type, title => $title } if $type ne 'section';
+            push @{$doc->{toc}}, { type => $type, title => $title };
             next;
         }
 
@@ -327,6 +362,10 @@ sub _typst_preamble {
     my $para_spacing = _cfg($config, 'paragraph-spacing', '0');
     my $typst_para_spacing = $para_spacing eq '0' ? '0pt' : $para_spacing;
     my $header_text = _fill_tokens($header, $doc);
+    my $header_clause = '';
+    if (_bool_cfg($config, 'page-header.enabled', 1)) {
+        $header_clause = qq{, header-ascent: $header_edge, header: align(right)[#text(font: "$header_font", size: $header_size)[$header_text]]};
+    }
 
     return <<"TYPST";
 // style: @{[_cfg($config, 'style', 'british')]}
@@ -339,7 +378,7 @@ sub _typst_preamble {
 // line-spacing: $line_spacing
 // paragraph-indent: $para_indent
 // paragraph-spacing: $para_spacing
-#set page(paper: "$page", margin: $margin, numbering: "1", header: align(right)[#text(font: "$header_font", size: $header_size)[$header_text]])
+#set page(paper: "$page", margin: $margin, numbering: "1"$header_clause)
 #set text(font: "$font", size: $font_size)
 #set par(first-line-indent: $para_indent, spacing: $typst_para_spacing, leading: ${line_spacing}em)
 TYPST
@@ -368,21 +407,35 @@ sub _title_page {
     my $address = _meta($doc, 'address');
     my $email = _meta($doc, 'email');
     my $website = _meta($doc, 'website');
+    my $header_pad = _cfg($config, 'page-header.content-padding-after', '10mm');
 
     my @lines;
     push @lines, '#set page(numbering: none)';
+    push @lines, "#v($header_pad)";
     push @lines, '#align(center)[';
-    push @lines, qq{#text(font: "$title_font", size: $title_size, weight: "$title_weight")[@{[_esc($title)]}]};
-    push @lines, qq{#v(1em)\n#text(font: "$subtitle_font", size: $subtitle_size, style: "$subtitle_style")[@{[_esc($subtitle)]}]} if $subtitle ne '';
-    push @lines, qq{#v(2em)\n#text(font: "$author_font")[@{[_esc($author_attr)]} @{[_esc($author)]}]} if $author ne '';
+    if (_bool_cfg($config, 'title-page.include-title', 1)) {
+        push @lines, qq{#text(font: "$title_font", size: $title_size, weight: "$title_weight")[@{[_esc($title)]}]};
+    }
+    if ($subtitle ne '' && _bool_cfg($config, 'title-page.include-subtitle', 1)) {
+        push @lines, qq{#v(1em)\n#text(font: "$subtitle_font", size: $subtitle_size, style: "$subtitle_style")[@{[_esc($subtitle)]}]};
+    }
+    if ($author ne '' && _bool_cfg($config, 'title-page.include-author', 1)) {
+        push @lines, qq{#v(2em)\n#text(font: "$author_font")[@{[_esc($author_attr)]} @{[_esc($author)]}]};
+    }
     push @lines, ']';
     push @lines, '#v(1fr)';
-    push @lines, _meta_line($config, 'date', $date);
-    push @lines, _meta_line($config, 'version', $version);
-    push @lines, _meta_line($config, 'wordcount', "word count: $wordcount");
-    push @lines, _meta_line($config, 'contact', $address);
-    push @lines, _meta_line($config, 'contact', $email);
-    push @lines, _meta_line($config, 'contact', $website);
+    push @lines, _meta_line($config, 'date', $date)
+        if _bool_cfg($config, 'title-page.include-date', 1);
+    push @lines, _meta_line($config, 'version', $version)
+        if _bool_cfg($config, 'title-page.include-version', 1);
+    push @lines, _meta_line($config, 'wordcount', "word count: $wordcount")
+        if $wordcount ne '' && _bool_cfg($config, 'title-page.include-wordcount', 1);
+    push @lines, _meta_line($config, 'contact', $address)
+        if _bool_cfg($config, 'title-page.include-address', 1);
+    push @lines, _meta_line($config, 'contact', $email)
+        if _bool_cfg($config, 'title-page.include-email', 1);
+    push @lines, _meta_line($config, 'contact', $website)
+        if _bool_cfg($config, 'title-page.include-website', 1);
     push @lines, '#pagebreak()';
     push @lines, '#set page(numbering: "1")';
     return join("\n", grep { defined $_ && $_ ne '' } @lines);
@@ -407,11 +460,17 @@ sub _toc {
     my $font_size = _cfg($config, 'toc.font-size', '11pt');
     my $heading_font = _cfg($config, 'toc.heading-font', _heading_font($config));
     my $heading_size = _cfg($config, 'toc.heading-font-size', '16pt');
+    my $include_parts = _bool_cfg($config, 'toc.include-parts', 1);
+    my $include_chapters = _bool_cfg($config, 'toc.include-chapters', 1);
+    my $include_sections = _bool_cfg($config, 'toc.include-sections', 0);
     my @lines;
     push @lines, qq{// TOC Font: $font};
     push @lines, qq{// TOC Heading: $heading_font};
     push @lines, qq{#text(font: "$heading_font", size: $heading_size)[@{[_esc($title)]}]};
     for my $entry (@{$doc->{toc}}) {
+        next if $entry->{type} eq 'part' && !$include_parts;
+        next if $entry->{type} eq 'chapter' && !$include_chapters;
+        next if $entry->{type} eq 'section' && !$include_sections;
         push @lines, qq{#text(font: "$font", size: $font_size)[@{[_esc($entry->{title})]}]};
     }
     push @lines, '#pagebreak()';
@@ -440,13 +499,13 @@ sub _body {
         } elsif ($el->{type} eq 'code_start') {
             my $mono = _cfg($config, 'mono-font', 'Libertinus Mono');
             push @lines, qq{// mono-font: $mono};
-            push @lines, '#raw(block: true, "';
+            push @lines, qq{#text(font: "$mono")[#raw(block: true, "};
         } elsif ($el->{type} eq 'code_end') {
-            push @lines, '")';
+            push @lines, '")]';
         } elsif ($el->{type} eq 'code') {
             push @lines, _raw_esc($el->{text});
         } elsif ($el->{type} eq 'paragraph') {
-            push @lines, _inline($el->{text}, $doc);
+            push @lines, _inline($el->{text}, $doc, $config);
             push @lines, '';
         }
     }
@@ -511,21 +570,39 @@ sub _case {
 }
 
 sub _inline {
-    my ($text, $doc) = @_;
+    my ($text, $doc, $config) = @_;
+    my $mono = _cfg($config, 'mono-font', 'Libertinus Mono');
     my @footnotes;
     $text =~ s/\[\^(\S+?)\]/_stash_footnote(\@footnotes, _footnote($doc, $1))/ge;
     $text =~ s/\[fn:(\S+?)\]/_stash_footnote(\@footnotes, _footnote($doc, $1))/ge;
+    my @raw;
+    $text =~ s/`([^`]+)`/_stash_raw(\@raw, _inline_raw($mono, $1))/ge;
+    $text =~ s/~([^~]+)~/_stash_raw(\@raw, _inline_raw($mono, $1))/ge;
     $text = _esc($text);
-    $text =~ s/`([^`]+)`/#raw("$1")/g;
-    $text =~ s/~([^~]+)~/#raw("$1")/g;
     $text =~ s{\*\*([^*\n]+)\*\*}{*$1*}g;
     $text =~ s{(?<!\w)\*([^*\n]+)\*(?!\w)}{_$1_}g;
     $text =~ s{(?<!\w)/([^/\n]+)/(?!\w)}{_$1_}g;
+    for my $i (0 .. $#raw) {
+        my $token = "__FOLIO_RAW_${i}__";
+        $text =~ s/$token/$raw[$i]/g;
+    }
     for my $i (0 .. $#footnotes) {
         my $token = "__FOLIO_FOOTNOTE_${i}__";
         $text =~ s/$token/$footnotes[$i]/g;
     }
     return $text;
+}
+
+sub _stash_raw {
+    my ($raw, $text) = @_;
+    push @$raw, $text;
+    my $index = $#$raw;
+    return "__FOLIO_RAW_${index}__";
+}
+
+sub _inline_raw {
+    my ($font, $text) = @_;
+    return qq{#text(font: "$font")[#raw("@{[_raw_esc($text)]}")]};
 }
 
 sub _stash_footnote {
