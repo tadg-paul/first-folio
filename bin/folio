@@ -40,6 +40,11 @@ if (grep { $_ eq '--help' || $_ eq '-h' } @ARGV) {
         print_letter_usage();
         exit 0;
     }
+    if ($subcommand eq 'manuscript') {
+        shift @ARGV;
+        print_manuscript_usage();
+        exit 0;
+    }
     print_usage();
     exit 0;
 }
@@ -56,6 +61,9 @@ if ($subcommand eq 'convert') {
 } elsif ($subcommand eq 'letter') {
     shift @ARGV;  # remove 'letter'
     cmd_letter();
+} elsif ($subcommand eq 'manuscript') {
+    shift @ARGV;  # remove 'manuscript'
+    cmd_manuscript();
 } elsif ($subcommand eq '') {
     print STDERR "Error: no subcommand given.\n";
     print STDERR "Usage: folio <command> [options]\n";
@@ -330,6 +338,7 @@ A format converter for stage plays.
 Commands:
   convert    Convert a play between formats
   letter     Generate letters from :letter: tagged sections
+  manuscript Generate prose manuscripts from Markdown or org-mode files
 
 Options:
   -h, --help     Show this help message
@@ -364,6 +373,107 @@ PDF options (ignored for non-PDF output):
   --direction-spacing SIZE Space before stage directions
   --[no-]direction-italic  Italicise stage directions
   --[no-]direction-center  Centre stage directions
+
+Config: script.yaml in source dir or ~/.config/first-folio/script.yaml
+USAGE
+}
+
+# --- manuscript subcommand ---
+
+sub cmd_manuscript {
+    require Folio::Manuscript;
+
+    my %cli_overrides;
+    my %metadata;
+
+    GetOptions(
+        'style=s'              => \$cli_overrides{'style'},
+        'font=s'               => \$cli_overrides{'font'},
+        'font-size=s'          => \$cli_overrides{'font-size'},
+        'heading-font=s'       => \$cli_overrides{'heading-font'},
+        'heading-font-size=s'  => \$cli_overrides{'heading-font-size'},
+        'mono-font=s'          => \$cli_overrides{'mono-font'},
+        'page=s'               => \$cli_overrides{'page'},
+        'margin=s'             => \$cli_overrides{'margin'},
+        'line-spacing=s'       => \$cli_overrides{'line-spacing'},
+        'paragraph-indent=s'   => \$cli_overrides{'paragraph-indent'},
+        'paragraph-spacing=s'  => \$cli_overrides{'paragraph-spacing'},
+        'title=s'              => \$metadata{'title'},
+        'subtitle=s'           => \$metadata{'subtitle'},
+        'author=s'             => \$metadata{'author'},
+        'date=s'               => \$metadata{'date'},
+        'wordcount=s'          => \$metadata{'wordcount'},
+        'version=s'            => \$metadata{'version'},
+        'address=s'            => \$metadata{'address'},
+        'email=s'              => \$metadata{'email'},
+        'website=s'            => \$metadata{'website'},
+    ) or do { print_manuscript_usage(); exit 2; };
+
+    my $output_path = pop @ARGV;
+    if (!defined $output_path || !@ARGV) {
+        die "Error: manuscript requires one or more input files and an output path.\n" .
+            "Usage: folio manuscript <input.md|input.org...> <output.typ|output.pdf>\n";
+    }
+
+    my $source_dir = _source_dir_for_inputs(@ARGV);
+    my $config = Folio::Config->load(
+        source_dir => $source_dir,
+        mode       => 'manuscript',
+        cli        => \%cli_overrides,
+    );
+
+    Folio::Manuscript->render(
+        inputs   => \@ARGV,
+        output   => $output_path,
+        config   => $config,
+        metadata => \%metadata,
+    );
+
+    print "Generated: $output_path\n";
+}
+
+sub _source_dir_for_inputs {
+    my (@inputs) = @_;
+    for my $input (@inputs) {
+        my @matches = glob($input);
+        @matches = ($input) if !@matches;
+        for my $path (sort @matches) {
+            return dirname($path) if -f $path;
+        }
+    }
+    return '.';
+}
+
+sub print_manuscript_usage {
+    print <<'USAGE';
+Usage: folio manuscript <input.md|input.org...> <output.typ|output.pdf> [options]
+
+Generate a prose manuscript from one or more Markdown or org-mode files.
+Inputs are sorted deterministically and joined with a blank line separator.
+
+Options:
+  --style STYLE              Manuscript preset: british (default) or us
+  --font FONT                Body font family
+  --font-size SIZE           Body font size
+  --heading-font FONT        Heading font family
+  --heading-font-size SIZE   Heading font size
+  --mono-font FONT           Monospace/code font family
+  --page SIZE                Page size (default: a4)
+  --margin SIZE              Page margins
+  --line-spacing VALUE       Paragraph leading multiplier
+  --paragraph-indent SIZE    First-line paragraph indent
+  --paragraph-spacing SIZE   Space between paragraphs
+
+Metadata overrides:
+  --title TEXT
+  --subtitle TEXT
+  --author TEXT
+  --date TEXT
+  --wordcount TEXT
+  --version TEXT
+  --address TEXT
+  --email TEXT
+  --website TEXT
 
 Config: script.yaml in source dir or ~/.config/first-folio/script.yaml
 USAGE

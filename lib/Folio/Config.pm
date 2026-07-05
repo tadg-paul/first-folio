@@ -1,5 +1,5 @@
 # ABOUTME: Config loading with deep layered merge and dotted-path access.
-# ABOUTME: Layers: British preset → global script.yaml → local script.yaml → CLI flags.
+# ABOUTME: Layers: British preset → style preset → global/local script.yaml → CLI flags.
 package Folio::Config;
 
 use strict;
@@ -48,8 +48,11 @@ sub load {
 
     my $source_dir = $args{source_dir};
     my $cli        = $args{cli} || {};
+    my $mode       = $args{mode} || 'script';
+    my %manuscript_root_overrides;
+    my %manuscript_child_overrides;
 
-    # Layer 1: British preset (always the base)
+    # Layer 1: British script preset (always the root base)
     my $base = _load_yaml_file("$PRESET_DIR/british-script.yaml")
         or die "Error: cannot load British preset from $PRESET_DIR/british-script.yaml\n";
 
@@ -64,6 +67,11 @@ sub load {
         if ($global_data && $global_data->{folio} && $global_data->{folio}{style}) {
             $style = lc $global_data->{folio}{style};
         }
+        _record_manuscript_override_keys(
+            $global_data,
+            \%manuscript_root_overrides,
+            \%manuscript_child_overrides,
+        );
     }
 
     my $local_data;
@@ -74,6 +82,11 @@ sub load {
             if ($local_data && $local_data->{folio} && $local_data->{folio}{style}) {
                 $style = lc $local_data->{folio}{style};
             }
+            _record_manuscript_override_keys(
+                $local_data,
+                \%manuscript_root_overrides,
+                \%manuscript_child_overrides,
+            );
         }
     }
 
@@ -87,13 +100,20 @@ sub load {
     $style = 'british'    if $style eq 'uk' || $style eq 'british';
     $style = 'screenplay' if $style eq 'screenplay';
 
-    # Layer 2: Style overrides (sits above British, below user config)
-    if ($style eq 'american') {
-        my $us = _load_yaml_file("$PRESET_DIR/us-overrides-script.yaml");
-        _deep_merge($base, $us) if $us;
+    # Layer 2: Mode/style presets (sit above British, below user config)
+    if ($mode eq 'manuscript') {
+        my $british_manuscript = _load_yaml_file("$PRESET_DIR/british-manuscript.yaml");
+        _deep_merge($base, $british_manuscript) if $british_manuscript;
+        if ($style eq 'american') {
+            my $us_manuscript = _load_yaml_file("$PRESET_DIR/us-overrides-manuscript.yaml");
+            _deep_merge($base, $us_manuscript) if $us_manuscript;
+        }
+    } elsif ($style eq 'american') {
+        my $us_script = _load_yaml_file("$PRESET_DIR/us-overrides-script.yaml");
+        _deep_merge($base, $us_script) if $us_script;
     } elsif ($style eq 'screenplay') {
-        my $sp = _load_yaml_file("$PRESET_DIR/us-screenplay-overrides.yaml");
-        _deep_merge($base, $sp) if $sp;
+        my $screenplay = _load_yaml_file("$PRESET_DIR/us-screenplay-overrides.yaml");
+        _deep_merge($base, $screenplay) if $screenplay;
     }
 
     # Layer 3: global config
@@ -107,7 +127,14 @@ sub load {
     my $global_style_path = "$ENV{HOME}/.config/first-folio/script-${style_suffix}.yaml";
     if (-f $global_style_path) {
         my $global_style = _load_yaml_file($global_style_path);
-        _deep_merge($base, $global_style) if $global_style;
+        if ($global_style) {
+            _record_manuscript_override_keys(
+                $global_style,
+                \%manuscript_root_overrides,
+                \%manuscript_child_overrides,
+            );
+            _deep_merge($base, $global_style);
+        }
     }
 
     # Layer 5: local config (source file directory)
@@ -120,8 +147,23 @@ sub load {
         my $local_style_path = "$source_dir/script-${style_suffix}.yaml";
         if (-f $local_style_path) {
             my $local_style = _load_yaml_file($local_style_path);
-            _deep_merge($base, $local_style) if $local_style;
+            if ($local_style) {
+                _record_manuscript_override_keys(
+                    $local_style,
+                    \%manuscript_root_overrides,
+                    \%manuscript_child_overrides,
+                );
+                _deep_merge($base, $local_style);
+            }
         }
+    }
+
+    if ($mode eq 'manuscript') {
+        _apply_manuscript_root_overrides(
+            $base,
+            \%manuscript_root_overrides,
+            \%manuscript_child_overrides,
+        );
     }
 
     # Layer 7: CLI flags (mapped into folio: namespace)
@@ -129,7 +171,9 @@ sub load {
         for my $key (keys %$cli) {
             next if !defined $cli->{$key};
             next if $key eq 'style';  # already handled above
-            if (exists $base->{folio}{$key}) {
+            if ($mode eq 'manuscript' && exists $base->{folio}{manuscript}{$key}) {
+                $base->{folio}{manuscript}{$key} = $cli->{$key};
+            } elsif (exists $base->{folio}{$key}) {
                 $base->{folio}{$key} = $cli->{$key};
             }
         }
@@ -218,6 +262,39 @@ sub _deep_merge {
         } else {
             $base->{$key} = $overlay->{$key};
         }
+    }
+}
+
+sub _record_manuscript_override_keys {
+    my ($data, $root_keys, $child_keys) = @_;
+    return if !$data || ref $data->{folio} ne 'HASH';
+
+    my %inherited_keys = map { $_ => 1 } qw(
+        font font-size font-weight font-stretch
+        heading-font heading-font-size heading-font-weight heading-font-stretch
+        page margin
+    );
+
+    for my $key (keys %inherited_keys) {
+        $root_keys->{$key} = 1 if exists $data->{folio}{$key};
+    }
+
+    if (ref $data->{folio}{manuscript} eq 'HASH') {
+        for my $key (keys %inherited_keys) {
+            $child_keys->{$key} = 1 if exists $data->{folio}{manuscript}{$key};
+        }
+    }
+}
+
+sub _apply_manuscript_root_overrides {
+    my ($base, $root_keys, $child_keys) = @_;
+    return if ref $base->{folio} ne 'HASH';
+    $base->{folio}{manuscript} ||= {};
+
+    for my $key (keys %$root_keys) {
+        next if $child_keys->{$key};
+        next if !exists $base->{folio}{$key};
+        $base->{folio}{manuscript}{$key} = $base->{folio}{$key};
     }
 }
 
