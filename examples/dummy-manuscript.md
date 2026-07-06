@@ -22,6 +22,8 @@ The corridor outside the archive was quiet enough for a whisper to travel. "Are 
 
 Mira checked the [archive index](https://example.invalid/archive) and found a note where none had been before.[^ledger]
 
+The margin held a *soft warning* beside ~~an erased instruction~~.
+
 - The drawer hummed when touched.
 - The latch answered only after the ninth word.
 - The map showed a room that had been demolished.

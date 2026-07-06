@@ -49,7 +49,10 @@
 }
 
 #let folio-code(body) = {
-  block[
+  block(
+    above: {{.Config.Folio.Manuscript.CodeBlock.SpaceBefore}},
+    below: {{.Config.Folio.Manuscript.CodeBlock.SpaceAfter}},
+  )[
     #text(
       font: "{{.Config.Folio.Manuscript.MonoFont}}",
       size: {{.Config.Folio.Manuscript.MonoFontSize}},
@@ -58,7 +61,26 @@
   ]
 }
 
-#show raw: it => text(
+#show list: it => block(
+  above: {{.Config.Folio.Manuscript.List.SpaceBefore}},
+  below: {{.Config.Folio.Manuscript.List.SpaceAfter}},
+)[#it]
+
+#show enum: it => block(
+  above: {{.Config.Folio.Manuscript.List.SpaceBefore}},
+  below: {{.Config.Folio.Manuscript.List.SpaceAfter}},
+)[#it]
+
+#show raw.where(block: true): it => block(
+  above: {{.Config.Folio.Manuscript.CodeBlock.SpaceBefore}},
+  below: {{.Config.Folio.Manuscript.CodeBlock.SpaceAfter}},
+)[#text(
+  font: "{{.Config.Folio.Manuscript.MonoFont}}",
+  size: {{.Config.Folio.Manuscript.MonoFontSize}},
+  weight: "{{.Config.Folio.Manuscript.MonoFontWeight}}",
+)[#it]]
+
+#show raw.where(block: false): it => text(
   font: "{{.Config.Folio.Manuscript.MonoFont}}",
   size: {{.Config.Folio.Manuscript.MonoFontSize}},
   weight: "{{.Config.Folio.Manuscript.MonoFontWeight}}",

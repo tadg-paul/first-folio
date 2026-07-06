@@ -22,6 +22,7 @@ Supported frontmatter fields are `title`, `subtitle`, `author`, `attribution`, `
 | `***` or `---` on its own line, surrounded by blank lines | Section break, rendered as the configured manuscript scene-break marker |
 | `**bold**` | Bold text |
 | `*italic*` | Italic text |
+| `~~deleted~~` | Strikethrough text |
 | `` `code` `` and fenced code blocks | Monospace text |
 | `--` and `---` | En dash and em dash |
 | `[^name]` and `[^name]: text` | Footnote reference and definition |
@@ -32,6 +33,8 @@ Supported frontmatter fields are `title`, `subtitle`, `author`, `attribution`, `
 Setext headings are not part of the manuscript contract; use ATX headings (`#`, `##`, `###`) only. HTML blocks are not supported.
 
 Section breaks default to a centred `#` marker in rendered manuscripts. Override `folio.manuscript.scene-break.marker` in YAML config to use another marker.
+
+Lists and fenced code blocks render with `0.5em` vertical padding before and after by default. Override `folio.manuscript.list.space-before`, `folio.manuscript.list.space-after`, `folio.manuscript.code-block.space-before`, and `folio.manuscript.code-block.space-after` to adjust this spacing.
 
 Fountain is not accepted by manuscript mode.
 

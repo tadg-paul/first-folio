@@ -33,6 +33,7 @@ Supported front matter fields are `TITLE`, `SUBTITLE`, `AUTHOR`, `ATTRIBUTION`, 
 | `-----` or `_____` on its own line | Section break, rendered as the configured manuscript scene-break marker |
 | `*bold*` | Bold text |
 | `/italic/` | Italic text |
+| `+deleted+` | Strikethrough text |
 | `=code=` and source blocks | Monospace text |
 | `--` and `---` | En dash and em dash |
 | `[fn:name]` and `[fn:name] Text` | Footnote reference and definition |
@@ -42,6 +43,8 @@ Supported front matter fields are `TITLE`, `SUBTITLE`, `AUTHOR`, `ATTRIBUTION`, 
 Fountain is not accepted by manuscript mode.
 
 Section breaks default to a centred `#` marker in rendered manuscripts. Override `folio.manuscript.scene-break.marker` in YAML config to use another marker.
+
+Lists and source blocks render with `0.5em` vertical padding before and after by default. Override `folio.manuscript.list.space-before`, `folio.manuscript.list.space-after`, `folio.manuscript.code-block.space-before`, and `folio.manuscript.code-block.space-after` to adjust this spacing.
 
 ## Example
 

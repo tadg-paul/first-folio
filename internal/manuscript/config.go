@@ -41,52 +41,54 @@ type Folio struct {
 }
 
 type ManuscriptConfig struct {
-	Style               string           `yaml:"style"`
-	Page                string           `yaml:"page"`
-	Margin              string           `yaml:"margin"`
-	Font                string           `yaml:"font"`
-	FontSize            string           `yaml:"font-size"`
-	FontWeight          string           `yaml:"font-weight"`
-	HeadingFont         string           `yaml:"heading-font"`
-	HeadingFontSize     string           `yaml:"heading-font-size"`
-	HeadingFontWeight   string           `yaml:"heading-font-weight"`
-	MonoFont            string           `yaml:"mono-font"`
-	MonoFontSize        string           `yaml:"mono-font-size"`
-	MonoFontWeight      string           `yaml:"mono-font-weight"`
-	TitleFont           string           `yaml:"title-font"`
-	TitleFontSize       string           `yaml:"title-font-size"`
-	TitleFontWeight     string           `yaml:"title-font-weight"`
-	SubtitleFont        string           `yaml:"subtitle-font"`
-	SubtitleFontSize    string           `yaml:"subtitle-font-size"`
-	SubtitleFontWeight  string           `yaml:"subtitle-font-weight"`
-	SubtitleFontStyle   string           `yaml:"subtitle-font-style"`
-	AuthorFont          string           `yaml:"author-font"`
-	AuthorFontSize      string           `yaml:"author-font-size"`
-	AuthorFontWeight    string           `yaml:"author-font-weight"`
-	Attribution         string           `yaml:"attribution"`
-	AuthorAttribution   string           `yaml:"author-attribution"`
-	DateFont            string           `yaml:"date-font"`
-	DateFontSize        string           `yaml:"date-font-size"`
-	DateFontWeight      string           `yaml:"date-font-weight"`
-	DateFormat          string           `yaml:"date-format"`
-	VersionFont         string           `yaml:"version-font"`
-	VersionFontSize     string           `yaml:"version-font-size"`
-	VersionFontWeight   string           `yaml:"version-font-weight"`
-	WordCountFont       string           `yaml:"wordcount-font"`
-	WordCountFontSize   string           `yaml:"wordcount-font-size"`
-	WordCountFontWeight string           `yaml:"wordcount-font-weight"`
-	ContactFont         string           `yaml:"contact-font"`
-	ContactFontSize     string           `yaml:"contact-font-size"`
-	ContactFontWeight   string           `yaml:"contact-font-weight"`
-	LineSpacing         string           `yaml:"line-spacing"`
-	ParagraphIndent     string           `yaml:"paragraph-indent"`
-	ParagraphSpacing    string           `yaml:"paragraph-spacing"`
-	PageHeader          PageHeaderConfig `yaml:"page-header"`
-	TOC                 TOCConfig        `yaml:"toc"`
-	TitlePage           TitlePageConfig  `yaml:"title-page"`
-	SceneBreak          SceneBreakConfig `yaml:"scene-break"`
-	Part                HeadingConfig    `yaml:"part"`
-	Chapter             HeadingConfig    `yaml:"chapter"`
+	Style               string            `yaml:"style"`
+	Page                string            `yaml:"page"`
+	Margin              string            `yaml:"margin"`
+	Font                string            `yaml:"font"`
+	FontSize            string            `yaml:"font-size"`
+	FontWeight          string            `yaml:"font-weight"`
+	HeadingFont         string            `yaml:"heading-font"`
+	HeadingFontSize     string            `yaml:"heading-font-size"`
+	HeadingFontWeight   string            `yaml:"heading-font-weight"`
+	MonoFont            string            `yaml:"mono-font"`
+	MonoFontSize        string            `yaml:"mono-font-size"`
+	MonoFontWeight      string            `yaml:"mono-font-weight"`
+	TitleFont           string            `yaml:"title-font"`
+	TitleFontSize       string            `yaml:"title-font-size"`
+	TitleFontWeight     string            `yaml:"title-font-weight"`
+	SubtitleFont        string            `yaml:"subtitle-font"`
+	SubtitleFontSize    string            `yaml:"subtitle-font-size"`
+	SubtitleFontWeight  string            `yaml:"subtitle-font-weight"`
+	SubtitleFontStyle   string            `yaml:"subtitle-font-style"`
+	AuthorFont          string            `yaml:"author-font"`
+	AuthorFontSize      string            `yaml:"author-font-size"`
+	AuthorFontWeight    string            `yaml:"author-font-weight"`
+	Attribution         string            `yaml:"attribution"`
+	AuthorAttribution   string            `yaml:"author-attribution"`
+	DateFont            string            `yaml:"date-font"`
+	DateFontSize        string            `yaml:"date-font-size"`
+	DateFontWeight      string            `yaml:"date-font-weight"`
+	DateFormat          string            `yaml:"date-format"`
+	VersionFont         string            `yaml:"version-font"`
+	VersionFontSize     string            `yaml:"version-font-size"`
+	VersionFontWeight   string            `yaml:"version-font-weight"`
+	WordCountFont       string            `yaml:"wordcount-font"`
+	WordCountFontSize   string            `yaml:"wordcount-font-size"`
+	WordCountFontWeight string            `yaml:"wordcount-font-weight"`
+	ContactFont         string            `yaml:"contact-font"`
+	ContactFontSize     string            `yaml:"contact-font-size"`
+	ContactFontWeight   string            `yaml:"contact-font-weight"`
+	LineSpacing         string            `yaml:"line-spacing"`
+	ParagraphIndent     string            `yaml:"paragraph-indent"`
+	ParagraphSpacing    string            `yaml:"paragraph-spacing"`
+	PageHeader          PageHeaderConfig  `yaml:"page-header"`
+	TOC                 TOCConfig         `yaml:"toc"`
+	TitlePage           TitlePageConfig   `yaml:"title-page"`
+	SceneBreak          SceneBreakConfig  `yaml:"scene-break"`
+	List                SpacedBlockConfig `yaml:"list"`
+	CodeBlock           SpacedBlockConfig `yaml:"code-block"`
+	Part                HeadingConfig     `yaml:"part"`
+	Chapter             HeadingConfig     `yaml:"chapter"`
 }
 
 type TitlePageConfig struct {
@@ -139,6 +141,11 @@ type TOCConfig struct {
 
 type SceneBreakConfig struct {
 	Marker string `yaml:"marker"`
+}
+
+type SpacedBlockConfig struct {
+	SpaceBefore string `yaml:"space-before"`
+	SpaceAfter  string `yaml:"space-after"`
 }
 
 type HeadingConfig struct {
@@ -281,6 +288,10 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.TOC.HeadingFontWeight, "bold")
 	fill(&ms.TOC.PartGapBefore, "0.5em")
 	fill(&ms.SceneBreak.Marker, "#")
+	fill(&ms.List.SpaceBefore, "0.5em")
+	fill(&ms.List.SpaceAfter, "0.5em")
+	fill(&ms.CodeBlock.SpaceBefore, "0.5em")
+	fill(&ms.CodeBlock.SpaceAfter, "0.5em")
 	fill(&ms.TitlePage.TitleBlockAlign, "center")
 	fill(&ms.TitlePage.FooterAlign, "center")
 	fill(&ms.Part.Align, "center")

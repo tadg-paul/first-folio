@@ -103,6 +103,14 @@ folio:
     scene-break:
       marker: "#"
 
+    list:
+      space-before: 0.5em
+      space-after: 0.5em
+
+    code-block:
+      space-before: 0.5em
+      space-after: 0.5em
+
     part:
       page-break-before: true
       vertical-align: center
