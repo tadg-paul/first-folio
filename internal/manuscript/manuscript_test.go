@@ -35,7 +35,7 @@ func TestMarkdownManuscriptCLIProducesTypstContract(t *testing.T) {
 	assertContains(t, typst, `#folio-chapter(first: false)[Chapter 1]`)
 	assertContains(t, typst, `#folio-chapter(first: false)[Chapter 2]`)
 	assertContains(t, typst, `#folio-scene-break()`)
-	assertContains(t, typst, `#text(font: "Libertinus Mono")[watch]`)
+	assertContains(t, typst, `#text(font: "Liberation Mono", size: 10pt, weight: "bold")[watch]`)
 	assertNotContains(t, typst, `Private planning`)
 	assertBefore(t, typst, `Chapter 1`, `Chapter 2`)
 }
@@ -72,6 +72,9 @@ func TestUSManuscriptOverridesBritishWithoutChangingPageSize(t *testing.T) {
 	assertNotContains(t, typst, `us-letter`)
 	assertContains(t, typst, `font: "Libertinus Mono"`)
 	assertContains(t, typst, `size: 10pt`)
+	assertContains(t, typst, `font: "Menlo"`)
+	assertContains(t, typst, `size: 9pt`)
+	assertContains(t, typst, `weight: "bold"`)
 	assertContains(t, typst, `first-line-indent: 12.7mm`)
 	assertContains(t, typst, `leading: 2em`)
 	assertContains(t, typst, `spacing: 2em`)
@@ -124,15 +127,18 @@ func TestMarkdownInlineMarkupAndLiteralDelimitersRenderToTypst(t *testing.T) {
 
 	assertContains(t, typst, `Kevin thought, \_.`)
 	assertContains(t, typst, `The form had three blanks: \_, \_, and \_.`)
-	assertContains(t, typst, `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Libertinus Mono")[kevin\_murray].`)
+	assertContains(t, typst, `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Liberation Mono", size: 10pt, weight: "bold")[kevin\_murray].`)
 	assertContains(t, typst, `\/\/ JOKES ABOUT HALLOWEEN`)
+	assertContains(t, typst, `font: "Liberation Mono"`)
+	assertContains(t, typst, `size: 10pt`)
+	assertContains(t, typst, `weight: "bold"`)
 	assertContains(t, typst, `#folio-code[living\_room:`)
 	assertContains(t, typst, `north\_wall: 4.20m]`)
 }
 
 func TestRenderInlineMarkup(t *testing.T) {
-	got := renderInlineMarkup("Dialogue begins --- like this -- then continues with **bold**, *italic*, and `kevin_murray`.", "Libertinus Mono")
-	want := `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Libertinus Mono")[kevin\_murray].`
+	got := renderInlineMarkup("Dialogue begins --- like this -- then continues with **bold**, *italic*, and `kevin_murray`.", "Liberation Mono", "10pt", "bold")
+	want := `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Liberation Mono", size: 10pt, weight: "bold")[kevin\_murray].`
 	if got != want {
 		t.Fatalf("unexpected inline render\nwant: %s\n got: %s", want, got)
 	}
@@ -143,7 +149,7 @@ func TestRenderInlineMarkup(t *testing.T) {
 		"Dialogue begins --- like this -- then continues with **bold**, *italic*, and `kevin_murray`.",
 	}, "\n"))
 	canonicalDoc := parseMarkdown(RenderMarkdown(doc))
-	got = renderInlineMarkup(canonicalDoc.Blocks[1].Text, "Libertinus Mono")
+	got = renderInlineMarkup(canonicalDoc.Blocks[1].Text, "Liberation Mono", "10pt", "bold")
 	if got != want {
 		t.Fatalf("unexpected canonical inline render\ncanonical: %s\nwant: %s\n got: %s", RenderMarkdown(doc), want, got)
 	}
@@ -170,7 +176,7 @@ func TestOrgInlineMarkupAndSectionBreakRenderThroughCanonicalMarkdown(t *testing
 	runManuscript(t, root, filepath.Join(dir, "ch01.org"), output)
 	typst := readFile(t, output)
 
-	assertContains(t, typst, `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Libertinus Mono")[kevin\_murray].`)
+	assertContains(t, typst, `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Liberation Mono", size: 10pt, weight: "bold")[kevin\_murray].`)
 	assertContains(t, typst, `#folio-scene-break()`)
 	assertContains(t, typst, `Kevin thought, \_.`)
 }
@@ -262,7 +268,6 @@ func TestPublicFolioDispatcherReachesGoManuscriptHelp(t *testing.T) {
 	root := testProjectRoot(t)
 	cmd := exec.Command(filepath.Join(root, "bin", "folio"), "manuscript", "--help")
 	cmd.Dir = root
-	cmd.Env = append(os.Environ(), "FIRST_FOLIO_ROOT="+root)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("folio manuscript --help failed: %v\n%s", err, string(out))
@@ -353,7 +358,6 @@ func runManuscriptOutput(t *testing.T, root string, args ...string) string {
 	cmdArgs := append([]string{"run", filepath.Join(root, "cmd", "folio-manuscript")}, args...)
 	cmd := exec.Command("go", cmdArgs...)
 	cmd.Dir = root
-	cmd.Env = append(os.Environ(), "FIRST_FOLIO_ROOT="+root)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("folio manuscript failed: %v\n%s", err, string(out))
 	} else {
@@ -367,7 +371,6 @@ func assertCommandFails(t *testing.T, root string, args []string, want string) {
 	cmdArgs := append([]string{"run", filepath.Join(root, "cmd", "folio-manuscript")}, args...)
 	cmd := exec.Command("go", cmdArgs...)
 	cmd.Dir = root
-	cmd.Env = append(os.Environ(), "FIRST_FOLIO_ROOT="+root)
 	out, err := cmd.CombinedOutput()
 	if err == nil {
 		t.Fatalf("expected command to fail")

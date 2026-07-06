@@ -38,48 +38,66 @@ type Folio struct {
 }
 
 type ManuscriptConfig struct {
-	Style             string           `yaml:"style"`
-	Page              string           `yaml:"page"`
-	Margin            string           `yaml:"margin"`
-	Font              string           `yaml:"font"`
-	FontSize          string           `yaml:"font-size"`
-	FontWeight        string           `yaml:"font-weight"`
-	HeadingFont       string           `yaml:"heading-font"`
-	HeadingFontSize   string           `yaml:"heading-font-size"`
-	HeadingFontWeight string           `yaml:"heading-font-weight"`
-	MonoFont          string           `yaml:"mono-font"`
-	MonoFontSize      string           `yaml:"mono-font-size"`
-	MonoFontWeight    string           `yaml:"mono-font-weight"`
-	TitleFont         string           `yaml:"title-font"`
-	TitleFontSize     string           `yaml:"title-font-size"`
-	TitleFontWeight   string           `yaml:"title-font-weight"`
-	SubtitleFont      string           `yaml:"subtitle-font"`
-	SubtitleFontSize  string           `yaml:"subtitle-font-size"`
-	SubtitleFontStyle string           `yaml:"subtitle-font-style"`
-	AuthorFont        string           `yaml:"author-font"`
-	AuthorFontSize    string           `yaml:"author-font-size"`
-	AuthorAttribution string           `yaml:"author-attribution"`
-	DateFont          string           `yaml:"date-font"`
-	DateFontSize      string           `yaml:"date-font-size"`
-	VersionFont       string           `yaml:"version-font"`
-	VersionFontSize   string           `yaml:"version-font-size"`
-	WordCountFont     string           `yaml:"wordcount-font"`
-	WordCountFontSize string           `yaml:"wordcount-font-size"`
-	ContactFont       string           `yaml:"contact-font"`
-	ContactFontSize   string           `yaml:"contact-font-size"`
-	LineSpacing       string           `yaml:"line-spacing"`
-	ParagraphIndent   string           `yaml:"paragraph-indent"`
-	ParagraphSpacing  string           `yaml:"paragraph-spacing"`
-	PageHeader        PageHeaderConfig `yaml:"page-header"`
-	TOC               TOCConfig        `yaml:"toc"`
-	TitlePage         TitlePageConfig  `yaml:"title-page"`
-	Part              HeadingConfig    `yaml:"part"`
-	Chapter           HeadingConfig    `yaml:"chapter"`
+	Style               string           `yaml:"style"`
+	Page                string           `yaml:"page"`
+	Margin              string           `yaml:"margin"`
+	Font                string           `yaml:"font"`
+	FontSize            string           `yaml:"font-size"`
+	FontWeight          string           `yaml:"font-weight"`
+	HeadingFont         string           `yaml:"heading-font"`
+	HeadingFontSize     string           `yaml:"heading-font-size"`
+	HeadingFontWeight   string           `yaml:"heading-font-weight"`
+	MonoFont            string           `yaml:"mono-font"`
+	MonoFontSize        string           `yaml:"mono-font-size"`
+	MonoFontWeight      string           `yaml:"mono-font-weight"`
+	TitleFont           string           `yaml:"title-font"`
+	TitleFontSize       string           `yaml:"title-font-size"`
+	TitleFontWeight     string           `yaml:"title-font-weight"`
+	SubtitleFont        string           `yaml:"subtitle-font"`
+	SubtitleFontSize    string           `yaml:"subtitle-font-size"`
+	SubtitleFontWeight  string           `yaml:"subtitle-font-weight"`
+	SubtitleFontStyle   string           `yaml:"subtitle-font-style"`
+	AuthorFont          string           `yaml:"author-font"`
+	AuthorFontSize      string           `yaml:"author-font-size"`
+	AuthorFontWeight    string           `yaml:"author-font-weight"`
+	AuthorAttribution   string           `yaml:"author-attribution"`
+	DateFont            string           `yaml:"date-font"`
+	DateFontSize        string           `yaml:"date-font-size"`
+	DateFontWeight      string           `yaml:"date-font-weight"`
+	VersionFont         string           `yaml:"version-font"`
+	VersionFontSize     string           `yaml:"version-font-size"`
+	VersionFontWeight   string           `yaml:"version-font-weight"`
+	WordCountFont       string           `yaml:"wordcount-font"`
+	WordCountFontSize   string           `yaml:"wordcount-font-size"`
+	WordCountFontWeight string           `yaml:"wordcount-font-weight"`
+	ContactFont         string           `yaml:"contact-font"`
+	ContactFontSize     string           `yaml:"contact-font-size"`
+	ContactFontWeight   string           `yaml:"contact-font-weight"`
+	LineSpacing         string           `yaml:"line-spacing"`
+	ParagraphIndent     string           `yaml:"paragraph-indent"`
+	ParagraphSpacing    string           `yaml:"paragraph-spacing"`
+	PageHeader          PageHeaderConfig `yaml:"page-header"`
+	TOC                 TOCConfig        `yaml:"toc"`
+	TitlePage           TitlePageConfig  `yaml:"title-page"`
+	Part                HeadingConfig    `yaml:"part"`
+	Chapter             HeadingConfig    `yaml:"chapter"`
 }
 
 type TitlePageConfig struct {
-	TitleBlockAlign string `yaml:"title-block-align"`
-	FooterAlign     string `yaml:"footer-align"`
+	Enabled          bool   `yaml:"enabled"`
+	PageNumber       bool   `yaml:"page-number"`
+	IncludeTitle     bool   `yaml:"include-title"`
+	IncludeSubtitle  bool   `yaml:"include-subtitle"`
+	IncludeAuthor    bool   `yaml:"include-author"`
+	IncludeDate      bool   `yaml:"include-date"`
+	IncludeWordCount bool   `yaml:"include-wordcount"`
+	IncludeAddress   bool   `yaml:"include-address"`
+	IncludePhone     bool   `yaml:"include-phone"`
+	IncludeEmail     bool   `yaml:"include-email"`
+	IncludeWebsite   bool   `yaml:"include-website"`
+	IncludeVersion   bool   `yaml:"include-version"`
+	TitleBlockAlign  string `yaml:"title-block-align"`
+	FooterAlign      string `yaml:"footer-align"`
 }
 
 type PageHeaderConfig struct {
@@ -89,6 +107,7 @@ type PageHeaderConfig struct {
 	FontWeight          string `yaml:"font-weight"`
 	Format              string `yaml:"format"`
 	Align               string `yaml:"align"`
+	DistanceFromEdge    string `yaml:"distance-from-edge"`
 	ContentPaddingAfter string `yaml:"content-padding-after"`
 }
 
@@ -103,13 +122,19 @@ type TOCConfig struct {
 	HeadingFontWeight string `yaml:"heading-font-weight"`
 	IncludeParts      bool   `yaml:"include-parts"`
 	IncludeChapters   bool   `yaml:"include-chapters"`
+	IncludeSections   bool   `yaml:"include-sections"`
+	DotLeaders        bool   `yaml:"dot-leaders"`
+	PageNumbers       bool   `yaml:"page-numbers"`
+	PageBreakBefore   bool   `yaml:"page-break-before"`
 }
 
 type HeadingConfig struct {
-	Position      string `yaml:"position"`
-	Align         string `yaml:"align"`
-	CaseTransform string `yaml:"case-transform"`
-	SpaceAfter    string `yaml:"space-after"`
+	PageBreakBefore bool   `yaml:"page-break-before"`
+	VerticalAlign   string `yaml:"vertical-align"`
+	Position        string `yaml:"position"`
+	Align           string `yaml:"align"`
+	CaseTransform   string `yaml:"case-transform"`
+	SpaceAfter      string `yaml:"space-after"`
 }
 
 func LoadConfig(sourceDir string, opts Options) (Config, error) {
@@ -185,31 +210,42 @@ func normalizeConfig(cfg *Config) {
 	fill(&folio.Margin, "25mm")
 	fill(&folio.Font, "Libertinus Serif")
 	fill(&folio.FontSize, "12pt")
+	fill(&folio.FontWeight, "regular")
 	fill(&folio.HeadingFont, folio.Font)
 	fill(&folio.HeadingFontSize, folio.FontSize)
 	fill(&ms.Page, folio.Page)
 	fill(&ms.Margin, folio.Margin)
 	fill(&ms.Font, folio.Font)
 	fill(&ms.FontSize, folio.FontSize)
+	fill(&ms.FontWeight, folio.FontWeight)
 	fill(&ms.HeadingFont, folio.HeadingFont)
 	fill(&ms.HeadingFontSize, folio.HeadingFontSize)
+	fill(&ms.HeadingFontWeight, "regular")
 	fill(&ms.MonoFont, "Libertinus Mono")
 	fill(&ms.MonoFontSize, ms.FontSize)
+	fill(&ms.MonoFontWeight, "regular")
 	fill(&ms.TitleFont, ms.HeadingFont)
 	fill(&ms.TitleFontSize, "20pt")
+	fill(&ms.TitleFontWeight, "bold")
 	fill(&ms.SubtitleFont, ms.HeadingFont)
 	fill(&ms.SubtitleFontSize, "14pt")
+	fill(&ms.SubtitleFontWeight, "regular")
 	fill(&ms.AuthorFont, ms.HeadingFont)
 	fill(&ms.AuthorFontSize, ms.FontSize)
+	fill(&ms.AuthorFontWeight, "regular")
 	fill(&ms.AuthorAttribution, "by")
 	fill(&ms.DateFont, ms.HeadingFont)
 	fill(&ms.DateFontSize, "10pt")
+	fill(&ms.DateFontWeight, "regular")
 	fill(&ms.VersionFont, ms.HeadingFont)
 	fill(&ms.VersionFontSize, "10pt")
+	fill(&ms.VersionFontWeight, "regular")
 	fill(&ms.WordCountFont, ms.HeadingFont)
 	fill(&ms.WordCountFontSize, "10pt")
+	fill(&ms.WordCountFontWeight, "regular")
 	fill(&ms.ContactFont, ms.HeadingFont)
 	fill(&ms.ContactFontSize, "10pt")
+	fill(&ms.ContactFontWeight, "regular")
 	fill(&ms.LineSpacing, "1.5")
 	fill(&ms.ParagraphIndent, "10mm")
 	fill(&ms.ParagraphSpacing, "0")
@@ -221,15 +257,19 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.PageHeader.FontWeight, "regular")
 	fill(&ms.PageHeader.Format, "[author] / [title] / [page]")
 	fill(&ms.PageHeader.Align, "right")
+	fill(&ms.PageHeader.DistanceFromEdge, ms.Margin)
 	fill(&ms.PageHeader.ContentPaddingAfter, "10mm")
 	fill(&ms.TOC.Title, "Contents")
 	fill(&ms.TOC.Font, ms.HeadingFont)
 	fill(&ms.TOC.FontSize, "11pt")
+	fill(&ms.TOC.FontWeight, "regular")
 	fill(&ms.TOC.HeadingFont, ms.HeadingFont)
 	fill(&ms.TOC.HeadingFontSize, "16pt")
+	fill(&ms.TOC.HeadingFontWeight, "bold")
 	fill(&ms.TitlePage.TitleBlockAlign, "center")
 	fill(&ms.TitlePage.FooterAlign, "center")
 	fill(&ms.Part.Align, "center")
+	fill(&ms.Part.VerticalAlign, "center")
 	fill(&ms.Part.CaseTransform, "as-written")
 	fill(&ms.Chapter.Align, "center")
 	fill(&ms.Chapter.Position, "one-third")
@@ -313,8 +353,14 @@ func stringAt(node map[string]any, parts ...string) string {
 }
 
 func projectRoot() (string, error) {
-	if root := os.Getenv("FIRST_FOLIO_ROOT"); root != "" {
-		return root, nil
+	if executable, err := os.Executable(); err == nil {
+		if resolved, err := filepath.EvalSymlinks(executable); err == nil {
+			executable = resolved
+		}
+		root := filepath.Dir(filepath.Dir(executable))
+		if _, err := os.Stat(filepath.Join(root, "presets", "british-script.yaml")); err == nil {
+			return root, nil
+		}
 	}
 	wd, err := os.Getwd()
 	if err != nil {

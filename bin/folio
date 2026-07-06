@@ -427,7 +427,6 @@ sub print_help_doc {
 
 sub cmd_manuscript {
     my $root = "$FindBin::RealBin/..";
-    local $ENV{FIRST_FOLIO_ROOT} = $root;
 
     my $helper = "$FindBin::RealBin/folio-manuscript";
     if (-x $helper) {

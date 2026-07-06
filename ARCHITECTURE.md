@@ -14,7 +14,7 @@ First Folio is a CLI-first document renderer with two implementation paths.
 Prose manuscript rendering is implemented in Go:
 
 - `folio manuscript` is dispatched by `bin/folio`.
-- The dispatcher sets `FIRST_FOLIO_ROOT` and executes `bin/folio-manuscript` when built.
+- The dispatcher executes `bin/folio-manuscript` when built; the Go helper resolves the project root from its executable realpath.
 - During development, the dispatcher falls back to `go run ./cmd/folio-manuscript`.
 - `cmd/folio-manuscript` delegates all behaviour to `internal/manuscript`.
 

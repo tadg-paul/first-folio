@@ -13,13 +13,15 @@ import (
 )
 
 type templateData struct {
-	Config  Config
-	Meta    Metadata
-	Header  string
-	Body    string
-	IsUS    bool
-	Leading string
-	Spacing string
+	Config          Config
+	Meta            Metadata
+	Header          string
+	Body            string
+	IsUS            bool
+	Leading         string
+	Spacing         string
+	PartVertical    string
+	ChapterPosition string
 }
 
 func RenderTypst(doc Document, cfg Config) (string, error) {
@@ -29,13 +31,15 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 	}
 	safeMeta := escapedMetadata(doc.Metadata)
 	data := templateData{
-		Config:  cfg,
-		Meta:    safeMeta,
-		Header:  renderHeader(doc.Metadata, cfg),
-		Body:    body,
-		IsUS:    cfg.Folio.Manuscript.Style == "us",
-		Leading: lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing),
-		Spacing: paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, cfg.Folio.Manuscript.LineSpacing),
+		Config:          cfg,
+		Meta:            safeMeta,
+		Header:          renderHeader(doc.Metadata, cfg),
+		Body:            body,
+		IsUS:            cfg.Folio.Manuscript.Style == "us",
+		Leading:         lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing),
+		Spacing:         paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, cfg.Folio.Manuscript.LineSpacing),
+		PartVertical:    typstVerticalAlign(cfg.Folio.Manuscript.Part.VerticalAlign),
+		ChapterPosition: chapterPosition(cfg.Folio.Manuscript.Chapter.Position),
 	}
 	root, err := projectRoot()
 	if err != nil {
@@ -92,7 +96,7 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 		case "chapter":
 			lines = append(lines, fmt.Sprintf("#folio-chapter(first: %t)[%s]",
 				firstPageBlock,
-				typstInline(block.Text, cfg)))
+				caseTransform(block.Text, cfg.Folio.Manuscript.Chapter.CaseTransform)))
 			firstPageBlock = false
 		case "section":
 			lines = append(lines, "#folio-section["+typstInline(block.Text, cfg)+"]")
@@ -121,17 +125,17 @@ func renderHeader(meta Metadata, cfg Config) string {
 }
 
 func typstInline(text string, cfg Config) string {
-	return renderInlineMarkup(text, cfg.Folio.Manuscript.MonoFont)
+	return renderInlineMarkup(text, cfg.Folio.Manuscript.MonoFont, cfg.Folio.Manuscript.MonoFontSize, cfg.Folio.Manuscript.MonoFontWeight)
 }
 
-func renderInlineMarkup(text string, monoFont string) string {
+func renderInlineMarkup(text string, monoFont string, monoSize string, monoWeight string) string {
 	var out strings.Builder
 	for i := 0; i < len(text); {
 		switch {
 		case strings.HasPrefix(text[i:], "`"):
 			if end := strings.Index(text[i+1:], "`"); end >= 0 {
 				content := text[i+1 : i+1+end]
-				out.WriteString(fmt.Sprintf(`#text(font: "%s")[%s]`, escapeTypst(monoFont), escapeTypst(content)))
+				out.WriteString(fmt.Sprintf(`#text(font: "%s", size: %s, weight: "%s")[%s]`, escapeTypst(monoFont), monoSize, escapeTypst(monoWeight), escapeTypst(content)))
 				i += end + 2
 				continue
 			}
@@ -139,7 +143,7 @@ func renderInlineMarkup(text string, monoFont string) string {
 			if end := strings.Index(text[i+2:], "**"); end >= 0 {
 				content := text[i+2 : i+2+end]
 				out.WriteString("*")
-				out.WriteString(renderInlineMarkup(content, monoFont))
+				out.WriteString(renderInlineMarkup(content, monoFont, monoSize, monoWeight))
 				out.WriteString("*")
 				i += end + 4
 				continue
@@ -148,7 +152,7 @@ func renderInlineMarkup(text string, monoFont string) string {
 			if end := strings.Index(text[i+1:], "*"); end >= 0 {
 				content := text[i+1 : i+1+end]
 				out.WriteString("_")
-				out.WriteString(renderInlineMarkup(content, monoFont))
+				out.WriteString(renderInlineMarkup(content, monoFont, monoSize, monoWeight))
 				out.WriteString("_")
 				i += end + 2
 				continue
@@ -204,6 +208,32 @@ func nextInlineMarker(text string) int {
 func applyMarkdownDashes(text string) string {
 	text = strings.ReplaceAll(text, "---", "—")
 	return strings.ReplaceAll(text, "--", "–")
+}
+
+func typstVerticalAlign(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "center", "middle", "horizon", "":
+		return "horizon"
+	case "top":
+		return "top"
+	case "bottom":
+		return "bottom"
+	default:
+		return value
+	}
+}
+
+func chapterPosition(value string) string {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "one-third", "third", "":
+		return "30%"
+	case "center", "middle":
+		return "50%"
+	case "top":
+		return "0%"
+	default:
+		return value
+	}
 }
 
 func escapeTypst(text string) string {
