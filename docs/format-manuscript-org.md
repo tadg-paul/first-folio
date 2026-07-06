@@ -33,7 +33,7 @@ Supported front matter fields are `TITLE`, `SUBTITLE`, `AUTHOR`, `ATTRIBUTION`, 
 | `-----` or `_____` on its own line | Section break, rendered as the configured manuscript scene-break marker |
 | `*bold*` | Bold text |
 | `/italic/` | Italic text |
-| `~code~`, `=verbatim=`, and source blocks | Monospace text |
+| `=code=` and source blocks | Monospace text |
 | `--` and `---` | En dash and em dash |
 | `[fn:name]` and `[fn:name] Text` | Footnote reference and definition |
 | Quotes, links, lists, and tables | Standard org-mode document elements |
@@ -61,7 +61,7 @@ Section breaks default to a centred `#` marker in rendered manuscripts. Override
 
 * PART ONE
 ** Chapter 1
-The rain had been falling since Tuesday. The ledger flashed *WAIT* -- then the latch answered --- and Mira typed ~nine-bell~.
+The rain had been falling since Tuesday. The ledger flashed *WAIT* -- then the latch answered --- and Mira typed =nine-bell=.
 
 -----
 
