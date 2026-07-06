@@ -60,6 +60,8 @@ func appendMarkdownBlocks(lines *[]string, blocks []Block) {
 			*lines = append(*lines, "***", "")
 		case "code":
 			*lines = append(*lines, "```"+block.Lang, block.Text, "```", "")
+		case "raw-typst":
+			*lines = append(*lines, block.Text, "")
 		}
 	}
 }

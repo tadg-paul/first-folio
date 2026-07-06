@@ -44,7 +44,7 @@
 
 #let folio-scene-break() = {
   v(1em)
-  align(center)[\* \* \*]
+  align(center)[{{.SceneBreakMarker}}]
   v(1em)
 }
 
@@ -57,6 +57,12 @@
     )[#body]
   ]
 }
+
+#show raw: it => text(
+  font: "{{.Config.Folio.Manuscript.MonoFont}}",
+  size: {{.Config.Folio.Manuscript.MonoFontSize}},
+  weight: "{{.Config.Folio.Manuscript.MonoFontWeight}}",
+)[#it]
 
 #set page(
   paper: "{{.Config.Folio.Manuscript.Page}}",

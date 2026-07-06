@@ -4,7 +4,9 @@ package manuscript
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
+	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -17,13 +19,36 @@ func Parse(format string, text string) (Document, error) {
 	case "markdown":
 		return parseMarkdown(text)
 	case "org":
-		return parseOrg(text), nil
+		return parseOrg(text)
 	default:
 		return Document{}, fmt.Errorf("unsupported manuscript format: %s", format)
 	}
 }
 
 func parseMarkdown(text string) (Document, error) {
+	var doc Document
+	var err error
+	text, err = parseMarkdownFrontmatter(&doc.Metadata, text)
+	if err != nil {
+		return Document{}, err
+	}
+	if err := rejectUnsupportedMarkdown(text); err != nil {
+		return Document{}, err
+	}
+	text = removeMarkdownPrivateSections(text)
+	typst, err := runPandoc("markdown-raw_html", "typst", text)
+	if err != nil {
+		return Document{}, err
+	}
+	blocks, err := pandocTypstBlocks(typst)
+	if err != nil {
+		return Document{}, err
+	}
+	doc.Blocks = blocks
+	return doc, nil
+}
+
+func parseMarkdownLegacy(text string) (Document, error) {
 	var doc Document
 	var paragraph []string
 	inNoExport := false
@@ -134,7 +159,26 @@ func parseMarkdown(text string) (Document, error) {
 	return doc, nil
 }
 
-func parseOrg(text string) Document {
+func parseOrg(text string) (Document, error) {
+	meta := parseOrgMetadataBlock(text)
+	text = removeOrgPrivateSections(text)
+	text = replaceOrgSectionBreaksWithSentinel(text)
+	markdown, err := runPandoc("org", "gfm", text)
+	if err != nil {
+		return Document{}, err
+	}
+	markdown = stripRawOrgBlocks(markdown)
+	markdown = restoreSectionBreakSentinel(markdown)
+	markdown = normalizePandocMarkdownEscapes(markdown)
+	doc, err := parseMarkdown(markdown)
+	if err != nil {
+		return Document{}, err
+	}
+	mergeMetadata(&doc.Metadata, meta)
+	return doc, nil
+}
+
+func parseOrgLegacy(text string) Document {
 	var doc Document
 	var paragraph []string
 	inNoExport := false
@@ -217,6 +261,305 @@ func parseOrg(text string) Document {
 	flushParagraph()
 	flushCode()
 	return doc
+}
+
+func runPandoc(from string, to string, text string) (string, error) {
+	cmd := exec.Command("pandoc", "-f", from, "-t", to)
+	cmd.Stdin = strings.NewReader(text)
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("pandoc %s to %s failed: %w: %s", from, to, err, strings.TrimSpace(stderr.String()))
+	}
+	return stdout.String(), nil
+}
+
+func rejectUnsupportedMarkdown(text string) error {
+	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
+	for index, raw := range lines {
+		lineNumber := index + 1
+		line := strings.TrimSpace(raw)
+		if line == "" {
+			continue
+		}
+		if isMarkdownSectionBreak(line) {
+			if !isBlankMarkdownNeighbour(lines, index-1) || !isBlankMarkdownNeighbour(lines, index+1) {
+				return fmt.Errorf("markdown section break at line %d must be surrounded by blank lines", lineNumber)
+			}
+			continue
+		}
+		if isSetextUnderline(line) && !isBlankMarkdownNeighbour(lines, index-1) {
+			return fmt.Errorf("setext headings are not supported at line %d; use ATX headings", lineNumber)
+		}
+		if isHTMLBlockStart(line) {
+			return fmt.Errorf("HTML blocks are not supported at line %d", lineNumber)
+		}
+	}
+	return nil
+}
+
+func isMarkdownSectionBreak(line string) bool {
+	return line == "***" || line == "---"
+}
+
+func isBlankMarkdownNeighbour(lines []string, index int) bool {
+	return index < 0 || index >= len(lines) || strings.TrimSpace(lines[index]) == ""
+}
+
+func isSetextUnderline(line string) bool {
+	if len(line) < 3 {
+		return false
+	}
+	trimmed := strings.Trim(line, "=-")
+	return trimmed == "" && (strings.HasPrefix(line, "===") || strings.HasPrefix(line, "---"))
+}
+
+func isHTMLBlockStart(line string) bool {
+	if line == "" || strings.HasPrefix(line, "<!--") {
+		return false
+	}
+	if strings.HasPrefix(line, "</") {
+		return true
+	}
+	if !strings.HasPrefix(line, "<") || !strings.Contains(line, ">") {
+		return false
+	}
+	if len(line) < 2 {
+		return false
+	}
+	next := line[1]
+	return next >= 'A' && next <= 'Z' || next >= 'a' && next <= 'z'
+}
+
+func removeMarkdownPrivateSections(text string) string {
+	var out []string
+	inNoExport := false
+	noExportLevel := 0
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	for scanner.Scan() {
+		line := scanner.Text()
+		level, heading := markdownHeading(line)
+		if level > 0 {
+			if inNoExport && level <= noExportLevel {
+				inNoExport = false
+			}
+			if strings.Contains(heading, "<!-- noexport -->") {
+				inNoExport = true
+				noExportLevel = level
+				continue
+			}
+		}
+		if inNoExport || strings.HasPrefix(strings.TrimSpace(line), "<!--") {
+			continue
+		}
+		out = append(out, line)
+	}
+	return strings.Join(out, "\n")
+}
+
+func removeOrgPrivateSections(text string) string {
+	var out []string
+	inNoExport := false
+	noExportLevel := 0
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	for scanner.Scan() {
+		line := scanner.Text()
+		level, heading := orgHeading(line)
+		if level > 0 {
+			if inNoExport && level <= noExportLevel {
+				inNoExport = false
+			}
+			if strings.Contains(strings.ToLower(heading), ":noexport:") {
+				inNoExport = true
+				noExportLevel = level
+				continue
+			}
+		}
+		if inNoExport {
+			continue
+		}
+		out = append(out, line)
+	}
+	return strings.Join(out, "\n")
+}
+
+func stripRawOrgBlocks(text string) string {
+	var out []string
+	inRawOrg := false
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.TrimSpace(line) == "```{=org}" {
+			inRawOrg = true
+			continue
+		}
+		if inRawOrg {
+			if strings.TrimSpace(line) == "```" {
+				inRawOrg = false
+			}
+			continue
+		}
+		out = append(out, line)
+	}
+	return strings.Join(out, "\n")
+}
+
+func replaceOrgSectionBreaksWithSentinel(text string) string {
+	var out []string
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "-----" || trimmed == "_____" {
+			out = append(out, "FOLIOSECTIONBREAKTOKEN")
+			continue
+		}
+		out = append(out, line)
+	}
+	return strings.Join(out, "\n")
+}
+
+func restoreSectionBreakSentinel(text string) string {
+	var out []string
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.TrimSpace(line) == "FOLIOSECTIONBREAKTOKEN" {
+			out = append(out, "***")
+			continue
+		}
+		out = append(out, line)
+	}
+	return strings.Join(out, "\n")
+}
+
+func normalizePandocMarkdownEscapes(text string) string {
+	replacer := strings.NewReplacer(
+		`\"`, `"`,
+		`\_`, `_`,
+		`\*`, `*`,
+		`\[`, `[`,
+		`\]`, `]`,
+		`\(`, `(`,
+		`\)`, `)`,
+	)
+	return replacer.Replace(text)
+}
+
+func parseOrgMetadataBlock(text string) Metadata {
+	var meta Metadata
+	scanner := bufio.NewScanner(strings.NewReader(text))
+	for scanner.Scan() {
+		parseOrgMetadata(&meta, scanner.Text())
+	}
+	return meta
+}
+
+func mergeMetadata(target *Metadata, source Metadata) {
+	if source.Title != "" {
+		target.Title = source.Title
+	}
+	if source.Subtitle != "" {
+		target.Subtitle = source.Subtitle
+	}
+	if source.Author != "" {
+		target.Author = source.Author
+	}
+	if source.AuthorAttribution != "" {
+		target.AuthorAttribution = source.AuthorAttribution
+	}
+	if source.Date != "" {
+		target.Date = source.Date
+	}
+	if source.Version != "" {
+		target.Version = source.Version
+	}
+	if source.WordCount != "" {
+		target.WordCount = source.WordCount
+	}
+	if source.ContactName != "" {
+		target.ContactName = source.ContactName
+	}
+	if source.Address != "" {
+		target.Address = source.Address
+	}
+	if source.Phone != "" {
+		target.Phone = source.Phone
+	}
+	if source.Email != "" {
+		target.Email = source.Email
+	}
+	if source.Website != "" {
+		target.Website = source.Website
+	}
+}
+
+func pandocTypstBlocks(typst string) ([]Block, error) {
+	var blocks []Block
+	var raw []string
+	flushRaw := func() {
+		var chunk []string
+		flushChunk := func() {
+			text := strings.TrimSpace(strings.Join(chunk, "\n"))
+			if text != "" {
+				blocks = append(blocks, Block{Kind: "raw-typst", Text: text})
+			}
+			chunk = nil
+		}
+		for _, line := range raw {
+			if strings.TrimSpace(line) == "#horizontalrule" {
+				flushChunk()
+				blocks = append(blocks, Block{Kind: "scene-break"})
+				continue
+			}
+			chunk = append(chunk, line)
+		}
+		flushChunk()
+		raw = nil
+	}
+	scanner := bufio.NewScanner(strings.NewReader(typst))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if isPandocTypstLabel(line) {
+			continue
+		}
+		if level, heading := pandocTypstHeading(line); level > 0 {
+			flushRaw()
+			switch level {
+			case 1:
+				blocks = append(blocks, Block{Kind: "part", Level: level, Text: heading})
+			case 2:
+				blocks = append(blocks, Block{Kind: "chapter", Level: level, Text: heading})
+			default:
+				blocks = append(blocks, Block{Kind: "section", Level: level, Text: heading})
+			}
+			continue
+		}
+		raw = append(raw, line)
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	flushRaw()
+	return blocks, nil
+}
+
+func pandocTypstHeading(line string) (int, string) {
+	level := 0
+	for level < len(line) && line[level] == '=' {
+		level++
+	}
+	if level == 0 || len(line) <= level || line[level] != ' ' {
+		return 0, ""
+	}
+	return level, strings.TrimSpace(line[level+1:])
+}
+
+func isPandocTypstLabel(line string) bool {
+	trimmed := strings.TrimSpace(line)
+	return strings.HasPrefix(trimmed, "<") && strings.HasSuffix(trimmed, ">") && !strings.Contains(trimmed, " ")
 }
 
 func markdownHeading(line string) (int, string) {

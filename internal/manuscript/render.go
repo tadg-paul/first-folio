@@ -14,16 +14,17 @@ import (
 )
 
 type templateData struct {
-	Config          Config
-	Meta            Metadata
-	Header          string
-	Body            string
-	IsUS            bool
-	Leading         string
-	Spacing         string
-	PartVertical    string
-	ChapterPosition string
-	HasContact      bool
+	Config           Config
+	Meta             Metadata
+	Header           string
+	Body             string
+	IsUS             bool
+	Leading          string
+	Spacing          string
+	PartVertical     string
+	ChapterPosition  string
+	SceneBreakMarker string
+	HasContact       bool
 }
 
 func RenderTypst(doc Document, cfg Config) (string, error) {
@@ -34,16 +35,17 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 	safeMeta := escapedMetadata(doc.Metadata)
 	safeMeta.Date = escapeTypst(renderDate(doc.Metadata.Date, cfg.Folio.Manuscript.DateFormat))
 	data := templateData{
-		Config:          cfg,
-		Meta:            safeMeta,
-		Header:          renderHeader(doc.Metadata, cfg),
-		Body:            body,
-		IsUS:            cfg.Folio.Manuscript.Style == "us",
-		Leading:         lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing),
-		Spacing:         paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, cfg.Folio.Manuscript.LineSpacing),
-		PartVertical:    typstVerticalAlign(cfg.Folio.Manuscript.Part.VerticalAlign),
-		ChapterPosition: chapterPosition(cfg.Folio.Manuscript.Chapter.Position),
-		HasContact:      hasContactBlock(doc.Metadata, cfg),
+		Config:           cfg,
+		Meta:             safeMeta,
+		Header:           renderHeader(doc.Metadata, cfg),
+		Body:             body,
+		IsUS:             cfg.Folio.Manuscript.Style == "us",
+		Leading:          lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing),
+		Spacing:          paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, cfg.Folio.Manuscript.LineSpacing),
+		PartVertical:     typstVerticalAlign(cfg.Folio.Manuscript.Part.VerticalAlign),
+		ChapterPosition:  chapterPosition(cfg.Folio.Manuscript.Chapter.Position),
+		SceneBreakMarker: escapeTypst(cfg.Folio.Manuscript.SceneBreak.Marker),
+		HasContact:       hasContactBlock(doc.Metadata, cfg),
 	}
 	root, err := projectRoot()
 	if err != nil {
@@ -125,6 +127,8 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 			lines = append(lines, "#folio-scene-break()")
 		case "code":
 			lines = append(lines, "#folio-code["+escapeTypst(block.Text)+"]")
+		case "raw-typst":
+			lines = append(lines, block.Text)
 		case "footnote":
 			continue
 		default:

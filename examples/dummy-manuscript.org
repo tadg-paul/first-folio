@@ -26,6 +26,25 @@
 
 The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it." The ledger flashed *WAIT* -- then the brass latch answered --- and Mira whispered ~nine-bell~ into her phone.
 
+#+BEGIN_QUOTE
+Nessa. I am sorry I called you Belly in the attic. I am in Delgany House. I want to go home. I miss you.
+#+END_QUOTE
+
+Mira checked the [[https://example.invalid/archive][archive index]] and found a note where none had been before.[fn:ledger]
+
+- The drawer hummed when touched.
+- The latch answered only after the ninth word.
+- The map showed a room that had been demolished.
+
+1. Copy the date.
+2. Close the ledger.
+3. Leave before the bell repeats.
+
+| Name | Value |
+|------+-------|
+| Bell | Nine |
+| Gate | Orchard |
+
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
 A short paragraph followed, because not every thought arrives wearing a long coat.
@@ -75,6 +94,8 @@ The clock above the door struck once. Then it struck once again, softer. By the 
 The ninth bell did not sound. The silence after it did.
 
 Every drawer in the archive opened at once.
+
+[fn:ledger] The ink was still wet when Mira touched the margin.
 
 ** Chapter 2
 

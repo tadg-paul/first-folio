@@ -84,6 +84,7 @@ type ManuscriptConfig struct {
 	PageHeader          PageHeaderConfig `yaml:"page-header"`
 	TOC                 TOCConfig        `yaml:"toc"`
 	TitlePage           TitlePageConfig  `yaml:"title-page"`
+	SceneBreak          SceneBreakConfig `yaml:"scene-break"`
 	Part                HeadingConfig    `yaml:"part"`
 	Chapter             HeadingConfig    `yaml:"chapter"`
 }
@@ -134,6 +135,10 @@ type TOCConfig struct {
 	PageBreakBefore   bool   `yaml:"page-break-before"`
 	PartGapBefore     string `yaml:"part-gap-before"`
 	PartBold          bool   `yaml:"part-bold"`
+}
+
+type SceneBreakConfig struct {
+	Marker string `yaml:"marker"`
 }
 
 type HeadingConfig struct {
@@ -275,6 +280,7 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.TOC.HeadingFontSize, "16pt")
 	fill(&ms.TOC.HeadingFontWeight, "bold")
 	fill(&ms.TOC.PartGapBefore, "0.5em")
+	fill(&ms.SceneBreak.Marker, "#")
 	fill(&ms.TitlePage.TitleBlockAlign, "center")
 	fill(&ms.TitlePage.FooterAlign, "center")
 	fill(&ms.Part.Align, "center")

@@ -19,7 +19,7 @@ Supported frontmatter fields are `title`, `subtitle`, `author`, `attribution`, `
 | `## Chapter 1` | Chapter start page |
 | `### Section` and deeper | Local section heading |
 | Plain paragraphs | Body prose |
-| `***` on its own line | Scene break |
+| `***` or `---` on its own line, surrounded by blank lines | Section break, rendered as the configured manuscript scene-break marker |
 | `**bold**` | Bold text |
 | `*italic*` | Italic text |
 | `` `code` `` and fenced code blocks | Monospace text |
@@ -30,6 +30,8 @@ Supported frontmatter fields are `title`, `subtitle`, `author`, `attribution`, `
 | Heading ending `<!-- noexport -->` | Private section excluded until the next same-or-higher heading |
 
 Setext headings are not part of the manuscript contract; use ATX headings (`#`, `##`, `###`) only. HTML blocks are not supported.
+
+Section breaks default to a centred `#` marker in rendered manuscripts. Override `folio.manuscript.scene-break.marker` in YAML config to use another marker.
 
 Fountain is not accepted by manuscript mode.
 

@@ -18,6 +18,23 @@ website: https://example.invalid
 
 The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it." The ledger flashed **WAIT** -- then the brass latch answered --- and Mira whispered `nine-bell` into her phone.
 
+> Nessa. I am sorry I called you Belly in the attic. I am in Delgany House. I want to go home. I miss you.
+
+Mira checked the [archive index](https://example.invalid/archive) and found a note where none had been before.[^ledger]
+
+- The drawer hummed when touched.
+- The latch answered only after the ninth word.
+- The map showed a room that had been demolished.
+
+1. Copy the date.
+2. Close the ledger.
+3. Leave before the bell repeats.
+
+| Name | Value |
+|---|---|
+| Bell | Nine |
+| Gate | Orchard |
+
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
 A short paragraph followed, because not every thought arrives wearing a long coat.
@@ -68,6 +85,8 @@ The ninth bell did not sound. The silence after it did.
 
 Every drawer in the archive opened at once.
 
+[^ledger]: The ink was still wet when Mira touched the margin.
+
 ## Chapter 2
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
@@ -112,11 +131,11 @@ The corridor outside the archive was quiet enough for a whisper to travel. "Are 
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
-***
+---
 
 After the pause, the room seemed to remember them.
 
-```
+```yaml
 living_room:
   north_wall: 4.20m
   warning: do not trust the ninth bell

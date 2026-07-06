@@ -59,12 +59,7 @@ func Run(args []string) error {
 		return nil
 	}
 
-	canonicalMarkdown := RenderMarkdown(doc)
-	canonicalDoc, err := Parse("markdown", canonicalMarkdown)
-	if err != nil {
-		return err
-	}
-	typst, err := RenderTypst(canonicalDoc, cfg)
+	typst, err := RenderTypst(doc, cfg)
 	if err != nil {
 		return err
 	}
