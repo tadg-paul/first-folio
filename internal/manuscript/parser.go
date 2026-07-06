@@ -185,7 +185,7 @@ func parseOrg(text string) Document {
 			flushParagraph()
 			continue
 		}
-		if strings.TrimSpace(line) == "-----" {
+		if strings.TrimSpace(line) == "-----" || strings.TrimSpace(line) == "_____" {
 			flushParagraph()
 			doc.Blocks = append(doc.Blocks, Block{Kind: "scene-break"})
 			continue
@@ -195,7 +195,7 @@ func parseOrg(text string) Document {
 			doc.Blocks = append(doc.Blocks, Block{Kind: "footnote", Text: name + "\t" + value})
 			continue
 		}
-		paragraph = append(paragraph, strings.TrimSpace(line))
+		paragraph = append(paragraph, canonicalizeOrgInline(strings.TrimSpace(line)))
 	}
 	flushParagraph()
 	flushCode()
@@ -393,4 +393,12 @@ func orgFootnote(line string) (string, string, bool) {
 		return "", "", false
 	}
 	return match[1], match[2], true
+}
+
+func canonicalizeOrgInline(text string) string {
+	text = regexp.MustCompile(`\*([^*\n]+)\*`).ReplaceAllString(text, `**$1**`)
+	text = regexp.MustCompile(`/([^/\n]+?)/`).ReplaceAllString(text, `*$1*`)
+	text = regexp.MustCompile(`~([^~\n]+?)~`).ReplaceAllString(text, "`$1`")
+	text = regexp.MustCompile(`=([^=\n]+?)=`).ReplaceAllString(text, "`$1`")
+	return text
 }

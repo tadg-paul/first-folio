@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -122,23 +121,89 @@ func renderHeader(meta Metadata, cfg Config) string {
 }
 
 func typstInline(text string, cfg Config) string {
-	monoFont := cfg.Folio.Manuscript.MonoFont
-	escaped := escapeTypst(text)
-	escaped = replaceInlineCode(escaped, monoFont)
-	escaped = regexp.MustCompile(`\*\*([^*]+)\*\*`).ReplaceAllString(escaped, `*$1*`)
-	escaped = regexp.MustCompile(`\*([^*]+)\*`).ReplaceAllString(escaped, `_$1_`)
-	escaped = regexp.MustCompile(`/([^/]+?)/`).ReplaceAllString(escaped, `_$1_`)
-	escaped = regexp.MustCompile(`\[fn:([^\]]+)\]`).ReplaceAllString(escaped, `#footnote[$1]`)
-	escaped = regexp.MustCompile(`\[\^([^\]]+)\]`).ReplaceAllString(escaped, `#footnote[$1]`)
-	return escaped
+	return renderInlineMarkup(text, cfg.Folio.Manuscript.MonoFont)
 }
 
-func replaceInlineCode(text string, monoFont string) string {
-	re := regexp.MustCompile("`([^`]+)`")
-	return re.ReplaceAllStringFunc(text, func(match string) string {
-		content := strings.Trim(match, "`")
-		return fmt.Sprintf(`#text(font: "%s")[%s]`, monoFont, content)
-	})
+func renderInlineMarkup(text string, monoFont string) string {
+	var out strings.Builder
+	for i := 0; i < len(text); {
+		switch {
+		case strings.HasPrefix(text[i:], "`"):
+			if end := strings.Index(text[i+1:], "`"); end >= 0 {
+				content := text[i+1 : i+1+end]
+				out.WriteString(fmt.Sprintf(`#text(font: "%s")[%s]`, escapeTypst(monoFont), escapeTypst(content)))
+				i += end + 2
+				continue
+			}
+		case strings.HasPrefix(text[i:], "**"):
+			if end := strings.Index(text[i+2:], "**"); end >= 0 {
+				content := text[i+2 : i+2+end]
+				out.WriteString("*")
+				out.WriteString(renderInlineMarkup(content, monoFont))
+				out.WriteString("*")
+				i += end + 4
+				continue
+			}
+		case strings.HasPrefix(text[i:], "*"):
+			if end := strings.Index(text[i+1:], "*"); end >= 0 {
+				content := text[i+1 : i+1+end]
+				out.WriteString("_")
+				out.WriteString(renderInlineMarkup(content, monoFont))
+				out.WriteString("_")
+				i += end + 2
+				continue
+			}
+		case strings.HasPrefix(text[i:], "[fn:"):
+			if end := strings.Index(text[i:], "]"); end >= 0 {
+				out.WriteString("#footnote[")
+				out.WriteString(escapeTypst(text[i+4 : i+end]))
+				out.WriteString("]")
+				i += end + 1
+				continue
+			}
+		case strings.HasPrefix(text[i:], "[^"):
+			if end := strings.Index(text[i:], "]"); end >= 0 {
+				out.WriteString("#footnote[")
+				out.WriteString(escapeTypst(text[i+2 : i+end]))
+				out.WriteString("]")
+				i += end + 1
+				continue
+			}
+		case strings.HasPrefix(text[i:], "---"):
+			out.WriteString("—")
+			i += 3
+			continue
+		case strings.HasPrefix(text[i:], "--"):
+			out.WriteString("–")
+			i += 2
+			continue
+		}
+
+		next := nextInlineMarker(text[i+1:])
+		if next < 0 {
+			out.WriteString(escapeTypst(applyMarkdownDashes(text[i:])))
+			break
+		}
+		next += i + 1
+		out.WriteString(escapeTypst(applyMarkdownDashes(text[i:next])))
+		i = next
+	}
+	return out.String()
+}
+
+func nextInlineMarker(text string) int {
+	index := -1
+	for _, marker := range []string{"`", "**", "*", "[fn:", "[^", "---", "--"} {
+		if found := strings.Index(text, marker); found >= 0 && (index < 0 || found < index) {
+			index = found
+		}
+	}
+	return index
+}
+
+func applyMarkdownDashes(text string) string {
+	text = strings.ReplaceAll(text, "---", "—")
+	return strings.ReplaceAll(text, "--", "–")
 }
 
 func escapeTypst(text string) string {
@@ -149,6 +214,9 @@ func escapeTypst(text string) string {
 		`#`, `\#`,
 		`$`, `\$`,
 		`@`, `\@`,
+		`_`, `\_`,
+		`*`, `\*`,
+		`/`, `\/`,
 	)
 	return replacer.Replace(text)
 }

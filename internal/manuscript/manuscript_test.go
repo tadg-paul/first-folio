@@ -94,6 +94,87 @@ func TestTOCCanBeDisabledByConfig(t *testing.T) {
 	assertNotContains(t, typst, `#outline(title: none)`)
 }
 
+func TestMarkdownInlineMarkupAndLiteralDelimitersRenderToTypst(t *testing.T) {
+	root := testProjectRoot(t)
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "ch01.md"), strings.Join([]string{
+		"# The Glass Orchard",
+		"",
+		"*by Example Author*",
+		"",
+		"### Chapter 1",
+		"",
+		"Kevin thought, _.",
+		"",
+		"The form had three blanks: _, _, and _.",
+		"",
+		"Dialogue begins --- like this -- then continues with **bold**, *italic*, and `kevin_murray`.",
+		"",
+		"// JOKES ABOUT HALLOWEEN",
+		"",
+		"```",
+		"living_room:",
+		"  north_wall: 4.20m",
+		"```",
+	}, "\n"))
+
+	output := filepath.Join(dir, "out.typ")
+	runManuscript(t, root, filepath.Join(dir, "ch01.md"), output)
+	typst := readFile(t, output)
+
+	assertContains(t, typst, `Kevin thought, \_.`)
+	assertContains(t, typst, `The form had three blanks: \_, \_, and \_.`)
+	assertContains(t, typst, `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Libertinus Mono")[kevin\_murray].`)
+	assertContains(t, typst, `\/\/ JOKES ABOUT HALLOWEEN`)
+	assertContains(t, typst, `#folio-code[living\_room:`)
+	assertContains(t, typst, `north\_wall: 4.20m]`)
+}
+
+func TestRenderInlineMarkup(t *testing.T) {
+	got := renderInlineMarkup("Dialogue begins --- like this -- then continues with **bold**, *italic*, and `kevin_murray`.", "Libertinus Mono")
+	want := `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Libertinus Mono")[kevin\_murray].`
+	if got != want {
+		t.Fatalf("unexpected inline render\nwant: %s\n got: %s", want, got)
+	}
+
+	doc := parseMarkdown(strings.Join([]string{
+		"### Chapter 1",
+		"",
+		"Dialogue begins --- like this -- then continues with **bold**, *italic*, and `kevin_murray`.",
+	}, "\n"))
+	canonicalDoc := parseMarkdown(RenderMarkdown(doc))
+	got = renderInlineMarkup(canonicalDoc.Blocks[1].Text, "Libertinus Mono")
+	if got != want {
+		t.Fatalf("unexpected canonical inline render\ncanonical: %s\nwant: %s\n got: %s", RenderMarkdown(doc), want, got)
+	}
+}
+
+func TestOrgInlineMarkupAndSectionBreakRenderThroughCanonicalMarkdown(t *testing.T) {
+	root := testProjectRoot(t)
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "ch01.org"), strings.Join([]string{
+		"#+TITLE: The Glass Orchard",
+		"#+AUTHOR: Example Author",
+		"",
+		"** Chapter 1",
+		"Dialogue begins --- like this -- then continues with *bold*, /italic/, and `kevin_murray`.",
+		"",
+		"-----",
+		"",
+		"_____",
+		"",
+		"Kevin thought, _.",
+	}, "\n"))
+
+	output := filepath.Join(dir, "out.typ")
+	runManuscript(t, root, filepath.Join(dir, "ch01.org"), output)
+	typst := readFile(t, output)
+
+	assertContains(t, typst, `Dialogue begins — like this – then continues with *bold*, _italic_, and #text(font: "Libertinus Mono")[kevin\_murray].`)
+	assertContains(t, typst, `#folio-scene-break()`)
+	assertContains(t, typst, `Kevin thought, \_.`)
+}
+
 func TestOrgManuscriptRenderingUsesCanonicalMarkdown(t *testing.T) {
 	dir := t.TempDir()
 	mdInput := filepath.Join(dir, "source.md")
