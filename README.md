@@ -41,6 +41,7 @@ make uninstall  # removes the symlink
 
 - **Perl 5** (core modules only - no CPAN dependencies)
 - **Typst** (required only for PDF output)
+- **Pandoc** (required for rich manuscript Markdown/org parsing and conversion)
 
 ## Supported Formats
 

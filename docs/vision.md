@@ -24,7 +24,7 @@ Playwrights and dramaturgs work across multiple tools and workflows. A play may 
 
 4. **CLI-first, scriptable.** All operations are available as command-line tools that read from files or stdin and write to files or stdout. Batch processing, piping, and scripting are first-class use cases.
 
-5. **Minimal dependencies.** Core conversion requires only Perl and its standard library. PDF output requires Typst. No other external tools are needed.
+5. **Minimal dependencies.** Core stage-play conversion requires only Perl and its standard library. PDF output requires Typst. Rich manuscript Markdown/org parsing and conversion may depend on Pandoc where using a standard document AST avoids custom parser complexity.
 
 6. **Shared configuration.** A single `script.yaml` file configures both First Folio and companion tools (e.g. [yapper](https://github.com/tadg-paul/yapper) for TTS rendering). Each tool reads shared metadata and its own namespace, ignoring the rest. Per-project config files override global defaults. See [docs/config.md](config.md).
 

@@ -25,8 +25,11 @@ Supported frontmatter fields are `title`, `subtitle`, `author`, `attribution`, `
 | `` `code` `` and fenced code blocks | Monospace text |
 | `--` and `---` | En dash and em dash |
 | `[^name]` and `[^name]: text` | Footnote reference and definition |
+| Blockquotes, links, lists, and tables | Standard Markdown document elements |
 | HTML comments | Private notes, excluded |
 | Heading ending `<!-- noexport -->` | Private section excluded until the next same-or-higher heading |
+
+Setext headings are not part of the manuscript contract; use ATX headings (`#`, `##`, `###`) only. HTML blocks are not supported.
 
 Fountain is not accepted by manuscript mode.
 

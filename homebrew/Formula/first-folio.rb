@@ -10,6 +10,7 @@ class FirstFolio < Formula
   head "https://github.com/tadg-paul/first-folio.git", branch: "master"
 
   depends_on "typst"
+  depends_on "pandoc"
 
   def install
     # Install into libexec preserving the directory structure so

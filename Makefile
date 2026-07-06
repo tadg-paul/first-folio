@@ -4,7 +4,7 @@ PROJECT_DIR := $(shell cd "$(dir $(lastword $(MAKEFILE_LIST)))" && pwd)
 CURRENT_VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 RELEASE_VERSION ?= $(shell echo "$(CURRENT_VERSION)" | awk -F. '{printf "%s.%s.%d", $$1, $$2, $$3+1}')
 
-.PHONY: build install uninstall test test-one-off lint sync release
+.PHONY: build install uninstall test test-one-off lint sync check-release-deps release
 
 build:
 	@go build -o "$(PROJECT_DIR)/bin/folio-manuscript" ./cmd/folio-manuscript
@@ -37,6 +37,10 @@ test: lint
 		bash "$$t" || exit 1; \
 	done
 
+check-release-deps:
+	@command -v typst >/dev/null 2>&1 || { echo "Error: typst is required for release packaging" >&2; exit 1; }
+	@command -v pandoc >/dev/null 2>&1 || { echo "Error: pandoc is required for manuscript format conversion" >&2; exit 1; }
+
 ifdef ISSUE
 test-one-off:
 	@bash tests/one_off/test_*$(ISSUE)*.sh
@@ -51,7 +55,7 @@ sync:
 	@git pull --rebase
 	@git push
 
-release:
+release: check-release-deps
 ifndef SKIP_TESTS
 	@echo "Running tests..."
 	$(MAKE) test

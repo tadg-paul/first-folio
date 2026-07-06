@@ -36,6 +36,7 @@ Supported front matter fields are `TITLE`, `SUBTITLE`, `AUTHOR`, `ATTRIBUTION`, 
 | `~code~`, `=verbatim=`, and source blocks | Monospace text |
 | `--` and `---` | En dash and em dash |
 | `[fn:name]` and `[fn:name] Text` | Footnote reference and definition |
+| Quotes, links, lists, and tables | Standard org-mode document elements |
 | Heading tagged `:noexport:` | Private section excluded with children |
 
 Fountain is not accepted by manuscript mode.
