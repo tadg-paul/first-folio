@@ -5,6 +5,7 @@ author: Example Author
 date: 2026-07-06
 version: Draft 2
 wordcount: 90000
+contact-name: Example Agent
 address: 100 Example Street / Sample City / Exampleland
 phone: +353 1 000 0000
 email: author@example.invalid

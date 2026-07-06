@@ -135,6 +135,8 @@ func setOption(opts *Options, key string, value string) {
 		opts.Version = value
 	case "wordcount":
 		opts.WordCount = value
+	case "contact-name":
+		opts.ContactName = value
 	}
 }
 
@@ -157,6 +159,7 @@ func Usage() string {
 		"  --date DATE                 Override manuscript date",
 		"  --version [VERSION]         Show command version, or override manuscript version when VALUE is supplied",
 		"  --wordcount WORDS           Override manuscript word count",
+		"  --contact-name NAME         Override title-page contact name",
 		"  --dry-run                   Validate inputs and print the render plan",
 		"  -h, --help                  Show this help message",
 		"",
@@ -183,6 +186,7 @@ func applyMetadataOverrides(meta *Metadata, opts Options, cfg Config) {
 	overrideString(&meta.Date, opts.Date, cfg.Date)
 	overrideString(&meta.Version, opts.Version, cfg.Version)
 	overrideString(&meta.WordCount, opts.WordCount, cfg.WordCount)
+	overrideString(&meta.ContactName, opts.ContactName, cfg.ContactName)
 	overrideString(&meta.Address, cfg.Address)
 	overrideString(&meta.Phone, cfg.Phone)
 	overrideString(&meta.Email, cfg.Email)

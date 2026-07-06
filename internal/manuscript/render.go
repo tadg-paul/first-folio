@@ -22,6 +22,7 @@ type templateData struct {
 	Spacing         string
 	PartVertical    string
 	ChapterPosition string
+	HasContact      bool
 }
 
 func RenderTypst(doc Document, cfg Config) (string, error) {
@@ -40,6 +41,7 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		Spacing:         paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, cfg.Folio.Manuscript.LineSpacing),
 		PartVertical:    typstVerticalAlign(cfg.Folio.Manuscript.Part.VerticalAlign),
 		ChapterPosition: chapterPosition(cfg.Folio.Manuscript.Chapter.Position),
+		HasContact:      hasContactBlock(doc.Metadata, cfg),
 	}
 	root, err := projectRoot()
 	if err != nil {
@@ -122,6 +124,15 @@ func renderHeader(meta Metadata, cfg Config) string {
 	header = strings.ReplaceAll(header, "[title]", escapeTypst(meta.Title))
 	header = strings.ReplaceAll(header, "[page]", "#context counter(page).display()")
 	return header
+}
+
+func hasContactBlock(meta Metadata, cfg Config) bool {
+	titlePage := cfg.Folio.Manuscript.TitlePage
+	return titlePage.IncludeContactName && meta.ContactName != "" ||
+		titlePage.IncludeAddress && meta.Address != "" ||
+		titlePage.IncludePhone && meta.Phone != "" ||
+		titlePage.IncludeEmail && meta.Email != "" ||
+		titlePage.IncludeWebsite && meta.Website != ""
 }
 
 func typstInline(text string, cfg Config) string {
@@ -267,6 +278,7 @@ func escapedMetadata(meta Metadata) Metadata {
 		Date:              escapeTypst(meta.Date),
 		Version:           escapeTypst(meta.Version),
 		WordCount:         escapeTypst(meta.WordCount),
+		ContactName:       escapeTypst(meta.ContactName),
 		Address:           escapeTypst(meta.Address),
 		Phone:             escapeTypst(meta.Phone),
 		Email:             escapeTypst(meta.Email),

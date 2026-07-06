@@ -86,7 +86,7 @@
       ],
       [
         {{if .Config.Folio.Manuscript.TitlePage.IncludeWordCount}}#text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}}, weight: "{{.Config.Folio.Manuscript.WordCountFontWeight}}")[
-          #if "{{.Meta.WordCount}}" != "" [{{.Meta.WordCount}} words]
+          #if "{{.Meta.WordCount}}" != "" [{{.Meta.WordCount}}]
         ]{{end}}
       ],
       [
@@ -98,21 +98,22 @@
 {{end}}
 
 {{if .Config.Folio.Manuscript.TitlePage.Enabled}}
-#place(top + left, float: true)[
+{{if .HasContact}}#place(top + left, float: true)[
   #stack(
     dir: ttb,
     spacing: 0.25em,
-    {{if .Config.Folio.Manuscript.TitlePage.IncludeAuthor}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Author}}]],{{end}}
-    {{if .Config.Folio.Manuscript.TitlePage.IncludeAddress}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Address}}]],{{end}}
-    {{if .Config.Folio.Manuscript.TitlePage.IncludePhone}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Phone}}]],{{end}}
-    {{if .Config.Folio.Manuscript.TitlePage.IncludeEmail}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Email}}]],{{end}}
-    {{if .Config.Folio.Manuscript.TitlePage.IncludeWebsite}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Website}}]],{{end}}
+    {{if and .Config.Folio.Manuscript.TitlePage.IncludeContactName .Meta.ContactName}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.ContactName}}]],{{end}}
+    {{if and .Config.Folio.Manuscript.TitlePage.IncludeAddress .Meta.Address}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Address}}]],{{end}}
+    {{if and .Config.Folio.Manuscript.TitlePage.IncludePhone .Meta.Phone}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Phone}}]],{{end}}
+    {{if and .Config.Folio.Manuscript.TitlePage.IncludeEmail .Meta.Email}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Email}}]],{{end}}
+    {{if and .Config.Folio.Manuscript.TitlePage.IncludeWebsite .Meta.Website}}[#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}}, weight: "{{.Config.Folio.Manuscript.ContactFontWeight}}")[{{.Meta.Website}}]],{{end}}
   )
 ]
+{{end}}
 {{if .IsUS}}
 #place(top + right, float: true)[
   {{if .Config.Folio.Manuscript.TitlePage.IncludeWordCount}}#if "{{.Meta.WordCount}}" != "" [
-    #text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}}, weight: "{{.Config.Folio.Manuscript.WordCountFontWeight}}")[{{.Meta.WordCount}} words]
+    #text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}}, weight: "{{.Config.Folio.Manuscript.WordCountFontWeight}}")[{{.Meta.WordCount}}]
   ]
   {{end}}
 ]

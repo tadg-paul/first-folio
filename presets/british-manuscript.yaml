@@ -20,9 +20,9 @@ folio:
     heading-font-size: 14pt
     heading-font-weight: regular
 
-    mono-font: Libertinus Mono
+    mono-font: Liberation Mono
     mono-font-size: 10pt
-    mono-font-weight: regular
+    mono-font-weight: bold
 
     title-font: Libertinus Sans
     title-font-size: 20pt
@@ -66,6 +66,7 @@ folio:
       include-author: true
       include-date: true
       include-wordcount: true
+      include-contact-name: true
       include-address: true
       include-phone: true
       include-email: true

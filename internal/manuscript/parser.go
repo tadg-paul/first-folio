@@ -31,11 +31,15 @@ func parseMarkdown(text string) (Document, error) {
 	inCode := false
 	var codeLines []string
 	inMetadataTable := false
+	metadataOpen := true
 
 	var err error
 	text, err = parseMarkdownFrontmatter(&doc.Metadata, text)
 	if err != nil {
 		return Document{}, err
+	}
+	if text != "" && doc.Metadata != (Metadata{}) {
+		metadataOpen = false
 	}
 
 	flushParagraph := func() {
@@ -73,6 +77,7 @@ func parseMarkdown(text string) (Document, error) {
 		level, heading := markdownHeading(line)
 		if level > 0 {
 			flushParagraph()
+			metadataOpen = false
 			if strings.Contains(heading, "<!-- noexport -->") {
 				inNoExport = true
 				noExportLevel = level
@@ -99,7 +104,7 @@ func parseMarkdown(text string) (Document, error) {
 		if strings.HasPrefix(strings.TrimSpace(line), "<!--") {
 			continue
 		}
-		if parseMarkdownMetadataTable(&doc.Metadata, line, &inMetadataTable) {
+		if metadataOpen && parseMarkdownMetadataTable(&doc.Metadata, line, &inMetadataTable) {
 			flushParagraph()
 			continue
 		}
@@ -108,17 +113,20 @@ func parseMarkdown(text string) (Document, error) {
 		}
 		if strings.TrimSpace(line) == "***" {
 			flushParagraph()
+			metadataOpen = false
 			doc.Blocks = append(doc.Blocks, Block{Kind: "scene-break"})
 			continue
 		}
 		if name, value, ok := markdownFootnote(line); ok {
 			flushParagraph()
+			metadataOpen = false
 			doc.Blocks = append(doc.Blocks, Block{Kind: "footnote", Text: name + "\t" + value})
 			continue
 		}
-		if parseMarkdownMetadata(&doc.Metadata, line) {
+		if metadataOpen && parseMarkdownMetadata(&doc.Metadata, line) {
 			continue
 		}
+		metadataOpen = false
 		paragraph = append(paragraph, strings.TrimSpace(line))
 	}
 	flushParagraph()
@@ -321,6 +329,8 @@ func applyMarkdownFrontmatter(meta *Metadata, values map[string]any) {
 			meta.Version = frontmatterString(value)
 		case "wordcount", "word count", "word-count":
 			meta.WordCount = frontmatterString(value)
+		case "contact-name", "contact_name", "contact":
+			meta.ContactName = frontmatterString(value)
 		case "address":
 			meta.Address = frontmatterString(value)
 		case "phone", "telephone":
@@ -393,6 +403,8 @@ func parseMarkdownMetadataTable(meta *Metadata, line string, inMetadataTable *bo
 		meta.Version = value
 	case "wordcount", "word count", "word-count":
 		meta.WordCount = value
+	case "contact-name", "contact name", "contact":
+		meta.ContactName = value
 	case "address":
 		meta.Address = value
 	case "phone", "telephone":
@@ -420,7 +432,7 @@ func markdownTableCells(line string) []string {
 
 func isMarkdownMetadataKey(key string) bool {
 	switch key {
-	case "title", "subtitle", "author", "date", "version", "draft", "wordcount", "word count", "word-count", "address", "phone", "telephone", "email", "website":
+	case "title", "subtitle", "author", "date", "version", "draft", "wordcount", "word count", "word-count", "contact-name", "contact name", "contact", "address", "phone", "telephone", "email", "website":
 		return true
 	default:
 		return false
@@ -450,6 +462,8 @@ func parseOrgMetadata(meta *Metadata, line string) bool {
 		meta.Version = value
 	case "wordcount":
 		meta.WordCount = value
+	case "contact-name", "contact_name", "contact":
+		meta.ContactName = value
 	case "address":
 		meta.Address = value
 	case "phone":

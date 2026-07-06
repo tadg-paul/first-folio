@@ -10,6 +10,7 @@ type Metadata struct {
 	Date              string
 	Version           string
 	WordCount         string
+	ContactName       string
 	Address           string
 	Phone             string
 	Email             string
@@ -46,4 +47,5 @@ type Options struct {
 	Date              string
 	Version           string
 	WordCount         string
+	ContactName       string
 }

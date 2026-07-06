@@ -162,6 +162,53 @@ func TestMarkdownFrontmatterScalarValuesBecomeStrings(t *testing.T) {
 	}
 }
 
+func TestMarkdownBodyDashDialogueDoesNotOverrideVersion(t *testing.T) {
+	doc, err := parseMarkdown(strings.Join([]string{
+		"---",
+		"title: The Glass Orchard",
+		"version: Draft 4",
+		"---",
+		"",
+		"## Chapter 17",
+		"",
+		"--- I didn't even ---",
+		"",
+		"--- Out.",
+	}, "\n"))
+	if err != nil {
+		t.Fatalf("parsing markdown: %v", err)
+	}
+	if doc.Metadata.Version != "Draft 4" {
+		t.Fatalf("body dialogue should not override version, got %q", doc.Metadata.Version)
+	}
+	assertContains(t, RenderMarkdown(doc), "--- I didn't even ---")
+}
+
+func TestContactNameIsOptionalAndDoesNotFallbackToAuthor(t *testing.T) {
+	root := testProjectRoot(t)
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "ch01.md"), strings.Join([]string{
+		"---",
+		"title: The Glass Orchard",
+		"author: Example Author",
+		"contact-name: Example Agent",
+		"email: agent@example.invalid",
+		"---",
+		"",
+		"## Chapter 1",
+		"",
+		"Body text.",
+	}, "\n"))
+
+	output := filepath.Join(dir, "out.typ")
+	runManuscript(t, root, filepath.Join(dir, "ch01.md"), output)
+	typst := readFile(t, output)
+
+	assertContains(t, typst, `Example Agent`)
+	assertContains(t, typst, `agent\@example.invalid`)
+	assertNotContains(t, typst, `size: 10pt, weight: "regular")[Example Author]`)
+}
+
 func TestMarkdownInlineMarkupAndLiteralDelimitersRenderToTypst(t *testing.T) {
 	root := testProjectRoot(t)
 	dir := t.TempDir()
@@ -534,6 +581,7 @@ func markdownChapterOne() string {
 		"date: 2026-07-06",
 		"version: Draft 4",
 		"wordcount: 90000",
+		"contact-name: Example Agent",
 		"address: 100 Example Street / Sample City / Exampleland",
 		"phone: +353 1 000 0000",
 		"email: author@example.invalid",
@@ -574,6 +622,7 @@ func orgChapterOne() string {
 		"#+DATE: 2026-07-06",
 		"#+VERSION: Draft 4",
 		"#+WORDCOUNT: 90000",
+		"#+CONTACT-NAME: Example Agent",
 		"#+ADDRESS: 100 Example Street / Sample City / Exampleland",
 		"#+PHONE: +353 1 000 0000",
 		"#+EMAIL: author@example.invalid",

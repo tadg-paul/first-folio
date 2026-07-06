@@ -10,6 +10,8 @@
 
 #+WORDCOUNT: 90000
 
+#+CONTACT-NAME: Example Agent
+
 #+ADDRESS: 100 Example Street / Sample City / Exampleland
 
 #+PHONE: +353 1 000 0000

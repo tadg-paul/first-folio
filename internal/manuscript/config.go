@@ -12,17 +12,18 @@ import (
 )
 
 type Config struct {
-	Title     string `yaml:"title"`
-	Subtitle  string `yaml:"subtitle"`
-	Author    string `yaml:"author"`
-	Date      string `yaml:"date"`
-	Version   string `yaml:"version"`
-	WordCount string `yaml:"wordcount"`
-	Address   string `yaml:"address"`
-	Phone     string `yaml:"phone"`
-	Email     string `yaml:"email"`
-	Website   string `yaml:"website"`
-	Folio     Folio  `yaml:"folio"`
+	Title       string `yaml:"title"`
+	Subtitle    string `yaml:"subtitle"`
+	Author      string `yaml:"author"`
+	Date        string `yaml:"date"`
+	Version     string `yaml:"version"`
+	WordCount   string `yaml:"wordcount"`
+	ContactName string `yaml:"contact-name"`
+	Address     string `yaml:"address"`
+	Phone       string `yaml:"phone"`
+	Email       string `yaml:"email"`
+	Website     string `yaml:"website"`
+	Folio       Folio  `yaml:"folio"`
 }
 
 type Folio struct {
@@ -84,20 +85,21 @@ type ManuscriptConfig struct {
 }
 
 type TitlePageConfig struct {
-	Enabled          bool   `yaml:"enabled"`
-	PageNumber       bool   `yaml:"page-number"`
-	IncludeTitle     bool   `yaml:"include-title"`
-	IncludeSubtitle  bool   `yaml:"include-subtitle"`
-	IncludeAuthor    bool   `yaml:"include-author"`
-	IncludeDate      bool   `yaml:"include-date"`
-	IncludeWordCount bool   `yaml:"include-wordcount"`
-	IncludeAddress   bool   `yaml:"include-address"`
-	IncludePhone     bool   `yaml:"include-phone"`
-	IncludeEmail     bool   `yaml:"include-email"`
-	IncludeWebsite   bool   `yaml:"include-website"`
-	IncludeVersion   bool   `yaml:"include-version"`
-	TitleBlockAlign  string `yaml:"title-block-align"`
-	FooterAlign      string `yaml:"footer-align"`
+	Enabled            bool   `yaml:"enabled"`
+	PageNumber         bool   `yaml:"page-number"`
+	IncludeTitle       bool   `yaml:"include-title"`
+	IncludeSubtitle    bool   `yaml:"include-subtitle"`
+	IncludeAuthor      bool   `yaml:"include-author"`
+	IncludeDate        bool   `yaml:"include-date"`
+	IncludeWordCount   bool   `yaml:"include-wordcount"`
+	IncludeContactName bool   `yaml:"include-contact-name"`
+	IncludeAddress     bool   `yaml:"include-address"`
+	IncludePhone       bool   `yaml:"include-phone"`
+	IncludeEmail       bool   `yaml:"include-email"`
+	IncludeWebsite     bool   `yaml:"include-website"`
+	IncludeVersion     bool   `yaml:"include-version"`
+	TitleBlockAlign    string `yaml:"title-block-align"`
+	FooterAlign        string `yaml:"footer-align"`
 }
 
 type PageHeaderConfig struct {
