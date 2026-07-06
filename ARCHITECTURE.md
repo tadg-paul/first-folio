@@ -30,12 +30,15 @@ The Go manuscript engine is organized as follows:
 | `internal/manuscript/input.go` | Explicit path and quoted-glob resolution, sorting, deduplication, and format validation |
 | `internal/manuscript/config.go` | Layered YAML loading and manuscript inheritance |
 | `internal/manuscript/parser.go` | Markdown and org-mode manuscript contracts |
+| `internal/manuscript/serialize.go` | Canonical manuscript Markdown serialization |
 | `internal/manuscript/render.go` | Typst template execution and Typst-safe markup generation |
 | `templates/manuscript.typ` | File-backed Typst layout template |
 | `presets/british-manuscript.yaml` | British manuscript base preset |
 | `presets/us-overrides-manuscript.yaml` | Shunn-style US manuscript override preset |
 
 The Go path uses `gopkg.in/yaml.v3` for YAML and `text/template` for Typst generation. The Typst template is a real file rather than an embedded heredoc so the layout language remains reviewable.
+
+For issue #9, Markdown is the canonical manuscript render contract. Markdown input is parsed and serialized back to canonical Markdown before Typst rendering. Org-mode input is parsed, serialized to canonical Markdown, reparsed, and then rendered through the same Typst path. This keeps Markdown and org-mode manuscript PDFs identical for the shared v1 manuscript contract. A future architecture issue tracks whether org-mode should become the canonical manuscript representation for richer semantics.
 
 ## Configuration Layers
 

@@ -92,7 +92,7 @@
 #place(top + left, float: true)[
   #stack(
     dir: ttb,
-    spacing: 0.1em,
+    spacing: 0.25em,
     [#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}})[{{.Meta.Author}}]],
     [#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}})[{{.Meta.Address}}]],
     [#text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}})[{{.Meta.Phone}}]],

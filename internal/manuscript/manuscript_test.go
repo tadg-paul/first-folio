@@ -93,6 +93,26 @@ func TestTOCCanBeDisabledByConfig(t *testing.T) {
 	assertNotContains(t, typst, `#outline(title: none)`)
 }
 
+func TestOrgManuscriptRenderingUsesCanonicalMarkdown(t *testing.T) {
+	dir := t.TempDir()
+	mdInput := filepath.Join(dir, "source.md")
+	orgInput := filepath.Join(dir, "source.org")
+	writeFile(t, mdInput, markdownChapterOne())
+	writeFile(t, orgInput, orgChapterOne())
+
+	mdDoc, err := Parse("markdown", readFile(t, mdInput))
+	if err != nil {
+		t.Fatalf("parsing markdown: %v", err)
+	}
+	orgDoc, err := Parse("org", readFile(t, orgInput))
+	if err != nil {
+		t.Fatalf("parsing org: %v", err)
+	}
+	if RenderMarkdown(mdDoc) != RenderMarkdown(orgDoc) {
+		t.Fatalf("Markdown and org did not canonicalize to the same Markdown\n--- markdown ---\n%s\n--- org ---\n%s", RenderMarkdown(mdDoc), RenderMarkdown(orgDoc))
+	}
+}
+
 func TestInvalidInputsFailClearly(t *testing.T) {
 	root := testProjectRoot(t)
 	dir := t.TempDir()
@@ -197,6 +217,9 @@ func TestDummyMarkdownAndOrgExamplesRenderSamePDFText(t *testing.T) {
 	requireTool(t, "pdftotext")
 
 	root := testProjectRoot(t)
+	assertExampleTypstMatches(t, root, "british")
+	assertExampleTypstMatches(t, root, "us")
+
 	britishMarkdown := renderExamplePDFText(t, root, "british", "dummy-manuscript.md")
 	britishOrg := renderExamplePDFText(t, root, "british", "dummy-manuscript.org")
 	if britishMarkdown != britishOrg {
@@ -207,6 +230,18 @@ func TestDummyMarkdownAndOrgExamplesRenderSamePDFText(t *testing.T) {
 	usOrg := renderExamplePDFText(t, root, "us", "dummy-manuscript.org")
 	if usMarkdown != usOrg {
 		t.Fatalf("US Markdown and org examples produced different PDF text\n--- markdown ---\n%s\n--- org ---\n%s", usMarkdown, usOrg)
+	}
+}
+
+func assertExampleTypstMatches(t *testing.T, root string, style string) {
+	t.Helper()
+	dir := t.TempDir()
+	mdTypst := filepath.Join(dir, "md-"+style+".typ")
+	orgTypst := filepath.Join(dir, "org-"+style+".typ")
+	runManuscript(t, root, "--style", style, filepath.Join(root, "examples", "dummy-manuscript.md"), mdTypst)
+	runManuscript(t, root, "--style", style, filepath.Join(root, "examples", "dummy-manuscript.org"), orgTypst)
+	if readFile(t, mdTypst) != readFile(t, orgTypst) {
+		t.Fatalf("%s Markdown and org examples produced different Typst\n--- markdown ---\n%s\n--- org ---\n%s", style, readFile(t, mdTypst), readFile(t, orgTypst))
 	}
 }
 
@@ -388,7 +423,9 @@ func orgChapterOne() string {
 		"",
 		"* PART ONE",
 		"** Chapter 1",
-		"The rain had been falling since Tuesday.",
+		"The rain had been falling since Tuesday, though nobody could agree which Tuesday had started it.",
+		"",
+		"Mira found the `watch` under the loose floorboard.",
 		"",
 		"-----",
 		"",
