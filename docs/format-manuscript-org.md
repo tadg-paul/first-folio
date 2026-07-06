@@ -8,13 +8,14 @@ Org-mode manuscript input uses org front matter and headings for prose manuscrip
 
 | Org syntax | Manuscript meaning |
 |---|---|
-| `#+TITLE: About Time` | Manuscript title |
+| `#+TITLE: The Glass Orchard` | Manuscript title |
 | `#+SUBTITLE: A Novel` | Subtitle |
-| `#+AUTHOR: Tadhg Paul` | Author name |
+| `#+AUTHOR: Example Author` | Author name |
 | `#+DATE: July 2026` | Manuscript date |
 | `#+VERSION: Draft 4` | Draft/version marker |
 | `#+WORDCOUNT: 80000` | Approximate word count |
 | `#+ADDRESS: ...` | Postal address |
+| `#+PHONE: ...` | Phone number |
 | `#+EMAIL: ...` | Email address |
 | `#+WEBSITE: ...` | Website |
 | `* PART ONE` | Part divider page |
@@ -31,12 +32,16 @@ Fountain is not accepted by manuscript mode.
 ## Example
 
 ```org
-#+TITLE: About Time
+#+TITLE: The Glass Orchard
 #+SUBTITLE: A Novel
-#+AUTHOR: Tadhg Paul
+#+AUTHOR: Example Author
 #+DATE: July 2026
 #+VERSION: Draft 4
 #+WORDCOUNT: 80000
+#+ADDRESS: 100 Example Street / Sample City / Exampleland
+#+PHONE: +353 1 000 0000
+#+EMAIL: author@example.invalid
+#+WEBSITE: https://example.invalid
 
 * PART ONE
 ** Chapter 1

@@ -51,6 +51,9 @@ folio:
     paragraph-indent: 12.7mm
     paragraph-spacing: 0
 
+    title-page:
+      title-block-align: center
+
     page-header:
       enabled: true
       font: Libertinus Mono

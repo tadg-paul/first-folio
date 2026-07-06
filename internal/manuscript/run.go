@@ -178,6 +178,10 @@ func applyMetadataOverrides(meta *Metadata, opts Options, cfg Config) {
 	overrideString(&meta.Date, opts.Date, cfg.Date)
 	overrideString(&meta.Version, opts.Version, cfg.Version)
 	overrideString(&meta.WordCount, opts.WordCount, cfg.WordCount)
+	overrideString(&meta.Address, cfg.Address)
+	overrideString(&meta.Phone, cfg.Phone)
+	overrideString(&meta.Email, cfg.Email)
+	overrideString(&meta.Website, cfg.Website)
 	if opts.AuthorAttribution != "" {
 		meta.AuthorAttribution = opts.AuthorAttribution
 	}

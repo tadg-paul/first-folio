@@ -103,6 +103,8 @@ Common manuscript keys:
 
 US manuscript style is selected with `folio.manuscript.style: us` or `folio.style: us`, or with `folio manuscript --style us ...`. The US override is layered on top of the British manuscript preset and does not change the page size to `us-letter`; page size changes require explicit user config.
 
+Manuscript metadata supports `title`, `subtitle`, `author`, `date`, `version`, `wordcount`, `address`, `phone`, `email`, and `website`.
+
 ### Yapper-specific keys
 
 The following keys are examples of yapper configuration. First Folio silently ignores them. See [yapper documentation](https://github.com/tadg-paul/yapper) for the full reference.

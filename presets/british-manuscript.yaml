@@ -86,7 +86,7 @@ folio:
       title: "Contents"
       page-break-before: true
       font: Libertinus Sans
-      font-size: 11pt
+      font-size: 10pt
       font-weight: regular
       heading-font: Libertinus Sans
       heading-font-size: 16pt

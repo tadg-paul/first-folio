@@ -18,6 +18,10 @@ type Config struct {
 	Date      string `yaml:"date"`
 	Version   string `yaml:"version"`
 	WordCount string `yaml:"wordcount"`
+	Address   string `yaml:"address"`
+	Phone     string `yaml:"phone"`
+	Email     string `yaml:"email"`
+	Website   string `yaml:"website"`
 	Folio     Folio  `yaml:"folio"`
 }
 
@@ -68,8 +72,14 @@ type ManuscriptConfig struct {
 	ParagraphSpacing  string           `yaml:"paragraph-spacing"`
 	PageHeader        PageHeaderConfig `yaml:"page-header"`
 	TOC               TOCConfig        `yaml:"toc"`
+	TitlePage         TitlePageConfig  `yaml:"title-page"`
 	Part              HeadingConfig    `yaml:"part"`
 	Chapter           HeadingConfig    `yaml:"chapter"`
+}
+
+type TitlePageConfig struct {
+	TitleBlockAlign string `yaml:"title-block-align"`
+	FooterAlign     string `yaml:"footer-align"`
 }
 
 type PageHeaderConfig struct {
@@ -217,6 +227,8 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.TOC.FontSize, "11pt")
 	fill(&ms.TOC.HeadingFont, ms.HeadingFont)
 	fill(&ms.TOC.HeadingFontSize, "16pt")
+	fill(&ms.TitlePage.TitleBlockAlign, "center")
+	fill(&ms.TitlePage.FooterAlign, "center")
 	fill(&ms.Part.Align, "center")
 	fill(&ms.Part.CaseTransform, "as-written")
 	fill(&ms.Chapter.Align, "center")

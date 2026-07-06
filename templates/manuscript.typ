@@ -20,7 +20,7 @@
   if not first {
     pagebreak()
   }
-  align(center + horizon)[
+  align({{.Config.Folio.Manuscript.Part.Align}} + horizon)[
     #text(
       font: "{{.Config.Folio.Manuscript.HeadingFont}}",
       size: {{.Config.Folio.Manuscript.HeadingFontSize}},
@@ -73,8 +73,40 @@
   leading: {{.Config.Folio.Manuscript.LineSpacing}}em,
 )
 
-#v(25%)
-#align(center)[
+{{if .IsUS}}
+#grid(
+  columns: (1fr, 1fr),
+  align: (left, right),
+  [
+    #text(font: "{{.Config.Folio.Manuscript.ContactFont}}", size: {{.Config.Folio.Manuscript.ContactFontSize}})[
+      {{.Meta.Author}}
+      #if "{{.Meta.Address}}" != "" [#linebreak(){{.Meta.Address}}]
+      #if "{{.Meta.Phone}}" != "" [#linebreak(){{.Meta.Phone}}]
+      #if "{{.Meta.Email}}" != "" [#linebreak(){{.Meta.Email}}]
+      #if "{{.Meta.Website}}" != "" [#linebreak(){{.Meta.Website}}]
+    ]
+  ],
+  [
+    #if "{{.Meta.WordCount}}" != "" [
+      #text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}})[{{.Meta.WordCount}} words]
+    ]
+  ],
+)
+#align(center + horizon)[
+{{else}}
+#set page(
+  footer: align({{.Config.Folio.Manuscript.TitlePage.FooterAlign}})[
+    #text(font: "{{.Config.Folio.Manuscript.DateFont}}", size: {{.Config.Folio.Manuscript.DateFontSize}})[
+      #if "{{.Meta.Version}}" != "" [{{.Meta.Version}}]
+      #if "{{.Meta.Version}}" != "" and "{{.Meta.Date}}" != "" [ | ]
+      #if "{{.Meta.Date}}" != "" [{{.Meta.Date}}]
+      #if ("{{.Meta.Version}}" != "" or "{{.Meta.Date}}" != "") and "{{.Meta.WordCount}}" != "" [ | ]
+      #if "{{.Meta.WordCount}}" != "" [{{.Meta.WordCount}} words]
+    ]
+  ],
+)
+#align(center + horizon)[
+{{end}}
   #text(
     font: "{{.Config.Folio.Manuscript.TitleFont}}",
     size: {{.Config.Folio.Manuscript.TitleFontSize}},
@@ -92,18 +124,6 @@
     #v(2em)
     #text(font: "{{.Config.Folio.Manuscript.AuthorFont}}", size: {{.Config.Folio.Manuscript.AuthorFontSize}})[{{.Meta.AuthorAttribution}} {{.Meta.Author}}]
   ]
-  #if "{{.Meta.Date}}" != "" [
-    #v(2em)
-    #text(font: "{{.Config.Folio.Manuscript.DateFont}}", size: {{.Config.Folio.Manuscript.DateFontSize}})[{{.Meta.Date}}]
-  ]
-  #if "{{.Meta.Version}}" != "" [
-    #v(0.6em)
-    #text(font: "{{.Config.Folio.Manuscript.VersionFont}}", size: {{.Config.Folio.Manuscript.VersionFontSize}})[{{.Meta.Version}}]
-  ]
-  #if "{{.Meta.WordCount}}" != "" [
-    #v(0.6em)
-    #text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}})[{{.Meta.WordCount}} words]
-  ]
 ]
 
 #pagebreak()
@@ -117,6 +137,7 @@
 )[{{.Config.Folio.Manuscript.TOC.Title}}]
 #v(1em)
 #text(font: "{{.Config.Folio.Manuscript.TOC.Font}}", size: {{.Config.Folio.Manuscript.TOC.FontSize}})[
+  #set par(leading: 0.15em)
   #outline(title: none)
 ]
 #pagebreak()
@@ -126,8 +147,7 @@
 #set page(
   paper: "{{.Config.Folio.Manuscript.Page}}",
   margin: {{.Config.Folio.Manuscript.Margin}},
-  numbering: "1",
-  number-align: right + bottom,
+  numbering: none,
   header: align(right)[
     #text(
       font: "{{.Config.Folio.Manuscript.PageHeader.Font}}",
@@ -136,6 +156,5 @@
     )[{{.Header}}]
   ],
 )
-#v({{.Config.Folio.Manuscript.PageHeader.ContentPaddingAfter}})
 
 {{.Body}}

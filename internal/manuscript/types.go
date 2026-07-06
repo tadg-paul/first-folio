@@ -11,6 +11,7 @@ type Metadata struct {
 	Version           string
 	WordCount         string
 	Address           string
+	Phone             string
 	Email             string
 	Website           string
 }

@@ -27,6 +27,7 @@ func parseMarkdown(text string) Document {
 	noExportLevel := 0
 	inCode := false
 	var codeLines []string
+	inMetadataTable := false
 
 	flushParagraph := func() {
 		if len(paragraph) > 0 && !inNoExport {
@@ -88,6 +89,13 @@ func parseMarkdown(text string) Document {
 		}
 		if strings.HasPrefix(strings.TrimSpace(line), "<!--") {
 			continue
+		}
+		if parseMarkdownMetadataTable(&doc.Metadata, line, &inMetadataTable) {
+			flushParagraph()
+			continue
+		}
+		if !strings.HasPrefix(strings.TrimSpace(line), "|") {
+			inMetadataTable = false
 		}
 		if strings.TrimSpace(line) == "***" {
 			flushParagraph()
@@ -267,6 +275,73 @@ func parseMarkdownMetadata(meta *Metadata, line string) bool {
 	return false
 }
 
+func parseMarkdownMetadataTable(meta *Metadata, line string, inMetadataTable *bool) bool {
+	if !strings.HasPrefix(strings.TrimSpace(line), "|") {
+		return false
+	}
+	cells := markdownTableCells(line)
+	if len(cells) < 2 {
+		return false
+	}
+	key := strings.ToLower(strings.TrimSpace(cells[0]))
+	value := strings.TrimSpace(cells[1])
+	if key == "metadata" || key == "field" {
+		*inMetadataTable = true
+		return true
+	}
+	if strings.Trim(key, "-: ") == "" {
+		return *inMetadataTable
+	}
+	if !*inMetadataTable && !isMarkdownMetadataKey(key) {
+		return false
+	}
+	switch key {
+	case "title":
+		meta.Title = value
+	case "subtitle":
+		meta.Subtitle = value
+	case "author":
+		meta.Author = value
+	case "date":
+		meta.Date = value
+	case "version", "draft":
+		meta.Version = value
+	case "wordcount", "word count", "word-count":
+		meta.WordCount = value
+	case "address":
+		meta.Address = value
+	case "phone", "telephone":
+		meta.Phone = value
+	case "email":
+		meta.Email = value
+	case "website":
+		meta.Website = value
+	default:
+		return *inMetadataTable
+	}
+	*inMetadataTable = true
+	return true
+}
+
+func markdownTableCells(line string) []string {
+	trimmed := strings.Trim(strings.TrimSpace(line), "|")
+	rawCells := strings.Split(trimmed, "|")
+	cells := make([]string, 0, len(rawCells))
+	for _, cell := range rawCells {
+		cells = append(cells, strings.TrimSpace(cell))
+	}
+	return cells
+}
+
+func isMarkdownMetadataKey(key string) bool {
+	switch key {
+	case "title", "subtitle", "author", "date", "version", "draft", "wordcount", "word count", "word-count", "address", "phone", "telephone", "email", "website":
+		return true
+	default:
+		return false
+	}
+}
+
 func parseOrgMetadata(meta *Metadata, line string) bool {
 	if !strings.HasPrefix(line, "#+") {
 		return false
@@ -292,6 +367,8 @@ func parseOrgMetadata(meta *Metadata, line string) bool {
 		meta.WordCount = value
 	case "address":
 		meta.Address = value
+	case "phone":
+		meta.Phone = value
 	case "email":
 		meta.Email = value
 	case "website":

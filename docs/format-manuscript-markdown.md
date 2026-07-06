@@ -12,6 +12,7 @@ Markdown manuscript input is a prose contract, separate from the Markdown stage-
 | `**Subtitle**` after the title | Subtitle |
 | `*by Author*` | Author name |
 | `--- Draft | Date ---` | Version and date |
+| Metadata table with `Metadata`/`Value` headings | Optional manuscript metadata: word count, address, phone, email, website |
 | `## PART ONE` | Part divider page |
 | `### Chapter 1` | Chapter start page |
 | `#### Section` and deeper | Local section heading |
@@ -27,13 +28,21 @@ Fountain is not accepted by manuscript mode.
 ## Example
 
 ```markdown
-# About Time
+# The Glass Orchard
 
 **A Novel**
 
-*by Tadhg Paul*
+*by Example Author*
 
---- Draft 4 | July 2026 ---
+--- Draft 2 | July 2026 ---
+
+| Metadata | Value |
+|---|---|
+| Wordcount | 90000 |
+| Address | 100 Example Street / Sample City / Exampleland |
+| Phone | +353 1 000 0000 |
+| Email | author@example.invalid |
+| Website | https://example.invalid |
 
 ## PART ONE
 

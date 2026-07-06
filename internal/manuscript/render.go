@@ -17,6 +17,7 @@ type templateData struct {
 	Meta   Metadata
 	Header string
 	Body   string
+	IsUS   bool
 }
 
 func RenderTypst(doc Document, cfg Config) (string, error) {
@@ -30,6 +31,7 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		Meta:   safeMeta,
 		Header: renderHeader(doc.Metadata, cfg),
 		Body:   body,
+		IsUS:   cfg.Folio.Manuscript.Style == "us",
 	}
 	root, err := projectRoot()
 	if err != nil {
@@ -137,6 +139,7 @@ func escapedMetadata(meta Metadata) Metadata {
 		Version:           escapeTypst(meta.Version),
 		WordCount:         escapeTypst(meta.WordCount),
 		Address:           escapeTypst(meta.Address),
+		Phone:             escapeTypst(meta.Phone),
 		Email:             escapeTypst(meta.Email),
 		Website:           escapeTypst(meta.Website),
 	}

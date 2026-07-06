@@ -45,7 +45,7 @@ func TestOrgManuscriptCLIProducesTypstContract(t *testing.T) {
 	runManuscript(t, root, filepath.Join(dir, "part?", "ch??.org"), output)
 	typst := readFile(t, output)
 
-	assertContains(t, typst, `About Time`)
+	assertContains(t, typst, `The Glass Orchard`)
 	assertContains(t, typst, `#folio-part(first: true)[PART ONE]`)
 	assertContains(t, typst, `#folio-chapter(first: false)[Chapter 1]`)
 	assertContains(t, typst, `#folio-chapter(first: false)[Chapter 2]`)
@@ -69,6 +69,8 @@ func TestUSManuscriptOverridesBritishWithoutChangingPageSize(t *testing.T) {
 	assertContains(t, typst, `first-line-indent: 12.7mm`)
 	assertContains(t, typst, `leading: 2em`)
 	assertContains(t, typst, `margin: 25mm`)
+	assertContains(t, typst, `author\@example.invalid`)
+	assertContains(t, typst, `+353 1 000 0000`)
 }
 
 func TestTOCCanBeDisabledByConfig(t *testing.T) {
@@ -177,10 +179,40 @@ func TestPDFRenderHasTOCAndNoBlankPageBeforePart(t *testing.T) {
 	assertContains(t, pdfText, `Contents`)
 	assertContains(t, pdfText, `PART ONE`)
 	assertContains(t, pdfText, `Chapter 1`)
-	assertContains(t, pdfText, `Tadhg Paul / About Time / 1`)
-	assertContains(t, pdfText, `Tadhg Paul / About Time / 2`)
+	assertContains(t, pdfText, `Example Author / The Glass Orchard / 1`)
+	assertContains(t, pdfText, `Example Author / The Glass Orchard / 2`)
 	assertBefore(t, pdfText, `Contents`, `PART ONE`)
 	assertBefore(t, pdfText, `PART ONE`, `Chapter 1`)
+}
+
+func TestDummyMarkdownAndOrgExamplesRenderSamePDFText(t *testing.T) {
+	requireTool(t, "typst")
+	requireTool(t, "pdftotext")
+
+	root := testProjectRoot(t)
+	britishMarkdown := renderExamplePDFText(t, root, "british", "dummy-manuscript.md")
+	britishOrg := renderExamplePDFText(t, root, "british", "dummy-manuscript.org")
+	if britishMarkdown != britishOrg {
+		t.Fatalf("British Markdown and org examples produced different PDF text\n--- markdown ---\n%s\n--- org ---\n%s", britishMarkdown, britishOrg)
+	}
+
+	usMarkdown := renderExamplePDFText(t, root, "us", "dummy-manuscript.md")
+	usOrg := renderExamplePDFText(t, root, "us", "dummy-manuscript.org")
+	if usMarkdown != usOrg {
+		t.Fatalf("US Markdown and org examples produced different PDF text\n--- markdown ---\n%s\n--- org ---\n%s", usMarkdown, usOrg)
+	}
+}
+
+func renderExamplePDFText(t *testing.T, root string, style string, name string) string {
+	t.Helper()
+	dir := t.TempDir()
+	output := filepath.Join(dir, strings.TrimSuffix(name, filepath.Ext(name))+"-"+style+".pdf")
+	input := filepath.Join(root, "examples", name)
+	runManuscript(t, root, "--style", style, input, output)
+
+	textPath := filepath.Join(dir, strings.TrimSuffix(name, filepath.Ext(name))+"-"+style+".txt")
+	commandOutput(t, exec.Command("pdftotext", "-layout", output, textPath))
+	return readFile(t, textPath)
 }
 
 func runManuscript(t *testing.T, root string, args ...string) {
@@ -292,13 +324,21 @@ func commandOutput(t *testing.T, cmd *exec.Cmd) string {
 
 func markdownChapterOne() string {
 	return strings.Join([]string{
-		"# About Time",
+		"# The Glass Orchard",
 		"",
 		"**A Novel**",
 		"",
-		"*by Tadhg Paul*",
+		"*by Example Author*",
 		"",
 		"--- Draft 4 | July 2026 ---",
+		"",
+		"| Metadata | Value |",
+		"|---|---|",
+		"| Wordcount | 90000 |",
+		"| Address | 100 Example Street / Sample City / Exampleland |",
+		"| Phone | +353 1 000 0000 |",
+		"| Email | author@example.invalid |",
+		"| Website | https://example.invalid |",
 		"",
 		"## PART ONE",
 		"",
@@ -306,7 +346,7 @@ func markdownChapterOne() string {
 		"",
 		"The rain had been falling since Tuesday, though nobody could agree which Tuesday had started it.",
 		"",
-		"Mairead found the `watch` under the loose floorboard.",
+		"Mira found the `watch` under the loose floorboard.",
 		"",
 		"***",
 		"",
@@ -328,12 +368,16 @@ func markdownChapterTwo() string {
 
 func orgChapterOne() string {
 	return strings.Join([]string{
-		"#+TITLE: About Time",
+		"#+TITLE: The Glass Orchard",
 		"#+SUBTITLE: A Novel",
-		"#+AUTHOR: Tadhg Paul",
+		"#+AUTHOR: Example Author",
 		"#+DATE: July 2026",
 		"#+VERSION: Draft 4",
-		"#+WORDCOUNT: 80000",
+		"#+WORDCOUNT: 90000",
+		"#+ADDRESS: 100 Example Street / Sample City / Exampleland",
+		"#+PHONE: +353 1 000 0000",
+		"#+EMAIL: author@example.invalid",
+		"#+WEBSITE: https://example.invalid",
 		"",
 		"* PART ONE",
 		"** Chapter 1",
