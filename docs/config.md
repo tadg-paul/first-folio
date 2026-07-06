@@ -109,6 +109,8 @@ Manuscript metadata supports `title`, `subtitle`, `author`, `attribution`, `date
 
 `folio.manuscript.toc.part-gap-before` controls extra vertical space before part entries in the table of contents. The default is `0.5em`.
 
+`folio.manuscript.toc.part-bold` controls whether part entries are bold in the table of contents. The default is `true`.
+
 ### Yapper-specific keys
 
 The following keys are examples of yapper configuration. First Folio silently ignores them. See [yapper documentation](https://github.com/tadg-paul/yapper) for the full reference.

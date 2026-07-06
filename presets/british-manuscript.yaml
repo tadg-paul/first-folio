@@ -98,6 +98,7 @@ folio:
       dot-leaders: true
       page-numbers: true
       part-gap-before: 0.5em
+      part-bold: true
 
     part:
       page-break-before: true

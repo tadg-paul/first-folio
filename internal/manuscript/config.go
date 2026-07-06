@@ -133,6 +133,7 @@ type TOCConfig struct {
 	PageNumbers       bool   `yaml:"page-numbers"`
 	PageBreakBefore   bool   `yaml:"page-break-before"`
 	PartGapBefore     string `yaml:"part-gap-before"`
+	PartBold          bool   `yaml:"part-bold"`
 }
 
 type HeadingConfig struct {

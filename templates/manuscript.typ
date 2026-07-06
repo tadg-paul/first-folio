@@ -157,7 +157,13 @@
   #show outline.entry: it => block(
     above: if it.level == 1 { {{.Config.Folio.Manuscript.TOC.PartGapBefore}} } else { 0pt },
     below: 0.5em,
-  )[#it]
+  )[
+    #if it.level == 1 and {{.Config.Folio.Manuscript.TOC.PartBold}} {
+      strong[#it]
+    } else {
+      it
+    }
+  ]
   #outline(title: none)
 ]
 #pagebreak()
