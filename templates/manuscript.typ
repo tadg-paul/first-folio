@@ -137,7 +137,7 @@
   ]{{end}}
   {{if .Config.Folio.Manuscript.TitlePage.IncludeAuthor}}#if "{{.Meta.Author}}" != "" [
     #v(2em)
-    #text(font: "{{.Config.Folio.Manuscript.AuthorFont}}", size: {{.Config.Folio.Manuscript.AuthorFontSize}}, weight: "{{.Config.Folio.Manuscript.AuthorFontWeight}}")[{{.Meta.AuthorAttribution}} {{.Meta.Author}}]
+    #text(font: "{{.Config.Folio.Manuscript.AuthorFont}}", size: {{.Config.Folio.Manuscript.AuthorFontSize}}, weight: "{{.Config.Folio.Manuscript.AuthorFontWeight}}")[{{if .Meta.AuthorAttribution}}{{.Meta.AuthorAttribution}} {{end}}{{.Meta.Author}}]
   ]{{end}}
 ]
 

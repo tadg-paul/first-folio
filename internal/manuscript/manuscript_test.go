@@ -209,6 +209,45 @@ func TestContactNameIsOptionalAndDoesNotFallbackToAuthor(t *testing.T) {
 	assertNotContains(t, typst, `size: 10pt, weight: "regular")[Example Author]`)
 }
 
+func TestAuthorAttributionDefaultsEmptyAndCanPrefixAuthor(t *testing.T) {
+	root := testProjectRoot(t)
+	dir := t.TempDir()
+
+	withoutAttribution := filepath.Join(dir, "without.md")
+	writeFile(t, withoutAttribution, strings.Join([]string{
+		"---",
+		"title: The Glass Orchard",
+		"author: Example Author",
+		"---",
+		"",
+		"## Chapter 1",
+		"",
+		"Body text.",
+	}, "\n"))
+	withoutOutput := filepath.Join(dir, "without.typ")
+	runManuscript(t, root, withoutAttribution, withoutOutput)
+	withoutTypst := readFile(t, withoutOutput)
+	assertContains(t, withoutTypst, `)[Example Author]`)
+	assertNotContains(t, withoutTypst, `)[by Example Author]`)
+	assertNotContains(t, withoutTypst, `)[ Example Author]`)
+
+	withAttribution := filepath.Join(dir, "with.md")
+	writeFile(t, withAttribution, strings.Join([]string{
+		"---",
+		"title: The Glass Orchard",
+		"author: Example Author",
+		"attribution: by",
+		"---",
+		"",
+		"## Chapter 1",
+		"",
+		"Body text.",
+	}, "\n"))
+	withOutput := filepath.Join(dir, "with.typ")
+	runManuscript(t, root, withAttribution, withOutput)
+	assertContains(t, readFile(t, withOutput), `)[by Example Author]`)
+}
+
 func TestMarkdownInlineMarkupAndLiteralDelimitersRenderToTypst(t *testing.T) {
 	root := testProjectRoot(t)
 	dir := t.TempDir()

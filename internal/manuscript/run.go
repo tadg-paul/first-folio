@@ -127,7 +127,7 @@ func setOption(opts *Options, key string, value string) {
 		opts.Subtitle = value
 	case "author":
 		opts.Author = value
-	case "author-attribution":
+	case "attribution", "author-attribution":
 		opts.AuthorAttribution = value
 	case "date":
 		opts.Date = value
@@ -155,7 +155,8 @@ func Usage() string {
 		"  --title TITLE               Override manuscript title",
 		"  --subtitle SUBTITLE         Override manuscript subtitle",
 		"  --author AUTHOR             Override author name",
-		"  --author-attribution TEXT   Override author attribution, default by",
+		"  --attribution TEXT          Prefix author name, for example by",
+		"  --author-attribution TEXT   Compatibility alias for --attribution",
 		"  --date DATE                 Override manuscript date",
 		"  --version [VERSION]         Show command version, or override manuscript version when VALUE is supplied",
 		"  --wordcount WORDS           Override manuscript word count",
@@ -183,6 +184,7 @@ func applyMetadataOverrides(meta *Metadata, opts Options, cfg Config) {
 	overrideString(&meta.Title, opts.Title, cfg.Title)
 	overrideString(&meta.Subtitle, opts.Subtitle, cfg.Subtitle)
 	overrideString(&meta.Author, opts.Author, cfg.Author)
+	overrideString(&meta.AuthorAttribution, opts.AuthorAttribution, cfg.Attribution, cfg.AuthorAttribution, cfg.Folio.Manuscript.Attribution, cfg.Folio.Manuscript.AuthorAttribution)
 	overrideString(&meta.Date, opts.Date, cfg.Date)
 	overrideString(&meta.Version, opts.Version, cfg.Version)
 	overrideString(&meta.WordCount, opts.WordCount, cfg.WordCount)
@@ -191,12 +193,6 @@ func applyMetadataOverrides(meta *Metadata, opts Options, cfg Config) {
 	overrideString(&meta.Phone, cfg.Phone)
 	overrideString(&meta.Email, cfg.Email)
 	overrideString(&meta.Website, cfg.Website)
-	if opts.AuthorAttribution != "" {
-		meta.AuthorAttribution = opts.AuthorAttribution
-	}
-	if meta.AuthorAttribution == "" {
-		meta.AuthorAttribution = cfg.Folio.Manuscript.AuthorAttribution
-	}
 }
 
 func overrideString(target *string, values ...string) {

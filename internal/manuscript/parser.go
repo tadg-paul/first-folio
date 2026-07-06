@@ -321,7 +321,7 @@ func applyMarkdownFrontmatter(meta *Metadata, values map[string]any) {
 			meta.Subtitle = frontmatterString(value)
 		case "author":
 			meta.Author = frontmatterString(value)
-		case "author-attribution", "author_attribution":
+		case "attribution", "author-attribution", "author_attribution":
 			meta.AuthorAttribution = frontmatterString(value)
 		case "date":
 			meta.Date = frontmatterString(value)
@@ -397,6 +397,8 @@ func parseMarkdownMetadataTable(meta *Metadata, line string, inMetadataTable *bo
 		meta.Subtitle = value
 	case "author":
 		meta.Author = value
+	case "attribution", "author-attribution", "author_attribution":
+		meta.AuthorAttribution = value
 	case "date":
 		meta.Date = value
 	case "version", "draft":

@@ -12,18 +12,20 @@ import (
 )
 
 type Config struct {
-	Title       string `yaml:"title"`
-	Subtitle    string `yaml:"subtitle"`
-	Author      string `yaml:"author"`
-	Date        string `yaml:"date"`
-	Version     string `yaml:"version"`
-	WordCount   string `yaml:"wordcount"`
-	ContactName string `yaml:"contact-name"`
-	Address     string `yaml:"address"`
-	Phone       string `yaml:"phone"`
-	Email       string `yaml:"email"`
-	Website     string `yaml:"website"`
-	Folio       Folio  `yaml:"folio"`
+	Title             string `yaml:"title"`
+	Subtitle          string `yaml:"subtitle"`
+	Author            string `yaml:"author"`
+	Attribution       string `yaml:"attribution"`
+	AuthorAttribution string `yaml:"author-attribution"`
+	Date              string `yaml:"date"`
+	Version           string `yaml:"version"`
+	WordCount         string `yaml:"wordcount"`
+	ContactName       string `yaml:"contact-name"`
+	Address           string `yaml:"address"`
+	Phone             string `yaml:"phone"`
+	Email             string `yaml:"email"`
+	Website           string `yaml:"website"`
+	Folio             Folio  `yaml:"folio"`
 }
 
 type Folio struct {
@@ -61,6 +63,7 @@ type ManuscriptConfig struct {
 	AuthorFont          string           `yaml:"author-font"`
 	AuthorFontSize      string           `yaml:"author-font-size"`
 	AuthorFontWeight    string           `yaml:"author-font-weight"`
+	Attribution         string           `yaml:"attribution"`
 	AuthorAttribution   string           `yaml:"author-attribution"`
 	DateFont            string           `yaml:"date-font"`
 	DateFontSize        string           `yaml:"date-font-size"`
@@ -235,7 +238,6 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.AuthorFont, ms.HeadingFont)
 	fill(&ms.AuthorFontSize, ms.FontSize)
 	fill(&ms.AuthorFontWeight, "regular")
-	fill(&ms.AuthorAttribution, "by")
 	fill(&ms.DateFont, ms.HeadingFont)
 	fill(&ms.DateFontSize, "10pt")
 	fill(&ms.DateFontWeight, "regular")

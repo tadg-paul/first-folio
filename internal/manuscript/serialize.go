@@ -22,7 +22,7 @@ func appendMarkdownFrontmatter(lines *[]string, meta Metadata) {
 	appendFrontmatterLine(lines, "title", meta.Title)
 	appendFrontmatterLine(lines, "subtitle", meta.Subtitle)
 	appendFrontmatterLine(lines, "author", meta.Author)
-	appendFrontmatterLine(lines, "author-attribution", meta.AuthorAttribution)
+	appendFrontmatterLine(lines, "attribution", meta.AuthorAttribution)
 	appendFrontmatterLine(lines, "date", meta.Date)
 	appendFrontmatterLine(lines, "version", meta.Version)
 	appendFrontmatterLine(lines, "wordcount", meta.WordCount)
