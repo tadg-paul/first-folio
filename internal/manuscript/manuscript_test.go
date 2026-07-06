@@ -26,6 +26,11 @@ func TestMarkdownManuscriptCLIProducesTypstContract(t *testing.T) {
 	assertContains(t, typst, `#outline(title: none)`)
 	assertContains(t, typst, `font: "Libertinus Serif"`)
 	assertContains(t, typst, `font: "Libertinus Sans"`)
+	assertContains(t, typst, `leading: 0.5em`)
+	assertContains(t, typst, `spacing: 0.7em`)
+	assertContains(t, typst, `author\@example.invalid`)
+	assertContains(t, typst, `+353 1 000 0000`)
+	assertContains(t, typst, `footer: none`)
 	assertContains(t, typst, `#folio-part(first: true)[PART ONE]`)
 	assertContains(t, typst, `#folio-chapter(first: false)[Chapter 1]`)
 	assertContains(t, typst, `#folio-chapter(first: false)[Chapter 2]`)
@@ -67,10 +72,12 @@ func TestUSManuscriptOverridesBritishWithoutChangingPageSize(t *testing.T) {
 	assertNotContains(t, typst, `us-letter`)
 	assertContains(t, typst, `font: "Libertinus Mono"`)
 	assertContains(t, typst, `first-line-indent: 12.7mm`)
-	assertContains(t, typst, `leading: 2em`)
+	assertContains(t, typst, `leading: 1em`)
+	assertContains(t, typst, `spacing: 1em`)
 	assertContains(t, typst, `margin: 25mm`)
 	assertContains(t, typst, `author\@example.invalid`)
 	assertContains(t, typst, `+353 1 000 0000`)
+	assertContains(t, typst, `#stack(`)
 }
 
 func TestTOCCanBeDisabledByConfig(t *testing.T) {

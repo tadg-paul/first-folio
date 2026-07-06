@@ -8,16 +8,19 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 )
 
 type templateData struct {
-	Config Config
-	Meta   Metadata
-	Header string
-	Body   string
-	IsUS   bool
+	Config  Config
+	Meta    Metadata
+	Header  string
+	Body    string
+	IsUS    bool
+	Leading string
+	Spacing string
 }
 
 func RenderTypst(doc Document, cfg Config) (string, error) {
@@ -27,11 +30,13 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 	}
 	safeMeta := escapedMetadata(doc.Metadata)
 	data := templateData{
-		Config: cfg,
-		Meta:   safeMeta,
-		Header: renderHeader(doc.Metadata, cfg),
-		Body:   body,
-		IsUS:   cfg.Folio.Manuscript.Style == "us",
+		Config:  cfg,
+		Meta:    safeMeta,
+		Header:  renderHeader(doc.Metadata, cfg),
+		Body:    body,
+		IsUS:    cfg.Folio.Manuscript.Style == "us",
+		Leading: lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing),
+		Spacing: paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, cfg.Folio.Manuscript.LineSpacing),
 	}
 	root, err := projectRoot()
 	if err != nil {
@@ -47,6 +52,34 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		return "", fmt.Errorf("executing Typst template: %w", err)
 	}
 	return out.String(), nil
+}
+
+func lineSpacingLeading(lineSpacing string) string {
+	multiplier, err := strconv.ParseFloat(strings.TrimSpace(lineSpacing), 64)
+	if err != nil {
+		return lineSpacing + "em"
+	}
+	leading := multiplier - 1
+	if leading < 0 {
+		leading = 0
+	}
+	return strconv.FormatFloat(leading, 'f', -1, 64) + "em"
+}
+
+func paragraphSpacing(spacing string, lineSpacing string) string {
+	trimmed := strings.TrimSpace(spacing)
+	if trimmed == "" || trimmed == "0" || trimmed == "0pt" {
+		multiplier, err := strconv.ParseFloat(strings.TrimSpace(lineSpacing), 64)
+		if err != nil {
+			return "0.7em"
+		}
+		leading := multiplier - 1
+		if leading < 0.7 {
+			leading = 0.7
+		}
+		return strconv.FormatFloat(leading, 'f', -1, 64) + "em"
+	}
+	return trimmed
 }
 
 func renderBlocks(blocks []Block, cfg Config) (string, error) {
@@ -67,7 +100,7 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 		case "section":
 			lines = append(lines, "#folio-section["+typstInline(block.Text, cfg)+"]")
 		case "paragraph":
-			lines = append(lines, "#folio-para["+typstInline(block.Text, cfg)+"]")
+			lines = append(lines, typstInline(block.Text, cfg))
 		case "scene-break":
 			lines = append(lines, "#folio-scene-break()")
 		case "code":
