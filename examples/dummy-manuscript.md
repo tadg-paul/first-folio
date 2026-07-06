@@ -1,24 +1,21 @@
-# The Glass Orchard
+---
+title: The Glass Orchard
+subtitle: A Novel
+author: Example Author
+date: 2026-07-06
+version: Draft 2
+wordcount: 90000
+address: 100 Example Street / Sample City / Exampleland
+phone: +353 1 000 0000
+email: author@example.invalid
+website: https://example.invalid
+---
 
-**A Novel**
+# PART ONE
 
-*by Example Author*
+## Chapter 1
 
---- Draft 2 | July 2026 ---
-
-| Metadata | Value |
-|---|---|
-| Wordcount | 90000 |
-| Address | 100 Example Street / Sample City / Exampleland |
-| Phone | +353 1 000 0000 |
-| Email | author@example.invalid |
-| Website | https://example.invalid |
-
-## PART ONE
-
-### Chapter 1
-
-The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
+The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it." The ledger flashed **WAIT** -- then the brass latch answered --- and Mira whispered `nine-bell` into her phone.
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
@@ -70,7 +67,7 @@ The ninth bell did not sound. The silence after it did.
 
 Every drawer in the archive opened at once.
 
-### Chapter 2
+## Chapter 2
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
@@ -82,7 +79,7 @@ Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
 
-### Chapter 3
+## Chapter 3
 
 A short paragraph followed, because not every thought arrives wearing a long coat.
 
@@ -96,7 +93,7 @@ The corridor outside the archive was quiet enough for a whisper to travel. "Are 
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
-### Chapter 4
+## Chapter 4
 
 "Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
 
@@ -104,67 +101,7 @@ Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
 
-### Chapter 5
-
-Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
-
-The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
-
-Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
-
-***
-
-After the pause, the room seemed to remember them.
-
-### Chapter 6
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
-
-The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
-
-Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
-
-A short paragraph followed, because not every thought arrives wearing a long coat.
-
-"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
-
-### Chapter 7
-
-The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
-
-Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
-
-A short paragraph followed, because not every thought arrives wearing a long coat.
-
-"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
-
-Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
-
-### Chapter 8
-
-Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
-
-A short paragraph followed, because not every thought arrives wearing a long coat.
-
-"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
-
-### Chapter 9
-
-A short paragraph followed, because not every thought arrives wearing a long coat.
-
-"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
-
-Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
-
-### Chapter 10
-
-"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+## Chapter 5
 
 Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
 
@@ -178,9 +115,13 @@ Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at
 
 After the pause, the room seemed to remember them.
 
-### Chapter 11
+```
+living_room:
+  north_wall: 4.20m
+  warning: do not trust the ninth bell
+```
 
-Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
+## Chapter 6
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
 
@@ -192,25 +133,9 @@ A short paragraph followed, because not every thought arrives wearing a long coa
 
 "Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
 
-### Chapter 12
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+## Chapter 7
 
 The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
-
-Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
-
-### Chapter 13
-
-The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
-
-Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
-
-A short paragraph followed, because not every thought arrives wearing a long coat.
-
-"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
-
-### Chapter 14
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
@@ -222,9 +147,25 @@ Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
 
-### Chapter 15
+## Chapter 8
+
+Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
 A short paragraph followed, because not every thought arrives wearing a long coat.
+
+"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+
+## Chapter 9
+
+A short paragraph followed, because not every thought arrives wearing a long coat.
+
+"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+
+Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+
+## Chapter 10
 
 "Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
 
@@ -240,25 +181,9 @@ Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at
 
 After the pause, the room seemed to remember them.
 
-### Chapter 16
-
-"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+## Chapter 11
 
 Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
-
-### Chapter 17
-
-Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
-
-The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
-
-Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
-
-### Chapter 18
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
 
@@ -270,7 +195,85 @@ A short paragraph followed, because not every thought arrives wearing a long coa
 
 "Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
 
-### Chapter 19
+## Chapter 12
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+
+The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
+
+Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
+
+## Chapter 13
+
+The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
+
+Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
+
+A short paragraph followed, because not every thought arrives wearing a long coat.
+
+"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+
+## Chapter 14
+
+Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
+
+A short paragraph followed, because not every thought arrives wearing a long coat.
+
+"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+
+Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+
+## Chapter 15
+
+A short paragraph followed, because not every thought arrives wearing a long coat.
+
+"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+
+Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+
+The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
+
+Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
+
+***
+
+After the pause, the room seemed to remember them.
+
+## Chapter 16
+
+"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+
+Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+
+## Chapter 17
+
+Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi. Suspendisse potenti. Cras vel libero eu neque dictum finibus sed sed nibh. Donec interdum risus at mi hendrerit, ac viverra orci lacinia.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+
+The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
+
+Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
+
+## Chapter 18
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
+
+The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
+
+Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
+
+A short paragraph followed, because not every thought arrives wearing a long coat.
+
+"Then we wait," Mira said. Rowan shook his head. "Waiting is how the clock wins."
+
+## Chapter 19
 
 The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
 
@@ -284,7 +287,7 @@ Curabitur blandit lectus in risus cursus, nec suscipit ex rutrum. Nulla facilisi
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non arcu vitae augue fermentum commodo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id nibh sit amet sem suscipit porta.
 
-### Chapter 20
+## Chapter 20
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 

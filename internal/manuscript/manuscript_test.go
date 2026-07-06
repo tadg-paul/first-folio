@@ -97,15 +97,81 @@ func TestTOCCanBeDisabledByConfig(t *testing.T) {
 	assertNotContains(t, typst, `#outline(title: none)`)
 }
 
+func TestMarkdownFrontmatterAndHeadingContract(t *testing.T) {
+	doc, err := parseMarkdown(strings.Join([]string{
+		"---",
+		"title: The Glass Orchard",
+		"subtitle: A Novel",
+		"author: Example Author",
+		"date: 2026-07-06",
+		"version: Draft 4",
+		"wordcount: about 90,000 words",
+		"phone: +353 1 000 0000",
+		"---",
+		"",
+		"# PART ONE",
+		"",
+		"## Chapter 1",
+		"",
+		"Body text.",
+	}, "\n"))
+	if err != nil {
+		t.Fatalf("parsing markdown frontmatter: %v", err)
+	}
+
+	if doc.Metadata.Title != "The Glass Orchard" || doc.Metadata.Date != "2026-07-06" || doc.Metadata.WordCount != "about 90,000 words" {
+		t.Fatalf("frontmatter metadata not parsed: %#v", doc.Metadata)
+	}
+	if doc.Blocks[0].Kind != "part" || doc.Blocks[0].Text != "PART ONE" {
+		t.Fatalf("H1 should be manuscript part, got %#v", doc.Blocks[0])
+	}
+	if doc.Blocks[1].Kind != "chapter" || doc.Blocks[1].Text != "Chapter 1" {
+		t.Fatalf("H2 should be manuscript chapter, got %#v", doc.Blocks[1])
+	}
+
+	canonical := RenderMarkdown(doc)
+	assertContains(t, canonical, "---\n")
+	assertContains(t, canonical, "title: \"The Glass Orchard\"")
+	assertContains(t, canonical, "date: \"2026-07-06\"")
+	assertContains(t, canonical, "wordcount: \"about 90,000 words\"")
+	assertContains(t, canonical, "# PART ONE")
+	assertContains(t, canonical, "## Chapter 1")
+	assertNotContains(t, canonical, "| Metadata | Value |")
+}
+
+func TestMarkdownFrontmatterScalarValuesBecomeStrings(t *testing.T) {
+	doc, err := parseMarkdown(strings.Join([]string{
+		"---",
+		"title: The Glass Orchard",
+		"date: 2026-07-06",
+		"wordcount: 90000",
+		"---",
+		"",
+		"## Chapter 1",
+		"",
+		"Body text.",
+	}, "\n"))
+	if err != nil {
+		t.Fatalf("parsing markdown frontmatter: %v", err)
+	}
+	if doc.Metadata.Date != "2026-07-06" {
+		t.Fatalf("date should be rendered as ISO string, got %q", doc.Metadata.Date)
+	}
+	if doc.Metadata.WordCount != "90000" {
+		t.Fatalf("numeric wordcount should be coerced to string, got %q", doc.Metadata.WordCount)
+	}
+}
+
 func TestMarkdownInlineMarkupAndLiteralDelimitersRenderToTypst(t *testing.T) {
 	root := testProjectRoot(t)
 	dir := t.TempDir()
 	writeFile(t, filepath.Join(dir, "ch01.md"), strings.Join([]string{
-		"# The Glass Orchard",
+		"---",
+		"title: The Glass Orchard",
+		"author: Example Author",
+		"---",
 		"",
-		"*by Example Author*",
-		"",
-		"### Chapter 1",
+		"## Chapter 1",
 		"",
 		"Kevin thought, _.",
 		"",
@@ -143,12 +209,18 @@ func TestRenderInlineMarkup(t *testing.T) {
 		t.Fatalf("unexpected inline render\nwant: %s\n got: %s", want, got)
 	}
 
-	doc := parseMarkdown(strings.Join([]string{
-		"### Chapter 1",
+	doc, err := parseMarkdown(strings.Join([]string{
+		"## Chapter 1",
 		"",
 		"Dialogue begins --- like this -- then continues with **bold**, *italic*, and `kevin_murray`.",
 	}, "\n"))
-	canonicalDoc := parseMarkdown(RenderMarkdown(doc))
+	if err != nil {
+		t.Fatalf("parsing markdown: %v", err)
+	}
+	canonicalDoc, err := parseMarkdown(RenderMarkdown(doc))
+	if err != nil {
+		t.Fatalf("parsing canonical markdown: %v", err)
+	}
 	got = renderInlineMarkup(canonicalDoc.Blocks[1].Text, "Liberation Mono", "10pt", "bold")
 	if got != want {
 		t.Fatalf("unexpected canonical inline render\ncanonical: %s\nwant: %s\n got: %s", RenderMarkdown(doc), want, got)
@@ -455,25 +527,22 @@ func commandOutput(t *testing.T, cmd *exec.Cmd) string {
 
 func markdownChapterOne() string {
 	return strings.Join([]string{
-		"# The Glass Orchard",
+		"---",
+		"title: The Glass Orchard",
+		"subtitle: A Novel",
+		"author: Example Author",
+		"date: 2026-07-06",
+		"version: Draft 4",
+		"wordcount: 90000",
+		"address: 100 Example Street / Sample City / Exampleland",
+		"phone: +353 1 000 0000",
+		"email: author@example.invalid",
+		"website: https://example.invalid",
+		"---",
 		"",
-		"**A Novel**",
+		"# PART ONE",
 		"",
-		"*by Example Author*",
-		"",
-		"--- Draft 4 | July 2026 ---",
-		"",
-		"| Metadata | Value |",
-		"|---|---|",
-		"| Wordcount | 90000 |",
-		"| Address | 100 Example Street / Sample City / Exampleland |",
-		"| Phone | +353 1 000 0000 |",
-		"| Email | author@example.invalid |",
-		"| Website | https://example.invalid |",
-		"",
-		"## PART ONE",
-		"",
-		"### Chapter 1",
+		"## Chapter 1",
 		"",
 		"The rain had been falling since Tuesday, though nobody could agree which Tuesday had started it.",
 		"",
@@ -491,7 +560,7 @@ func markdownChapterOne() string {
 
 func markdownChapterTwo() string {
 	return strings.Join([]string{
-		"### Chapter 2",
+		"## Chapter 2",
 		"",
 		"The first rule of time travel was that nobody should do it before breakfast.",
 	}, "\n")
@@ -502,7 +571,7 @@ func orgChapterOne() string {
 		"#+TITLE: The Glass Orchard",
 		"#+SUBTITLE: A Novel",
 		"#+AUTHOR: Example Author",
-		"#+DATE: July 2026",
+		"#+DATE: 2026-07-06",
 		"#+VERSION: Draft 4",
 		"#+WORDCOUNT: 90000",
 		"#+ADDRESS: 100 Example Street / Sample City / Exampleland",

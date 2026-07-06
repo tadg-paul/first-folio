@@ -7,12 +7,15 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 func Parse(format string, text string) (Document, error) {
 	switch format {
 	case "markdown":
-		return parseMarkdown(text), nil
+		return parseMarkdown(text)
 	case "org":
 		return parseOrg(text), nil
 	default:
@@ -20,7 +23,7 @@ func Parse(format string, text string) (Document, error) {
 	}
 }
 
-func parseMarkdown(text string) Document {
+func parseMarkdown(text string) (Document, error) {
 	var doc Document
 	var paragraph []string
 	inNoExport := false
@@ -28,6 +31,12 @@ func parseMarkdown(text string) Document {
 	inCode := false
 	var codeLines []string
 	inMetadataTable := false
+
+	var err error
+	text, err = parseMarkdownFrontmatter(&doc.Metadata, text)
+	if err != nil {
+		return Document{}, err
+	}
 
 	flushParagraph := func() {
 		if len(paragraph) > 0 && !inNoExport {
@@ -114,7 +123,7 @@ func parseMarkdown(text string) Document {
 	}
 	flushParagraph()
 	flushCode()
-	return doc
+	return doc, nil
 }
 
 func parseOrg(text string) Document {
@@ -216,12 +225,8 @@ func markdownHeading(line string) (int, string) {
 func addMarkdownHeading(doc *Document, level int, heading string) {
 	switch level {
 	case 1:
-		if doc.Metadata.Title == "" {
-			doc.Metadata.Title = heading
-		}
-	case 2:
 		doc.Blocks = append(doc.Blocks, Block{Kind: "part", Level: level, Text: heading})
-	case 3:
+	case 2:
 		doc.Blocks = append(doc.Blocks, Block{Kind: "chapter", Level: level, Text: heading})
 	default:
 		doc.Blocks = append(doc.Blocks, Block{Kind: "section", Level: level, Text: heading})
@@ -273,6 +278,86 @@ func parseMarkdownMetadata(meta *Metadata, line string) bool {
 		return true
 	}
 	return false
+}
+
+func parseMarkdownFrontmatter(meta *Metadata, text string) (string, error) {
+	normalized := strings.ReplaceAll(text, "\r\n", "\n")
+	if !strings.HasPrefix(normalized, "---\n") {
+		return text, nil
+	}
+	end := strings.Index(normalized[len("---\n"):], "\n---\n")
+	closingLen := len("\n---\n")
+	if end < 0 && strings.HasSuffix(normalized, "\n---") {
+		end = len(normalized) - len("---\n") - len("\n---")
+		closingLen = len("\n---")
+	}
+	if end < 0 {
+		return "", fmt.Errorf("markdown frontmatter starts with --- but has no closing ---")
+	}
+	content := normalized[len("---\n") : len("---\n")+end]
+	remaining := normalized[len("---\n")+end+closingLen:]
+	values := map[string]any{}
+	if err := yaml.Unmarshal([]byte(content), &values); err != nil {
+		return "", fmt.Errorf("parsing markdown frontmatter: %w", err)
+	}
+	applyMarkdownFrontmatter(meta, values)
+	return remaining, nil
+}
+
+func applyMarkdownFrontmatter(meta *Metadata, values map[string]any) {
+	for key, value := range values {
+		switch strings.ToLower(strings.TrimSpace(key)) {
+		case "title":
+			meta.Title = frontmatterString(value)
+		case "subtitle":
+			meta.Subtitle = frontmatterString(value)
+		case "author":
+			meta.Author = frontmatterString(value)
+		case "author-attribution", "author_attribution":
+			meta.AuthorAttribution = frontmatterString(value)
+		case "date":
+			meta.Date = frontmatterString(value)
+		case "version", "draft":
+			meta.Version = frontmatterString(value)
+		case "wordcount", "word count", "word-count":
+			meta.WordCount = frontmatterString(value)
+		case "address":
+			meta.Address = frontmatterString(value)
+		case "phone", "telephone":
+			meta.Phone = frontmatterString(value)
+		case "email":
+			meta.Email = frontmatterString(value)
+		case "website":
+			meta.Website = frontmatterString(value)
+		}
+	}
+}
+
+func frontmatterString(value any) string {
+	switch typed := value.(type) {
+	case nil:
+		return ""
+	case string:
+		return typed
+	case int:
+		return fmt.Sprintf("%d", typed)
+	case int64:
+		return fmt.Sprintf("%d", typed)
+	case float64:
+		return fmt.Sprintf("%.0f", typed)
+	case time.Time:
+		return typed.Format("2006-01-02")
+	case []any:
+		parts := make([]string, 0, len(typed))
+		for _, item := range typed {
+			if rendered := frontmatterString(item); rendered != "" {
+				parts = append(parts, rendered)
+			}
+		}
+		return strings.Join(parts, " / ")
+	default:
+		return fmt.Sprint(typed)
+	}
 }
 
 func parseMarkdownMetadataTable(meta *Metadata, line string, inMetadataTable *bool) bool {

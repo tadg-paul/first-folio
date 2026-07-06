@@ -3,56 +3,40 @@
 package manuscript
 
 import (
+	"fmt"
 	"strings"
 )
 
 func RenderMarkdown(doc Document) string {
 	var lines []string
-	meta := doc.Metadata
-	if meta.Title != "" {
-		lines = append(lines, "# "+meta.Title, "")
-	}
-	if meta.Subtitle != "" {
-		lines = append(lines, "**"+meta.Subtitle+"**", "")
-	}
-	if meta.Author != "" {
-		attribution := meta.AuthorAttribution
-		if attribution == "" {
-			attribution = "by"
-		}
-		lines = append(lines, "*"+strings.TrimSpace(attribution+" "+meta.Author)+"*", "")
-	}
-	if meta.Version != "" || meta.Date != "" {
-		dateLine := strings.TrimSpace(meta.Version)
-		if meta.Date != "" {
-			if dateLine != "" {
-				dateLine += " | "
-			}
-			dateLine += meta.Date
-		}
-		lines = append(lines, "--- "+dateLine+" ---", "")
-	}
-	appendMarkdownMetadataTable(&lines, meta)
+	appendMarkdownFrontmatter(&lines, doc.Metadata)
 	appendMarkdownBlocks(&lines, doc.Blocks)
 	return strings.TrimRight(strings.Join(lines, "\n"), "\n") + "\n"
 }
 
-func appendMarkdownMetadataTable(lines *[]string, meta Metadata) {
-	if meta.WordCount == "" && meta.Address == "" && meta.Phone == "" && meta.Email == "" && meta.Website == "" {
+func appendMarkdownFrontmatter(lines *[]string, meta Metadata) {
+	if meta == (Metadata{}) {
 		return
 	}
-	*lines = append(*lines, "| Metadata | Value |", "|---|---|")
-	appendMarkdownMetadataRow(lines, "Wordcount", meta.WordCount)
-	appendMarkdownMetadataRow(lines, "Address", meta.Address)
-	appendMarkdownMetadataRow(lines, "Phone", meta.Phone)
-	appendMarkdownMetadataRow(lines, "Email", meta.Email)
-	appendMarkdownMetadataRow(lines, "Website", meta.Website)
+	*lines = append(*lines, "---")
+	appendFrontmatterLine(lines, "title", meta.Title)
+	appendFrontmatterLine(lines, "subtitle", meta.Subtitle)
+	appendFrontmatterLine(lines, "author", meta.Author)
+	appendFrontmatterLine(lines, "author-attribution", meta.AuthorAttribution)
+	appendFrontmatterLine(lines, "date", meta.Date)
+	appendFrontmatterLine(lines, "version", meta.Version)
+	appendFrontmatterLine(lines, "wordcount", meta.WordCount)
+	appendFrontmatterLine(lines, "address", meta.Address)
+	appendFrontmatterLine(lines, "phone", meta.Phone)
+	appendFrontmatterLine(lines, "email", meta.Email)
+	appendFrontmatterLine(lines, "website", meta.Website)
+	*lines = append(*lines, "---")
 	*lines = append(*lines, "")
 }
 
-func appendMarkdownMetadataRow(lines *[]string, key string, value string) {
+func appendFrontmatterLine(lines *[]string, key string, value string) {
 	if value != "" {
-		*lines = append(*lines, "| "+key+" | "+value+" |")
+		*lines = append(*lines, fmt.Sprintf("%s: %q", key, value))
 	}
 }
 
@@ -60,13 +44,13 @@ func appendMarkdownBlocks(lines *[]string, blocks []Block) {
 	for _, block := range blocks {
 		switch block.Kind {
 		case "part":
-			*lines = append(*lines, "## "+block.Text, "")
+			*lines = append(*lines, "# "+block.Text, "")
 		case "chapter":
-			*lines = append(*lines, "### "+block.Text, "")
+			*lines = append(*lines, "## "+block.Text, "")
 		case "section":
 			level := block.Level
-			if level < 4 {
-				level = 4
+			if level < 3 {
+				level = 3
 			}
 			*lines = append(*lines, strings.Repeat("#", level)+" "+block.Text, "")
 		case "paragraph":

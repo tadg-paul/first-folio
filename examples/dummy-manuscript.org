@@ -4,7 +4,7 @@
 
 #+AUTHOR: Example Author
 
-#+DATE: July 2026
+#+DATE: 2026-07-06
 
 #+VERSION: Draft 2
 
@@ -22,7 +22,7 @@
 
 ** Chapter 1
 
-The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it."
+The corridor outside the archive was quiet enough for a whisper to travel. "Are you sure this is the right drawer?" Mira asked. "No," said Rowan, "but it is the only one that hummed when I touched it." The ledger flashed *WAIT* -- then the brass latch answered --- and Mira whispered ~nine-bell~ into her phone.
 
 Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at venenatis lacus tempor. Morbi posuere, nibh at blandit porttitor, neque erat volutpat nisl, non finibus risus justo vitae lectus.
 
@@ -121,6 +121,12 @@ Praesent at lacus vel risus iaculis consequat. Sed porta magna a orci luctus, at
 -----
 
 After the pause, the room seemed to remember them.
+
+#+BEGIN_SRC yaml
+living_room:
+  north_wall: 4.20m
+  warning: do not trust the ninth bell
+#+END_SRC
 
 ** Chapter 6
 
