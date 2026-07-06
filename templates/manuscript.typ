@@ -61,15 +61,23 @@
   ]
 }
 
-#show list: it => block(
-  above: {{.Config.Folio.Manuscript.List.SpaceBefore}},
-  below: {{.Config.Folio.Manuscript.List.SpaceAfter}},
-)[#it]
+#show list: it => {
+  v({{.Config.Folio.Manuscript.List.SpaceBefore}})
+  it
+  v({{.Config.Folio.Manuscript.List.SpaceAfter}})
+}
 
-#show enum: it => block(
-  above: {{.Config.Folio.Manuscript.List.SpaceBefore}},
-  below: {{.Config.Folio.Manuscript.List.SpaceAfter}},
-)[#it]
+#show enum: it => {
+  v({{.Config.Folio.Manuscript.List.SpaceBefore}})
+  it
+  v({{.Config.Folio.Manuscript.List.SpaceAfter}})
+}
+
+#show figure.where(kind: table): it => {
+  v({{.Config.Folio.Manuscript.Table.SpaceBefore}})
+  it
+  v({{.Config.Folio.Manuscript.Table.SpaceAfter}})
+}
 
 #show raw.where(block: true): it => block(
   above: {{.Config.Folio.Manuscript.CodeBlock.SpaceBefore}},

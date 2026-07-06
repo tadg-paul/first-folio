@@ -132,6 +132,15 @@
   #   line-spacing: 1.5
   #   paragraph-indent: 10mm
   #   paragraph-spacing: 0
+  #   list:
+  #     space-before: 0.5em
+  #     space-after: 0.5em
+  #   table:
+  #     space-before: 0.5em
+  #     space-after: 0.5em
+  #   code-block:
+  #     space-before: 0.5em
+  #     space-after: 0.5em
   #   toc:
   #     enabled: true
   #     title: Contents

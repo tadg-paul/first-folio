@@ -86,6 +86,7 @@ type ManuscriptConfig struct {
 	TitlePage           TitlePageConfig   `yaml:"title-page"`
 	SceneBreak          SceneBreakConfig  `yaml:"scene-break"`
 	List                SpacedBlockConfig `yaml:"list"`
+	Table               SpacedBlockConfig `yaml:"table"`
 	CodeBlock           SpacedBlockConfig `yaml:"code-block"`
 	Part                HeadingConfig     `yaml:"part"`
 	Chapter             HeadingConfig     `yaml:"chapter"`
@@ -290,6 +291,8 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.SceneBreak.Marker, "#")
 	fill(&ms.List.SpaceBefore, "0.5em")
 	fill(&ms.List.SpaceAfter, "0.5em")
+	fill(&ms.Table.SpaceBefore, "0.5em")
+	fill(&ms.Table.SpaceAfter, "0.5em")
 	fill(&ms.CodeBlock.SpaceBefore, "0.5em")
 	fill(&ms.CodeBlock.SpaceAfter, "0.5em")
 	fill(&ms.TitlePage.TitleBlockAlign, "center")
