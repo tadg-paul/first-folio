@@ -105,6 +105,10 @@ US manuscript style is selected with `folio.manuscript.style: us` or `folio.styl
 
 Manuscript metadata supports `title`, `subtitle`, `author`, `attribution`, `date`, `version`, `wordcount`, `contact-name`, `address`, `phone`, `email`, and `website`.
 
+`folio.manuscript.date-format` controls title-page date rendering for ISO frontmatter dates using Go date layouts. British defaults to `2 January 2006`; US overrides default to `January 2, 2006`.
+
+`folio.manuscript.toc.part-gap-before` controls extra vertical space before part entries in the table of contents. The default is `0.5em`.
+
 ### Yapper-specific keys
 
 The following keys are examples of yapper configuration. First Folio silently ignores them. See [yapper documentation](https://github.com/tadg-paul/yapper) for the full reference.

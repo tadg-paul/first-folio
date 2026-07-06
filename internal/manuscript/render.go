@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 )
 
 type templateData struct {
@@ -31,6 +32,7 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		return "", err
 	}
 	safeMeta := escapedMetadata(doc.Metadata)
+	safeMeta.Date = escapeTypst(renderDate(doc.Metadata.Date, cfg.Folio.Manuscript.DateFormat))
 	data := templateData{
 		Config:          cfg,
 		Meta:            safeMeta,
@@ -57,6 +59,21 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		return "", fmt.Errorf("executing Typst template: %w", err)
 	}
 	return out.String(), nil
+}
+
+func renderDate(value string, layout string) string {
+	trimmed := strings.TrimSpace(value)
+	if trimmed == "" {
+		return ""
+	}
+	parsed, err := time.Parse("2006-01-02", trimmed)
+	if err != nil {
+		return value
+	}
+	if strings.TrimSpace(layout) == "" {
+		layout = "2 January 2006"
+	}
+	return parsed.Format(layout)
 }
 
 func lineSpacingLeading(lineSpacing string) string {

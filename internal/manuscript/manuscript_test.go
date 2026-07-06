@@ -30,6 +30,8 @@ func TestMarkdownManuscriptCLIProducesTypstContract(t *testing.T) {
 	assertContains(t, typst, `spacing: 1.5em`)
 	assertContains(t, typst, `author\@example.invalid`)
 	assertContains(t, typst, `+353 1 000 0000`)
+	assertContains(t, typst, `6 July 2026`)
+	assertContains(t, typst, `above: if it.level == 1 { 0.5em } else { 0pt }`)
 	assertContains(t, typst, `footer: none`)
 	assertContains(t, typst, `#folio-part(first: true)[PART ONE]`)
 	assertContains(t, typst, `#folio-chapter(first: false)[Chapter 1]`)
@@ -95,6 +97,45 @@ func TestTOCCanBeDisabledByConfig(t *testing.T) {
 	typst := readFile(t, output)
 
 	assertNotContains(t, typst, `#outline(title: none)`)
+}
+
+func TestTOCPartGapBeforeCanBeConfigured(t *testing.T) {
+	root := testProjectRoot(t)
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "script.yaml"), "folio:\n  manuscript:\n    toc:\n      part-gap-before: 1.25em\n")
+	writeFile(t, filepath.Join(dir, "ch01.md"), markdownChapterOne())
+
+	output := filepath.Join(dir, "out.typ")
+	runManuscript(t, root, filepath.Join(dir, "ch01.md"), output)
+	typst := readFile(t, output)
+
+	assertContains(t, typst, `above: if it.level == 1 { 1.25em } else { 0pt }`)
+}
+
+func TestRenderDateUsesConfiguredGoLayoutForISOInput(t *testing.T) {
+	if got := renderDate("2026-07-06", "2 January 2006"); got != "6 July 2026" {
+		t.Fatalf("unexpected British date render: %q", got)
+	}
+	if got := renderDate("2026-07-06", "January 2, 2006"); got != "July 6, 2026" {
+		t.Fatalf("unexpected US date render: %q", got)
+	}
+	if got := renderDate("July 2026", "2 January 2006"); got != "July 2026" {
+		t.Fatalf("non-ISO dates should render as written, got %q", got)
+	}
+}
+
+func TestTitlePageDateFormatCanBeConfigured(t *testing.T) {
+	root := testProjectRoot(t)
+	dir := t.TempDir()
+	writeFile(t, filepath.Join(dir, "script.yaml"), "folio:\n  manuscript:\n    date-format: 2006/01/02\n")
+	writeFile(t, filepath.Join(dir, "ch01.md"), markdownChapterOne())
+
+	output := filepath.Join(dir, "out.typ")
+	runManuscript(t, root, filepath.Join(dir, "ch01.md"), output)
+	typst := readFile(t, output)
+
+	assertContains(t, typst, `2026\/07\/06`)
+	assertNotContains(t, typst, `6 July 2026`)
 }
 
 func TestMarkdownFrontmatterAndHeadingContract(t *testing.T) {

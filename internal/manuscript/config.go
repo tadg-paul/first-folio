@@ -68,6 +68,7 @@ type ManuscriptConfig struct {
 	DateFont            string           `yaml:"date-font"`
 	DateFontSize        string           `yaml:"date-font-size"`
 	DateFontWeight      string           `yaml:"date-font-weight"`
+	DateFormat          string           `yaml:"date-format"`
 	VersionFont         string           `yaml:"version-font"`
 	VersionFontSize     string           `yaml:"version-font-size"`
 	VersionFontWeight   string           `yaml:"version-font-weight"`
@@ -131,6 +132,7 @@ type TOCConfig struct {
 	DotLeaders        bool   `yaml:"dot-leaders"`
 	PageNumbers       bool   `yaml:"page-numbers"`
 	PageBreakBefore   bool   `yaml:"page-break-before"`
+	PartGapBefore     string `yaml:"part-gap-before"`
 }
 
 type HeadingConfig struct {
@@ -241,6 +243,7 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.DateFont, ms.HeadingFont)
 	fill(&ms.DateFontSize, "10pt")
 	fill(&ms.DateFontWeight, "regular")
+	fill(&ms.DateFormat, "2 January 2006")
 	fill(&ms.VersionFont, ms.HeadingFont)
 	fill(&ms.VersionFontSize, "10pt")
 	fill(&ms.VersionFontWeight, "regular")
@@ -270,6 +273,7 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.TOC.HeadingFont, ms.HeadingFont)
 	fill(&ms.TOC.HeadingFontSize, "16pt")
 	fill(&ms.TOC.HeadingFontWeight, "bold")
+	fill(&ms.TOC.PartGapBefore, "0.5em")
 	fill(&ms.TitlePage.TitleBlockAlign, "center")
 	fill(&ms.TitlePage.FooterAlign, "center")
 	fill(&ms.Part.Align, "center")

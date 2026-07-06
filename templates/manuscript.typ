@@ -154,7 +154,10 @@
 #v(1em)
 #text(font: "{{.Config.Folio.Manuscript.TOC.Font}}", size: {{.Config.Folio.Manuscript.TOC.FontSize}}, weight: "{{.Config.Folio.Manuscript.TOC.FontWeight}}")[
   #set par(leading: 0.5em)
-  #show outline.entry: it => block(below: 0.5em)[#it]
+  #show outline.entry: it => block(
+    above: if it.level == 1 { {{.Config.Folio.Manuscript.TOC.PartGapBefore}} } else { 0pt },
+    below: 0.5em,
+  )[#it]
   #outline(title: none)
 ]
 #pagebreak()

@@ -32,6 +32,7 @@ folio:
     date-font: Libertinus Mono
     date-font-size: 10pt
     date-font-weight: regular
+    date-format: "January 2, 2006"
 
     version-font: Libertinus Mono
     version-font-size: 10pt

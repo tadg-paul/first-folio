@@ -39,6 +39,7 @@ folio:
     date-font: Libertinus Sans
     date-font-size: 10pt
     date-font-weight: regular
+    date-format: "2 January 2006"
 
     version-font: Libertinus Sans
     version-font-size: 10pt
@@ -96,6 +97,7 @@ folio:
       include-sections: false
       dot-leaders: true
       page-numbers: true
+      part-gap-before: 0.5em
 
     part:
       page-break-before: true
