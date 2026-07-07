@@ -6,43 +6,43 @@ folio:
     style: us
     margin: 25mm
 
-    font: Liberation Mono
+    font: Menlo
     font-size: 10pt
     font-weight: regular
 
-    heading-font: Liberation Mono
+    heading-font: Menlo
     heading-font-size: 10pt
     heading-font-weight: regular
 
-    mono-font: Menlo
+    mono-font: Iosevka Custom
     mono-font-size: 9pt
     mono-font-weight: bold
 
-    title-font: Liberation Mono
+    title-font: Menlo
     title-font-size: 10pt
     title-font-weight: regular
 
-    subtitle-font: Liberation Mono
+    subtitle-font: Menlo
     subtitle-font-size: 10pt
     subtitle-font-weight: regular
 
-    author-font: Liberation Mono
+    author-font: Menlo
     author-font-size: 10pt
     author-font-weight: regular
-    date-font: Liberation Mono
+    date-font: Menlo
     date-font-size: 10pt
     date-font-weight: regular
     date-format: "January 2, 2006"
 
-    version-font: Liberation Mono
+    version-font: Menlo
     version-font-size: 10pt
     version-font-weight: regular
 
-    wordcount-font: Liberation Mono
+    wordcount-font: Menlo
     wordcount-font-size: 10pt
     wordcount-font-weight: regular
 
-    contact-font: Liberation Mono
+    contact-font: Menlo
     contact-font-size: 10pt
     contact-font-weight: regular
 
@@ -55,17 +55,17 @@ folio:
 
     page-header:
       enabled: true
-      font: Liberation Mono
+      font: Menlo
       font-size: 10pt
       font-weight: regular
       format: "[author] / [title] / [page]"
       align: right
 
     toc:
-      font: Liberation Mono
+      font: Menlo
       font-size: 10pt
       font-weight: regular
-      heading-font: Liberation Mono
+      heading-font: Menlo
       heading-font-size: 10pt
       heading-font-weight: regular
 

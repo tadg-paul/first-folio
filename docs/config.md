@@ -92,9 +92,9 @@ Common manuscript keys:
 |---|---|---|---|
 | `page` | string | `a4` | inherited |
 | `margin` | string | `20mm` | `25mm` |
-| `font` | string | `Libertinus Serif` | `Liberation Mono` |
-| `heading-font` | string | `Libertinus Sans` | `Liberation Mono` |
-| `mono-font` | string | `Libertinus Mono` | `Menlo` |
+| `font` | string | `Libertinus Serif` | `Menlo` |
+| `heading-font` | string | `Libertinus Sans` | `Menlo` |
+| `mono-font` | string | `Libertinus Mono` | `Iosevka Custom` |
 | `line-spacing` | number | `1.5` | `2` |
 | `paragraph-indent` | string | `10mm` | `12.7mm` |
 | `paragraph-spacing` | string | `0` | `0` |
