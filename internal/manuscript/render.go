@@ -34,14 +34,15 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 	}
 	safeMeta := escapedMetadata(doc.Metadata)
 	safeMeta.Date = escapeTypst(renderDate(doc.Metadata.Date, cfg.Folio.Manuscript.DateFormat))
+	leading := lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing)
 	data := templateData{
 		Config:           cfg,
 		Meta:             safeMeta,
 		Header:           renderHeader(doc.Metadata, cfg),
 		Body:             body,
 		IsUS:             cfg.Folio.Manuscript.Style == "us",
-		Leading:          lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing),
-		Spacing:          paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, cfg.Folio.Manuscript.LineSpacing),
+		Leading:          leading,
+		Spacing:          paragraphSpacing(cfg.Folio.Manuscript.ParagraphSpacing, leading),
 		PartVertical:     typstVerticalAlign(cfg.Folio.Manuscript.Part.VerticalAlign),
 		ChapterPosition:  chapterPosition(cfg.Folio.Manuscript.Chapter.Position),
 		SceneBreakMarker: escapeTypst(cfg.Folio.Manuscript.SceneBreak.Marker),
@@ -86,22 +87,18 @@ func lineSpacingLeading(lineSpacing string) string {
 	if multiplier < 1 {
 		multiplier = 1
 	}
-	return strconv.FormatFloat(multiplier, 'f', -1, 64) + "em"
+	return strconv.FormatFloat(multiplier-1, 'f', -1, 64) + "em"
 }
 
-func paragraphSpacing(spacing string, lineSpacing string) string {
+func paragraphSpacing(spacing string, leading string) string {
 	trimmed := strings.TrimSpace(spacing)
 	if trimmed == "" || trimmed == "0" || trimmed == "0pt" {
-		multiplier, err := strconv.ParseFloat(strings.TrimSpace(lineSpacing), 64)
-		if err != nil {
-			return lineSpacing + "em"
-		}
-		if multiplier < 1 {
-			multiplier = 1
-		}
-		return strconv.FormatFloat(multiplier, 'f', -1, 64) + "em"
+		return leading
 	}
-	return trimmed
+	if leading == "0em" {
+		return trimmed
+	}
+	return leading + " + " + trimmed
 }
 
 func renderBlocks(blocks []Block, cfg Config) (string, error) {

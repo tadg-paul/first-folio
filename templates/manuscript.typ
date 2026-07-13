@@ -108,11 +108,6 @@
   size: {{.Config.Folio.Manuscript.FontSize}},
   weight: "{{.Config.Folio.Manuscript.FontWeight}}",
 )
-#set par(
-  first-line-indent: {{.Config.Folio.Manuscript.ParagraphIndent}},
-  spacing: {{.Spacing}},
-  leading: {{.Leading}},
-)
 
 {{if and (not .IsUS) .Config.Folio.Manuscript.TitlePage.Enabled}}
 #set page(
@@ -209,9 +204,22 @@
 {{end}}
 
 #counter(page).update(1)
+#set text(
+  top-edge: 0.8em,
+  bottom-edge: -0.2em,
+)
+#set par(
+  first-line-indent: {{.Config.Folio.Manuscript.ParagraphIndent}},
+  spacing: {{.Spacing}},
+  leading: {{.Leading}},
+)
 #set page(
   paper: "{{.Config.Folio.Manuscript.Page}}",
-  margin: {{.Config.Folio.Manuscript.Margin}},
+  {{if .Config.Folio.Manuscript.PageHeader.Enabled}}margin: (
+    top: {{.Config.Folio.Manuscript.PageHeader.DistanceFromEdge}} + {{.Config.Folio.Manuscript.PageHeader.ContentPaddingAfter}},
+    rest: {{.Config.Folio.Manuscript.Margin}},
+  ),
+  header-ascent: {{.Config.Folio.Manuscript.PageHeader.ContentPaddingAfter}},{{else}}margin: {{.Config.Folio.Manuscript.Margin}},{{end}}
   numbering: none,
   footer: none,
   {{if .Config.Folio.Manuscript.PageHeader.Enabled}}header: align({{.Config.Folio.Manuscript.PageHeader.Align}})[
@@ -225,5 +233,4 @@
   ],{{else}}header: none,{{end}}
 )
 
-#v({{.Config.Folio.Manuscript.PageHeader.ContentPaddingAfter}})
 {{.Body}}
