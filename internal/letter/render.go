@@ -14,6 +14,7 @@ import (
 
 	folio "github.com/tadg-paul/first-folio"
 	"github.com/tadg-paul/first-folio/internal/config"
+	typstutil "github.com/tadg-paul/first-folio/internal/typst"
 )
 
 type templateData struct {
@@ -146,11 +147,11 @@ func formatAddress(value string) string {
 }
 
 func escapeContent(value string) string {
-	return strings.NewReplacer(`\`, `\\`, `$`, `\$`, `#`, `\#`, `@`, `\@`, `[`, `\[`, `]`, `\]`, `*`, `\*`, `_`, `\_`).Replace(value)
+	return typstutil.EscapeContent(value)
 }
 
 func escapeString(value string) string {
-	return strings.NewReplacer(`\`, `\\`, `"`, `\"`, "\n", `\n`).Replace(value)
+	return typstutil.EscapeString(value)
 }
 
 func optionalLetterWeight(value string) string {

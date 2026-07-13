@@ -17,6 +17,7 @@ import (
 	folio "github.com/tadg-paul/first-folio"
 	"github.com/tadg-paul/first-folio/internal/config"
 	"github.com/tadg-paul/first-folio/internal/play"
+	typstutil "github.com/tadg-paul/first-folio/internal/typst"
 )
 
 var (
@@ -258,12 +259,11 @@ func replaceMarkup(text string, expression *regexp.Regexp, render func(string) s
 }
 
 func escapeTypstContent(value string) string {
-	replacer := strings.NewReplacer(`\`, `\\`, `$`, `\$`, `#`, `\#`, `@`, `\@`, `[`, `\[`, `]`, `\]`, `*`, `\*`, `_`, `\_`)
-	return replacer.Replace(value)
+	return typstutil.EscapeContent(value)
 }
 
 func escapeTypstString(value string) string {
-	return strings.NewReplacer(`\`, `\\`, `"`, `\"`, "\n", `\n`, "\r", `\r`).Replace(value)
+	return typstutil.EscapeString(value)
 }
 
 func validateScriptData(data scriptTemplateData) error {

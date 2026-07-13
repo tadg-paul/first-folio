@@ -35,6 +35,12 @@ func TestRunTopLevelContract(t *testing.T) {
 			wantOut:    []string{"folio 0.4.10"},
 		},
 		{
+			name:       "subcommand version",
+			args:       []string{"manuscript", "--version"},
+			wantStatus: 0,
+			wantOut:    []string{"folio 0.4.10"},
+		},
+		{
 			name:       "missing command",
 			wantStatus: 1,
 			wantErr:    []string{"Error: no subcommand given", "Usage: folio <command>"},

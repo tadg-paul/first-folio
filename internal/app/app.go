@@ -21,13 +21,14 @@ func Run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int
 		fmt.Fprintln(stderr, "Run 'folio --help' for available commands.")
 		return 1
 	}
+	if hasVersion(args) {
+		fmt.Fprintf(stdout, "folio %s\n", Version)
+		return 0
+	}
 
 	switch args[0] {
 	case "-h", "--help":
 		return writeHelp(stdout, "docs/folio-help.md")
-	case "--version":
-		fmt.Fprintf(stdout, "folio %s\n", Version)
-		return 0
 	case "convert", "letter", "manuscript":
 		if hasHelp(args[1:]) {
 			name := args[0]
@@ -57,6 +58,15 @@ func Run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int
 		fmt.Fprintln(stderr, "Run 'folio --help' for available commands.")
 		return 1
 	}
+}
+
+func hasVersion(args []string) bool {
+	for _, arg := range args {
+		if arg == "--version" {
+			return true
+		}
+	}
+	return false
 }
 
 func hasHelp(args []string) bool {

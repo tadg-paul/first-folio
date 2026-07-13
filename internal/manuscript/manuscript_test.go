@@ -631,6 +631,30 @@ func TestPDFRenderHasTOCAndNoBlankPageBeforePart(t *testing.T) {
 	assertBefore(t, pdfText, `PART ONE`, `Chapter 1`)
 }
 
+func TestExamplePDFsRasterize(t *testing.T) {
+	requireTool(t, "typst")
+	requireTool(t, "pdf-to-png")
+	root := testProjectRoot(t)
+	dir := t.TempDir()
+	for _, style := range []string{"british", "us"} {
+		pdf := filepath.Join(dir, style+".pdf")
+		runManuscript(t, root, "--style", style, filepath.Join(root, "examples", "dummy-manuscript.md"), pdf)
+		cmd := exec.Command("pdf-to-png", filepath.Base(pdf), "120")
+		cmd.Dir = dir
+		commandOutput(t, cmd)
+		images, err := filepath.Glob(filepath.Join(dir, style+"-*.png"))
+		if err != nil || len(images) == 0 {
+			t.Fatalf("%s raster output: %v, %v", style, images, err)
+		}
+		for _, image := range images {
+			info, err := os.Stat(image)
+			if err != nil || info.Size() == 0 {
+				t.Errorf("empty raster output %s: %v", image, err)
+			}
+		}
+	}
+}
+
 func TestDummyMarkdownAndOrgExamplesRenderSamePDFText(t *testing.T) {
 	requireTool(t, "typst")
 	requireTool(t, "pdftotext")
