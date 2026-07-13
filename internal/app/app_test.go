@@ -20,13 +20,13 @@ func TestRunTopLevelContract(t *testing.T) {
 			name:       "help",
 			args:       []string{"--help"},
 			wantStatus: 0,
-			wantOut:    []string{"First Folio", "convert", "letter", "manuscript"},
+			wantOut:    []string{"format converter", "convert", "letter", "manuscript"},
 		},
 		{
 			name:       "short help",
 			args:       []string{"-h"},
 			wantStatus: 0,
-			wantOut:    []string{"First Folio", "convert", "letter", "manuscript"},
+			wantOut:    []string{"format converter", "convert", "letter", "manuscript"},
 		},
 		{
 			name:       "version",
