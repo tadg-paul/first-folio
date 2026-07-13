@@ -19,7 +19,7 @@ Hello [moniker] at [org].
 
 This has =inline code=, *bold*, /italic/, and _underline_.
 *** Yours sincerely :closing:
-*** 2026-07-13
+*** [2026-07-13]
 *** Recipient One / Cork :to:
 **** One Theatre :org:
 **** Aoife :moniker:

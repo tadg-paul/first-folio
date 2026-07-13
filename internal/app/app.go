@@ -39,6 +39,13 @@ func Run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int
 			}
 			return 0
 		}
+		if args[0] == "letter" {
+			if err := runLetter(args[1:], stdout); err != nil {
+				fmt.Fprintf(stderr, "Error: %v\n", err)
+				return 1
+			}
+			return 0
+		}
 		fmt.Fprintf(stderr, "Error: %s subcommand is not available in this build\n", args[0])
 		return 1
 	default:
