@@ -125,16 +125,14 @@ The following keys are examples of yapper configuration. First Folio silently ig
 - `dialogue-speed`, `stage-direction-speed`, `gap-after-dialogue`, `gap-after-stage-direction`, `gap-after-scene`
 - `speech-substitution`, `threads`
 
-## YAML subset
+## YAML
 
-Config files use a restricted YAML subset. The parser handles:
+Config files are parsed with `gopkg.in/yaml.v3` and support standard YAML mappings and scalar values. Common project configuration uses:
 
 - Scalar values: `key: value`, `key: "quoted"`, `key: 'single quoted'`
-- One-level-deep maps: a key followed by indented `key: value` lines
+- Nested maps: a key followed by indented `key: value` lines
 - Comments: `# comment` (full-line or inline)
 - Booleans: `true`/`false`/`yes`/`no`/`on`/`off`
-
-Not supported: multi-line strings, anchors/aliases, flow style (`{}`/`[]`), multi-document (`---`), nested maps beyond one level, sequences.
 
 Malformed YAML produces a descriptive error with the file path and line number.
 

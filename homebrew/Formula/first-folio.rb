@@ -11,20 +11,12 @@ class FirstFolio < Formula
 
   depends_on "typst"
   depends_on "pandoc"
+  depends_on "go" => :build
 
   def install
-    # Install into libexec preserving the directory structure so
-    # FindBin resolves ../lib and ../presets correctly from bin/
-    (libexec/"bin").install "bin/folio"
-    libexec.install "lib"
-    libexec.install "presets"
-
-    # Wrapper script in bin/ that exec's the real one
-    (bin/"folio").write <<~SH
-      #!/bin/bash
-      exec "#{libexec}/bin/folio" "$@"
-    SH
-    (bin/"folio").chmod 0755
+    system "go", "build", "-trimpath",
+           "-ldflags", "-X github.com/tadg-paul/first-folio/internal/app.Version=#{version}",
+           "-o", bin/"folio", "./cmd/folio"
   end
 
   def caveats

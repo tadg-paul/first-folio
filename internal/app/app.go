@@ -11,7 +11,7 @@ import (
 	"github.com/tadg-paul/first-folio/internal/manuscript"
 )
 
-const Version = "0.4.10"
+var Version = "0.4.10"
 
 func Run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
 	_ = stdin

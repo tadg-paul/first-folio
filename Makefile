@@ -1,53 +1,35 @@
-INSTALL_DIR := $(HOME)/.local/bin
-PROJECT_DIR := $(shell cd "$(dir $(lastword $(MAKEFILE_LIST)))" && pwd)
-
-CURRENT_VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+INSTALL_DIR ?= $(HOME)/.local/bin
+BUILD_DIR ?= $(CURDIR)/dist
+CURRENT_VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)
+VERSION ?= $(patsubst v%,%,$(CURRENT_VERSION))
 RELEASE_VERSION ?= $(shell echo "$(CURRENT_VERSION)" | awk -F. '{printf "%s.%s.%d", $$1, $$2, $$3+1}')
+LDFLAGS := -X github.com/tadg-paul/first-folio/internal/app.Version=$(VERSION)
 
-.PHONY: build install uninstall test test-one-off lint sync check-release-deps release
+.PHONY: build install uninstall test lint check-release-deps release sync
 
 build:
-	@go build -o "$(PROJECT_DIR)/bin/folio-manuscript" ./cmd/folio-manuscript
+	@mkdir -p "$(BUILD_DIR)"
+	@go build -trimpath -ldflags "$(LDFLAGS)" -o "$(BUILD_DIR)/folio" ./cmd/folio
 
 install: build
-	@ln -sf "$(PROJECT_DIR)/bin/folio" "$(INSTALL_DIR)/folio"
-	@echo "Linked folio -> $(INSTALL_DIR)/folio"
+	@mkdir -p "$(INSTALL_DIR)"
+	@ln -sf "$(BUILD_DIR)/folio" "$(INSTALL_DIR)/folio"
+	@echo "Linked $(INSTALL_DIR)/folio -> $(BUILD_DIR)/folio"
 
 uninstall:
-	@rm -f "$(INSTALL_DIR)/folio"
+	@unlink "$(INSTALL_DIR)/folio"
 	@echo "Removed $(INSTALL_DIR)/folio"
 
 lint:
-	@echo "Perl syntax check..."
-	@fail=0; \
-	for f in bin/folio lib/Folio/*.pm lib/Folio/*/*.pm lib/OrgPlay/*.pm; do \
-		if ! perl -Ilib -c "$$f" 2>/dev/null; then \
-			echo "FAIL: $$f"; fail=1; \
-		fi; \
-	done; \
-	if [ "$$fail" -eq 1 ]; then exit 1; fi
-	@echo "All files pass syntax check."
-	@echo "Go tests..."
+	@go vet ./...
+
+test:
 	@go test ./...
 
-test: lint
-	@for t in tests/regression/test_*.sh; do \
-		echo ""; \
-		echo ">>> Running $$t"; \
-		bash "$$t" || exit 1; \
-	done
-
 check-release-deps:
-	@command -v typst >/dev/null 2>&1 || { echo "Error: typst is required for release packaging" >&2; exit 1; }
-	@command -v pandoc >/dev/null 2>&1 || { echo "Error: pandoc is required for manuscript format conversion" >&2; exit 1; }
-
-ifdef ISSUE
-test-one-off:
-	@bash tests/one_off/test_*$(ISSUE)*.sh
-else
-test-one-off:
-	@echo "No one-off tests defined yet"
-endif
+	@command -v go >/dev/null
+	@command -v typst >/dev/null
+	@command -v pandoc >/dev/null
 
 sync:
 	@git add --all
@@ -57,25 +39,9 @@ sync:
 
 release: check-release-deps
 ifndef SKIP_TESTS
-	@echo "Running tests..."
-	$(MAKE) test
+	@$(MAKE) test
 endif
-	@echo ""
-	@echo "Creating release $(RELEASE_VERSION) (current: $(CURRENT_VERSION))..."
-	@echo ""
-	@echo "Stamping version..."
-	@perl -pi -e "s/VERSION = '[^']*'/VERSION = '$(shell echo $(RELEASE_VERSION) | sed 's/^v//')'/" bin/folio
-	@git add -A
-	@git commit -m "release: $(RELEASE_VERSION)" || true
 	@git tag -a "$(RELEASE_VERSION)" -m "$(RELEASE_VERSION)"
 	@git push
 	@git push --tags
-	@echo ""
-	@echo "Updating Homebrew formula..."
-	@bash scripts/update-homebrew.sh "$(shell echo $(RELEASE_VERSION) | sed 's/^v//')"
-	@echo ""
-	@echo "Publishing to Homebrew tap..."
-	@cp homebrew/Formula/first-folio.rb $(HOME)/code/tigoss/homebrew-tap/Formula/
-	@cd $(HOME)/code/tigoss/homebrew-tap && git add -A && git commit -m "first-folio $(shell echo $(RELEASE_VERSION) | sed 's/^v//')" && git push
-	@echo ""
-	@echo "Done. Tagged $(RELEASE_VERSION). Published to tadg-paul/tap."
+	@go run ./cmd/update-homebrew --publish-tap "$(HOME)/code/tigoss/homebrew-tap" "$(patsubst v%,%,$(RELEASE_VERSION))"

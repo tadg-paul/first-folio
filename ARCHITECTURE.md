@@ -1,67 +1,79 @@
-<!-- Version: 0.1 | Last updated: 2026-07-06 -->
+<!-- Version: 0.2 | Last updated: 2026-07-13 -->
 
 # Architecture
 
-First Folio is a CLI-first document renderer with two implementation paths.
+First Folio is a CLI-first Go application. One `folio` executable owns stage-play conversion, cover-letter generation, and prose-manuscript rendering.
 
-## Current Runtime
+## Runtime
 
-`bin/folio` is the public command. Existing stage-play conversion and cover-letter generation remain implemented in Perl:
+`cmd/folio` is the sole product entry point. It delegates process-independent command handling to `internal/app`, which returns an exit status and writes through injected streams.
 
-- `folio convert` uses `lib/Folio/Parser/*`, `lib/Folio/Emitter/*`, `Folio::Config`, and Typst for PDF output.
-- `folio letter` uses `Folio::CoverLetter` and the existing `script.yaml` configuration model.
+The subcommands are:
 
-Prose manuscript rendering is implemented in Go:
+- `folio convert`: parses Org, Markdown, or Fountain stage plays into typed events and emits Org, Markdown, Fountain, Typst, or PDF.
+- `folio letter`: parses Org `:letter:` sections and renders recipient-specific PDFs.
+- `folio manuscript`: parses Markdown or Org prose manuscripts and renders Typst or PDF.
 
-- `folio manuscript` is dispatched by `bin/folio`.
-- The dispatcher executes `bin/folio-manuscript` when built; the Go helper resolves the project root from its executable realpath.
-- During development, the dispatcher falls back to `go run ./cmd/folio-manuscript`.
-- `cmd/folio-manuscript` delegates all behaviour to `internal/manuscript`.
+Typst and Pandoc remain explicit external tools where their documented features require them. No command invokes Perl or a project-owned shell script.
 
-The Perl and Go paths share user-facing configuration and presets, but manuscript parsing and rendering do not reuse the stage-play event stream. Prose manuscripts have their own document model: metadata, parts, chapters, sections, paragraphs, scene breaks, code, and footnotes.
-
-## Go Manuscript Engine
-
-The Go manuscript engine is organized as follows:
+## Packages
 
 | Path | Responsibility |
 |---|---|
-| `cmd/folio-manuscript/` | CLI entry point for manuscript rendering |
-| `internal/manuscript/input.go` | Explicit path and quoted-glob resolution, sorting, deduplication, and format validation |
-| `internal/manuscript/config.go` | Layered YAML loading and manuscript inheritance |
-| `internal/manuscript/parser.go` | Markdown and org-mode manuscript contracts |
-| `internal/manuscript/serialize.go` | Canonical manuscript Markdown serialization |
-| `internal/manuscript/render.go` | Typst template execution and Typst-safe markup generation |
-| `templates/manuscript.typ` | File-backed Typst layout template |
-| `presets/british-manuscript.yaml` | British manuscript base preset |
-| `presets/us-overrides-manuscript.yaml` | Shunn-style US manuscript override preset |
+| `cmd/folio/` | Process entry point for the single executable |
+| `internal/app/` | Public CLI dispatch, conversion orchestration, script rendering, and process-level integration tests |
+| `internal/config/` | Shared embedded-preset and YAML configuration loading |
+| `internal/play/` | Typed stage-play model plus Org, Markdown, and Fountain parsers/emitters |
+| `internal/letter/` | Cover-letter model, Org parser, Typst renderer, and compiler |
+| `internal/manuscript/` | Manuscript input, parser, canonicalization, rendering, and compilation |
+| `templates/` | File-backed Typst layouts for scripts, letters, and manuscripts |
+| `presets/` | British base and explicit style override YAML |
+| `cmd/update-homebrew/` | Checked release-formula update and publication tooling |
 
-The Go path uses `gopkg.in/yaml.v3` for YAML and `text/template` for Typst generation. The Typst template is a real file rather than an embedded heredoc so the layout language remains reviewable.
+The root `assets.go` embeds help documents, presets, and Typst templates. The installed binary therefore does not discover a project root, depend on its working directory, or require a root environment variable.
 
-For issue #9, Markdown is the canonical manuscript render contract. Markdown input is parsed and serialized back to canonical Markdown before Typst rendering. Org-mode input is parsed, serialized to canonical Markdown, reparsed, and then rendered through the same Typst path. This keeps Markdown and org-mode manuscript PDFs identical for the shared v1 manuscript contract. A future architecture issue tracks whether org-mode should become the canonical manuscript representation for richer semantics.
+## Document Models
 
-## Configuration Layers
+Stage plays and manuscripts intentionally retain separate semantic models.
 
-Configuration remains based on `script.yaml`. Manuscript rendering uses the same precedence model as existing script rendering:
+Stage-play parsers produce typed events for metadata, acts, scenes, directions, speakers, dialogue, character tables, transitions, props, intro material, and footnotes. Text emitters consume that model, while script PDF rendering prepares escaped template data from it.
 
-1. British manuscript preset.
-2. US manuscript override preset, only when `--style us` or equivalent config is selected.
+Manuscripts use metadata plus prose blocks such as parts, chapters, sections, paragraphs, lists, tables, code, images where supported, scene breaks, and footnotes. Markdown remains the canonical shared manuscript contract for the current implementation; Org is canonicalized through that contract before rendering.
+
+Letters have a smaller recipient-oriented model because their sender, recipient, substitution, and signoff semantics do not map cleanly onto either stage plays or manuscripts.
+
+## Configuration
+
+`internal/config` owns YAML file loading and precedence for every mode:
+
+1. British built-in preset.
+2. Selected built-in style override.
 3. Global `~/.config/first-folio/script.yaml`.
-4. Global style-specific `script-british.yaml` or `script-us.yaml`.
-5. Local `script.yaml` beside the first source file.
-6. Local style-specific `script-british.yaml` or `script-us.yaml`.
+4. Global style-specific YAML.
+5. Selected local `script.yaml`.
+6. Selected local style-specific YAML.
 7. CLI overrides.
 
-Root `folio.*` values remain the shared defaults. `folio.manuscript.*` values are manuscript-specific overrides. Child settings such as `folio.manuscript.toc.font` override only their own element.
+The loader provides dotted and inherited access for scripts and letters, and typed decoding for manuscript layout. Root `folio.*` values remain shared defaults; child mode values override only their own elements.
 
-## Migration Direction
+## Rendering
 
-Go is the preferred target for new complex rendering features. The manuscript engine is the proving ground for a future migration because it provides:
+Substantial Typst layouts live in real `.typ` files. Go code owns:
 
-- typed configuration structures;
-- table-driven tests;
-- file-backed templates;
-- clearer subprocess handling;
-- a smaller shell surface.
+- typed template data;
+- context-specific escaping and validated layout literals;
+- event-to-layout policy;
+- temporary-file lifecycle;
+- direct subprocess invocation and diagnostics.
 
-Existing Perl code should not be rewritten opportunistically. Future migration should proceed feature by feature behind the stable `folio` CLI contract, with regression tests proving parity before each public path moves.
+Templates own page composition. Product Go code does not contain generated-language heredocs or invoke a shell to run Typst.
+
+## Build And Tests
+
+`make build` compiles `dist/folio`; `make install` builds first and then links that binary into the configured installation directory. Version values are injected with Go linker flags. Homebrew builds the same command directly.
+
+Automated coverage is Go-owned. Unit tests cover parsing, emission, configuration, escaping, and rendering. Integration tests execute both the in-process public application and a built binary outside the checkout working directory. PDF-sensitive suites invoke Typst directly and inspect supported outputs rather than source implementation text.
+
+## Migration History
+
+Before issue #10, conversion and letters used a Perl dispatcher, Perl parsers/emitters, embedded YAML::Tiny, and shell regression suites; manuscripts used a separately built Go helper. Issue #10 replaced that split with the single Go runtime while preserving the public CLI and accepted rendering behaviour.

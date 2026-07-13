@@ -40,4 +40,5 @@ inc/
 # cpanfile.snapshot
 *.pdf
 /bin/folio-manuscript
+/dist/
 /.agent/

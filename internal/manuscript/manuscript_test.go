@@ -3,6 +3,7 @@
 package manuscript
 
 import (
+	"bytes"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -587,8 +588,14 @@ func TestCLIHelpVersionAndDryRun(t *testing.T) {
 
 func TestPublicFolioDispatcherReachesGoManuscriptHelp(t *testing.T) {
 	root := testProjectRoot(t)
-	cmd := exec.Command(filepath.Join(root, "bin", "folio"), "manuscript", "--help")
-	cmd.Dir = root
+	binary := filepath.Join(t.TempDir(), "folio")
+	build := exec.Command("go", "build", "-o", binary, "./cmd/folio")
+	build.Dir = root
+	if out, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("building folio: %v\n%s", err, string(out))
+	}
+	cmd := exec.Command(binary, "manuscript", "--help")
+	cmd.Dir = t.TempDir()
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("folio manuscript --help failed: %v\n%s", err, string(out))
@@ -711,27 +718,23 @@ func runManuscriptDirect(t *testing.T, args ...string) {
 
 func runManuscriptOutput(t *testing.T, root string, args ...string) string {
 	t.Helper()
-	cmdArgs := append([]string{"run", filepath.Join(root, "cmd", "folio-manuscript")}, args...)
-	cmd := exec.Command("go", cmdArgs...)
-	cmd.Dir = root
-	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Fatalf("folio manuscript failed: %v\n%s", err, string(out))
-	} else {
-		return string(out)
+	_ = root
+	var output bytes.Buffer
+	if err := RunWithIO(args, &output); err != nil {
+		t.Fatalf("folio manuscript failed: %v\n%s", err, output.String())
 	}
-	return ""
+	return output.String()
 }
 
 func assertCommandFails(t *testing.T, root string, args []string, want string) {
 	t.Helper()
-	cmdArgs := append([]string{"run", filepath.Join(root, "cmd", "folio-manuscript")}, args...)
-	cmd := exec.Command("go", cmdArgs...)
-	cmd.Dir = root
-	out, err := cmd.CombinedOutput()
+	_ = root
+	var output bytes.Buffer
+	err := RunWithIO(args, &output)
 	if err == nil {
 		t.Fatalf("expected command to fail")
 	}
-	assertContains(t, string(out), want)
+	assertContains(t, err.Error()+output.String(), want)
 }
 
 func testProjectRoot(t *testing.T) string {

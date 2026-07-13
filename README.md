@@ -39,7 +39,7 @@ make uninstall  # removes the symlink
 
 ### Dependencies
 
-- **Perl 5** (core modules only - no CPAN dependencies)
+- **Go 1.26+** (build only; Homebrew installs a compiled binary)
 - **Typst** (required only for PDF output)
 - **Pandoc** (required for rich manuscript Markdown/org parsing and conversion)
 
@@ -90,32 +90,27 @@ See [docs/config.md](docs/config.md) for the full schema and [examples/script.ya
 
 | Path | Purpose |
 |------|---------|
-| `bin/folio` | Unified CLI with `convert` subcommand |
-| `lib/Folio/Parser/` | Format parsers (Org, Markdown, Fountain) |
-| `lib/Folio/Emitter/` | Format emitters (Org, Markdown, Fountain, Typst/PDF) |
-| `lib/Folio/Config.pm` | Config loading with layered merge |
-| `lib/Folio/Format.pm` | Extension and format mapping |
-| `lib/OrgPlay/` | Shared parser and Typst template (legacy namespace) |
-| `cmd/folio-manuscript/` | Go manuscript rendering CLI |
+| `cmd/folio/` | Single Go CLI entry point |
+| `internal/app/` | Public command dispatch and integration |
+| `internal/config/` | Shared layered YAML configuration |
+| `internal/play/` | Stage-play model, parsers, and text emitters |
+| `internal/letter/` | Cover-letter parser and renderer |
 | `internal/manuscript/` | Go manuscript parsing, config, and Typst rendering |
 | `templates/` | File-backed Typst templates |
-| `tests/regression/` | Regression test suite (run via `make test`) |
-| `tests/one_off/` | One-off tests for specific issues |
 | `examples/` | Annotated config example |
 | `docs/` | Format schemas, config reference, vision |
 
 ## Running Tests
 
 ```bash
-make test           # regression suite
-make test-one-off   # all one-off tests
-make test-one-off ISSUE=5  # one-off tests for a specific issue
+make test   # Go unit, integration, Typst, and PDF regression suite
+make lint   # Go static analysis
 ```
 
 ## Documentation
 
 - [Vision](docs/vision.md) - project goals, supported formats, and direction of travel
-- [Architecture](ARCHITECTURE.md) - current Perl/Go runtime boundary and migration direction
+- [Architecture](ARCHITECTURE.md) - Go runtime, document models, configuration, and rendering boundaries
 - [Configuration](docs/config.md) - config schema, precedence, shared keys, migration
 - [Formats](docs/formats.md) - format overview, event stream, and fidelity matrix
   - [Org-mode](docs/format-org.md) - org-mode play format schema
@@ -130,4 +125,4 @@ MIT - Copyright Taḋg Paul
 
 ## Acknowledgements
 
-- [YAML::Tiny](https://metacpan.org/pod/YAML::Tiny) v1.76 by Adam Kennedy --- embedded YAML parser. Licensed under the same terms as Perl itself (Artistic License 1.0 / GPL 1+).
+- Historical dependency: [YAML::Tiny](https://metacpan.org/pod/YAML::Tiny) v1.76 was embedded before the Go migration and was removed with the Perl runtime in issue #10.
