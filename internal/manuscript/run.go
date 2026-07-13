@@ -4,25 +4,32 @@ package manuscript
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	folio "github.com/tadg-paul/first-folio"
 )
 
 const Version = "0.4.7"
 
 func Run(args []string) error {
+	return RunWithIO(args, os.Stdout)
+}
+
+func RunWithIO(args []string, stdout io.Writer) error {
 	opts, inputs, err := parseArgs(args)
 	if err != nil {
 		return err
 	}
 	if opts.ShowHelp {
-		fmt.Print(Usage())
+		fmt.Fprint(stdout, Usage())
 		return nil
 	}
 	if opts.ShowVersion {
-		fmt.Printf("folio-manuscript %s\n", Version)
+		fmt.Fprintf(stdout, "folio-manuscript %s\n", Version)
 		return nil
 	}
 	if opts.Output == "" {
@@ -55,7 +62,7 @@ func Run(args []string) error {
 	applyMetadataOverrides(&doc.Metadata, opts, cfg)
 
 	if opts.DryRun {
-		printDryRun(inputSet, opts, cfg)
+		printDryRun(stdout, inputSet, opts, cfg)
 		return nil
 	}
 
@@ -140,38 +147,22 @@ func usageError() error {
 }
 
 func Usage() string {
-	lines := []string{
-		"Usage: folio manuscript <input>... <target> [options]",
-		"",
-		"Render Markdown or org-mode prose manuscript chapters to .typ or .pdf.",
-		"",
-		"Options:",
-		"  --style british|us          Manuscript preset, default british",
-		"  --title TITLE               Override manuscript title",
-		"  --subtitle SUBTITLE         Override manuscript subtitle",
-		"  --author AUTHOR             Override author name",
-		"  --attribution TEXT          Prefix author name, for example by",
-		"  --author-attribution TEXT   Compatibility alias for --attribution",
-		"  --date DATE                 Override manuscript date",
-		"  --version [VERSION]         Show command version, or override manuscript version when VALUE is supplied",
-		"  --wordcount WORDS           Override manuscript word count",
-		"  --contact-name NAME         Override title-page contact name",
-		"  --dry-run                   Validate inputs and print the render plan",
-		"  -h, --help                  Show this help message",
-		"",
+	raw, err := folio.Assets.ReadFile("docs/folio-manuscript-help.md")
+	if err != nil {
+		return "Usage: folio manuscript <input>... <target> [options]\n"
 	}
-	return strings.Join(lines, "\n")
+	return string(raw)
 }
 
-func printDryRun(inputSet InputSet, opts Options, cfg Config) {
-	fmt.Printf("format: %s\n", inputSet.Format)
-	fmt.Printf("output: %s\n", opts.Output)
-	fmt.Printf("style: %s\n", cfg.Folio.Manuscript.Style)
-	fmt.Printf("page: %s\n", cfg.Folio.Manuscript.Page)
-	fmt.Printf("margin: %s\n", cfg.Folio.Manuscript.Margin)
-	fmt.Println("inputs:")
+func printDryRun(stdout io.Writer, inputSet InputSet, opts Options, cfg Config) {
+	fmt.Fprintf(stdout, "format: %s\n", inputSet.Format)
+	fmt.Fprintf(stdout, "output: %s\n", opts.Output)
+	fmt.Fprintf(stdout, "style: %s\n", cfg.Folio.Manuscript.Style)
+	fmt.Fprintf(stdout, "page: %s\n", cfg.Folio.Manuscript.Page)
+	fmt.Fprintf(stdout, "margin: %s\n", cfg.Folio.Manuscript.Margin)
+	fmt.Fprintln(stdout, "inputs:")
 	for _, path := range inputSet.Paths {
-		fmt.Printf("  - %s\n", path)
+		fmt.Fprintf(stdout, "  - %s\n", path)
 	}
 }
 

@@ -5,12 +5,12 @@ package manuscript
 import (
 	"bytes"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
+
+	folio "github.com/tadg-paul/first-folio"
 )
 
 type templateData struct {
@@ -48,12 +48,11 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		SceneBreakMarker: escapeTypst(cfg.Folio.Manuscript.SceneBreak.Marker),
 		HasContact:       hasContactBlock(doc.Metadata, cfg),
 	}
-	root, err := projectRoot()
+	raw, err := folio.Assets.ReadFile("templates/manuscript.typ")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("loading Typst template: %w", err)
 	}
-	tmplPath := filepath.Join(root, "templates", "manuscript.typ")
-	tmpl, err := template.ParseFiles(tmplPath)
+	tmpl, err := template.New("manuscript.typ").Parse(string(raw))
 	if err != nil {
 		return "", fmt.Errorf("parsing Typst template: %w", err)
 	}
@@ -305,10 +304,6 @@ func escapedMetadata(meta Metadata) Metadata {
 }
 
 func templateExistsForTests() bool {
-	root, err := projectRoot()
-	if err != nil {
-		return false
-	}
-	_, err = os.Stat(filepath.Join(root, "templates", "manuscript.typ"))
+	_, err := folio.Assets.ReadFile("templates/manuscript.typ")
 	return err == nil
 }

@@ -224,7 +224,7 @@ func selectStyle(mode Mode, configs ...map[string]any) string {
 		}
 	}
 	cli := configs[len(configs)-1]
-	if value, ok := cli["style"]; ok && value != nil {
+	if value, ok := cli["style"]; ok && value != nil && strings.TrimSpace(fmt.Sprint(value)) != "" {
 		style = normalizeStyle(fmt.Sprint(value))
 	}
 	return style

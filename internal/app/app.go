@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	folio "github.com/tadg-paul/first-folio"
+	"github.com/tadg-paul/first-folio/internal/manuscript"
 )
 
 const Version = "0.4.10"
@@ -46,8 +47,11 @@ func Run(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int
 			}
 			return 0
 		}
-		fmt.Fprintf(stderr, "Error: %s subcommand is not available in this build\n", args[0])
-		return 1
+		if err := manuscript.RunWithIO(args[1:], stdout); err != nil {
+			fmt.Fprintf(stderr, "Error: %v\n", err)
+			return 1
+		}
+		return 0
 	default:
 		fmt.Fprintf(stderr, "Error: unknown subcommand '%s'.\n", args[0])
 		fmt.Fprintln(stderr, "Run 'folio --help' for available commands.")
