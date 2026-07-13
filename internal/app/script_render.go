@@ -110,8 +110,8 @@ func newScriptTemplateData(doc play.Document, cfg config.Config) (scriptTemplate
 		DialogueSameLine:  cfg.String("folio.positioning.speech.dialogue.placement", "same-line") == "same-line",
 		SpeakerWeight:     boolWeight(cfg.Bool("folio.positioning.speech.speaker.bold", true)),
 		SpeakerAlign:      validAlign(cfg.String("folio.positioning.speech.speaker.align", "left")),
-		InstructionPrefix: escapeTypstContent(cfg.String("folio.positioning.speech.speech-instruction.prefix", "(")),
-		InstructionSuffix: escapeTypstContent(cfg.String("folio.positioning.speech.speech-instruction.suffix", ")")),
+		InstructionPrefix: instructionDelimiter(cfg.String("folio.positioning.speech.speech-instruction.prefix", "(")),
+		InstructionSuffix: instructionDelimiter(cfg.String("folio.positioning.speech.speech-instruction.suffix", ")")),
 		DirectionSpace:    cfg.String("folio.positioning.stage-direction.space-before", "1.6em"),
 		DirectionAlign:    validAlign(cfg.String("folio.positioning.stage-direction.align", "left")),
 		ActSpace:          cfg.String("folio.positioning.act-header.space-before", "0em"),
@@ -416,6 +416,13 @@ func validAlign(value string) string {
 func defaultString(value string, fallback string) string {
 	if value == "" {
 		return fallback
+	}
+	return value
+}
+
+func instructionDelimiter(value string) string {
+	if strings.ContainsAny(value, `\#$@*_`) {
+		return escapeTypstContent(value)
 	}
 	return value
 }
