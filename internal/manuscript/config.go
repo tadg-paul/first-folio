@@ -202,7 +202,6 @@ func LoadConfig(sourceDir string, opts Options) (Config, error) {
 	if err := yaml.Unmarshal(raw, &cfg); err != nil {
 		return Config{}, fmt.Errorf("parsing merged config: %w", err)
 	}
-	cfg.Folio.Manuscript.Style = style
 	normalizeConfig(&cfg)
 	return cfg, nil
 }
