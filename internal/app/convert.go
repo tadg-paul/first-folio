@@ -206,7 +206,3 @@ func applyScriptConfig(doc *play.Document, cfg config.Config) {
 	}
 	doc.Events = filtered
 }
-
-func renderPlayDocument(play.Document, config.Config, string, bool, bool, io.Writer) error {
-	return fmt.Errorf("PDF rendering is not available in this build")
-}
