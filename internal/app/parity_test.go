@@ -6,9 +6,55 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/tadg-paul/first-folio/internal/play"
 )
+
+var scriptRoundTripSources = map[play.Format]string{
+	play.FormatOrg: `#+TITLE: Matrix Play
+#+AUTHOR: Taḋg Paul
+* ACT ONE
+** SCENE ONE
+*** Night.
+**** CÁIT softly
+Hello.
+`,
+	play.FormatMarkdown: `# Matrix Play
+
+*by Taḋg Paul*
+
+## ACT ONE
+
+### SCENE ONE
+
+*Night.*
+
+**CÁIT:** *(softly)*
+Hello.
+`,
+	play.FormatFountain: `Title: Matrix Play
+Author: Taḋg Paul
+
+> **ACT ONE** <
+
+.SCENE ONE
+
+Night.
+
+CÁIT
+(softly)
+Hello.
+`,
+}
+
+var scriptFormatExtensions = map[play.Format]string{
+	play.FormatOrg:      ".org",
+	play.FormatMarkdown: ".md",
+	play.FormatFountain: ".fountain",
+}
 
 func TestConversionMatrixParity(t *testing.T) {
 	sources := map[string]string{
@@ -79,6 +125,54 @@ CUT TO:
 			})
 		}
 	}
+}
+
+func TestScriptFormatRoundTrips(t *testing.T) {
+	routes := [][2]play.Format{
+		{play.FormatOrg, play.FormatMarkdown},
+		{play.FormatMarkdown, play.FormatOrg},
+		{play.FormatOrg, play.FormatFountain},
+		{play.FormatFountain, play.FormatOrg},
+		{play.FormatMarkdown, play.FormatFountain},
+		{play.FormatFountain, play.FormatMarkdown},
+	}
+	for _, route := range routes {
+		name := string(route[0]) + " via " + string(route[1])
+		t.Run(name, func(t *testing.T) {
+			returned := runScriptRoundTrip(t, route[0], route[1])
+			want := parseScriptDocument(t, route[0], scriptRoundTripSources[route[0]])
+			got := parseScriptDocument(t, route[0], returned)
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("semantic document changed\nwant: %#v\n got: %#v\nreturned source:\n%s", want, got, returned)
+			}
+		})
+	}
+}
+
+func runScriptRoundTrip(t *testing.T, sourceFormat play.Format, intermediateFormat play.Format) string {
+	t.Helper()
+	dir := t.TempDir()
+	t.Setenv("HOME", t.TempDir())
+	source := filepath.Join(dir, "source"+scriptFormatExtensions[sourceFormat])
+	intermediate := filepath.Join(dir, "intermediate"+scriptFormatExtensions[intermediateFormat])
+	returned := filepath.Join(dir, "returned"+scriptFormatExtensions[sourceFormat])
+	writeAppFile(t, source, scriptRoundTripSources[sourceFormat])
+	for _, conversion := range [][2]string{{source, intermediate}, {intermediate, returned}} {
+		status, stdout, stderr := runApp(t, "convert", conversion[0], conversion[1])
+		if status != 0 {
+			t.Fatalf("converting %s to %s: status %d\nstdout:%s\nstderr:%s", conversion[0], conversion[1], status, stdout, stderr)
+		}
+	}
+	return readAppFile(t, returned)
+}
+
+func parseScriptDocument(t *testing.T, format play.Format, source string) play.Document {
+	t.Helper()
+	doc, _, err := play.Parse(format, source, "round-trip"+scriptFormatExtensions[format])
+	if err != nil {
+		t.Fatal(err)
+	}
+	return doc
 }
 
 func TestScriptLayoutConfigurationParity(t *testing.T) {
