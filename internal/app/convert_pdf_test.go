@@ -4,6 +4,8 @@ package app
 
 import (
 	"bytes"
+	"image"
+	"image/png"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -126,16 +128,25 @@ Hello.
 `,
 	}
 	extensions := map[string]string{"org": ".org", "md": ".md", "fountain": ".fountain"}
+	bodyRasters := map[string]map[string]image.Image{}
 	for _, style := range []string{"british", "us"} {
 		for format, sourceText := range sources {
 			t.Run(style+"/"+format, func(t *testing.T) {
-				assertScriptPDFRasterizes(t, style, format, extensions[format], sourceText, toolHome)
+				if bodyRasters[format] == nil {
+					bodyRasters[format] = map[string]image.Image{}
+				}
+				bodyRasters[format][style] = assertScriptPDFRasterizes(t, style, format, extensions[format], sourceText, toolHome)
 			})
+		}
+	}
+	for format, rasters := range bodyRasters {
+		if rasterPixelsEqual(rasters["british"], rasters["us"]) {
+			t.Errorf("%s British and US body-page rasters are pixel-identical", format)
 		}
 	}
 }
 
-func assertScriptPDFRasterizes(t *testing.T, style string, format string, extension string, sourceText string, toolHome string) {
+func assertScriptPDFRasterizes(t *testing.T, style string, format string, extension string, sourceText string, toolHome string) image.Image {
 	t.Helper()
 	dir := t.TempDir()
 	t.Setenv("HOME", t.TempDir())
@@ -176,4 +187,28 @@ func assertScriptPDFRasterizes(t *testing.T, style string, format string, extens
 			t.Errorf("empty raster output %s: %v", image, err)
 		}
 	}
+	body, err := os.Open(images[len(images)-1])
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer body.Close()
+	raster, err := png.Decode(body)
+	if err != nil {
+		t.Fatalf("decoding body-page raster: %v", err)
+	}
+	return raster
+}
+
+func rasterPixelsEqual(left image.Image, right image.Image) bool {
+	if left == nil || right == nil || left.Bounds() != right.Bounds() {
+		return false
+	}
+	for y := left.Bounds().Min.Y; y < left.Bounds().Max.Y; y++ {
+		for x := left.Bounds().Min.X; x < left.Bounds().Max.X; x++ {
+			if left.At(x, y) != right.At(x, y) {
+				return false
+			}
+		}
+	}
+	return true
 }
