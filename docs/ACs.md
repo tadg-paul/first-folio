@@ -2,6 +2,10 @@
 
 Central record of accepted issue criteria after SDLC gate closure.
 
+Cutover date: 2026-07-14
+
+Last migrated: AC10.11 from #10 on 2026-07-15
+
 **Key:** ✅ passing · ⏳ pending · ❌ failing · ~~🚫 removed~~
 
 ## Issue 9: Manuscript PDF Mode
@@ -23,3 +27,25 @@ GitHub issue: https://github.com/tadg-paul/first-folio/issues/9
 | AC9.11 | Given invalid manuscript inputs or output destinations, First Folio exits non-zero and writes a diagnostic to stderr without creating a misleading success artefact. | ✅ RT-9.45: Missing input path exits non-zero with an error on stderr<br>✅ RT-9.46: Mixed Markdown and org-mode input exits non-zero with an error on stderr<br>✅ RT-9.47: Fountain input exits non-zero with an error that manuscript mode accepts only Markdown or org-mode<br>✅ RT-9.48: Other non-manuscript input formats exit non-zero with an error on stderr<br>✅ RT-9.49: Unwritable output destination exits non-zero with an error on stderr |
 | AC9.12 | Given manuscript TOC configuration, First Folio includes a table of contents by default and applies TOC-specific font and layout overrides when present. | ✅ RT-9.50: Manuscript output includes a table of contents when no TOC config is present<br>✅ RT-9.51: `folio.manuscript.toc.enabled: false` excludes the table of contents<br>✅ RT-9.52: `folio.manuscript.toc.font`, `font-size`, and `font-weight` affect TOC entries only<br>✅ RT-9.53: `folio.manuscript.toc.heading-font`, `heading-font-size`, and `heading-font-weight` affect the TOC heading only<br>✅ RT-9.54: TOC entries include part and chapter headings in document order |
 | AC9.13 | Given manuscript paragraph layout configuration, First Folio applies configurable line spacing, first-line paragraph indentation, and paragraph spacing with mode-specific defaults. | ✅ RT-9.55: British manuscript defaults use `line-spacing: 1.5`, `paragraph-indent: 10mm`, and `paragraph-spacing: 0`<br>✅ RT-9.56: US manuscript overrides use `line-spacing: 2`, `paragraph-indent: 12.7mm`, and `paragraph-spacing: 0`<br>✅ RT-9.57: Explicit manuscript `line-spacing`, `paragraph-indent`, and `paragraph-spacing` config overrides the active preset |
+
+## Go Runtime Migration
+
+Introduced: [#10](https://github.com/tadg-paul/first-folio/issues/10)
+
+Migrated: 2026-07-15
+
+| ID | AC | Tests |
+|---|---|---|
+| AC10.1 | Given any supported command, the public `folio` executable dispatches `convert`, `letter`, and `manuscript` within one Go process and preserves the documented CLI contract. | ✅ RT10.1: exercise all subcommands through the built binary<br>✅ RT10.2: verify help/version/dry-run<br>✅ RT10.3: verify stdout, stderr, exit status, and TTY safeguards. |
+| AC10.2 | Given existing script inputs and targets, Go conversion preserves the accepted Org, Markdown, Fountain, Typst, and PDF structure, metadata, Unicode, warnings, and errors. | ✅ RT10.4: run the complete Org/Markdown/Fountain text conversion matrix and compile/rasterize British, US stage-play, and screenplay PDFs from every readable source format<br>✅ RT10.5: verify Org↔Markdown, Org↔Fountain, and Markdown↔Fountain return-leg round trips over their common lossless semantics<br>✅ RT10.6: verify lossy warnings and invalid-input failures<br>✅ RT10.7: compare accepted fixtures.<br>✅ UT-10.1: A human reviewer confirms the British stage-play PDF layout<br>✅ UT-10.2: A human reviewer confirms the US stage-play PDF layout<br>✅ UT-10.3: A human reviewer confirms the US screenplay PDF layout |
+| AC10.3 | Given existing letter inputs and configuration, Go letter generation preserves recipient selection, inline formatting, metadata, filenames, Typst, and PDF layout behaviour. | ✅ RT10.8: render representative org and Markdown letters<br>✅ RT10.9: verify recipient filters and output naming<br>✅ RT10.10: verify inline code/emphasis/underline and PDF evidence.<br>✅ UT-10.4: A human reviewer confirms the British letter PDF layout |
+| AC10.4 | Given existing manuscript inputs and presets, the integrated Go subcommand preserves the accepted Markdown/org contract, multi-input joining, configuration, Typst, and British/US PDF behaviour. | ✅ RT10.11: run all manuscript unit and integration fixtures through `folio manuscript`<br>✅ RT10.12: compare Markdown/org outputs<br>✅ RT10.13: compile and inspect British/US PDFs.<br>✅ UT-10.5: A human reviewer confirms the British manuscript PDF layout<br>✅ UT-10.6: A human reviewer confirms the US manuscript PDF layout |
+| AC10.5 | Given global, local, style-specific, root, and mode-specific YAML, one typed Go loader applies documented precedence consistently across all subcommands while ignoring unrelated companion-tool keys. | ✅ RT10.14: cover every precedence layer and mode<br>✅ RT10.15: verify malformed/invalid config diagnostics<br>✅ RT10.16: verify unknown companion keys are ignored. |
+| AC10.6 | Given hostile or syntax-significant input, Go rendering escapes each Typst context without compile failure or unintended markup execution. | ✅ RT10.17: cover brackets, hashes, slashes, quotes, backslashes, URLs, Unicode, code, and footnotes<br>✅ RT10.18: compile hostile fixtures to PDF<br>✅ RT10.19: verify no injected Typst behaviour. |
+| AC10.7 | Given PDF or Typst output, substantial layout is loaded from file-backed templates and no project-owned Go, Perl, or shell production code contains complex generated-Typst heredocs or equivalent string assembly. | ✅ RT10.20: validate all template files<br>✅ RT10.21: render each template-backed mode<br>✅ RT10.22: code audit confirms prohibited embedding is absent. |
+| AC10.8 | Given a clean checkout, build, install, test, lint, and release preparation operate through Go tooling and produce/install one `folio` binary with installation-safe assets. | ✅ RT10.23: run build/install from a clean checkout<br>✅ RT10.24: execute installed-shaped binary outside the checkout cwd<br>✅ RT10.25: run release dependency/version/package checks. |
+| AC10.9 | Given the completed migration, First Folio has no Perl runtime/build/test/release dependency and no project-owned shell application or regression-test logic. | ✅ RT10.26: dependency audit finds no Perl invocation or shipped Perl modules<br>✅ RT10.27: test discovery finds only Go-owned automated suites plus declarative fixtures/templates<br>✅ RT10.28: clean-environment test succeeds without Perl. |
+| AC10.10 | Given all accepted pre-migration fixtures, the Go implementation is behaviourally equivalent except for changes explicitly approved in separately referenced issues. | ✅ RT10.29: run the full pre-migration characterization corpus<br>✅ RT10.30: compare semantic output and diagnostics<br>✅ RT10.31: compare PDF text and required visual evidence. |
+| AC10.11 | Given completion of the migration, architecture, configuration, format, installation, contributor, dependency, and release documentation describe the Go-only implementation accurately. | ✅ RT10.32: documentation audit against executable help, package layout, Make targets, and release artefacts. |
+
+**Key:** ✅ passing · ⏳ pending · ❌ failing · ~~🚫 removed~~
