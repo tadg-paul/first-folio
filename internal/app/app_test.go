@@ -23,6 +23,12 @@ func TestRunTopLevelContract(t *testing.T) {
 			wantOut:    []string{"format converter", "convert", "letter", "manuscript"},
 		},
 		{
+			name:       "convert help names every script style",
+			args:       []string{"convert", "--help"},
+			wantStatus: 0,
+			wantOut:    []string{"british", "us", "screenplay"},
+		},
+		{
 			name:       "short help",
 			args:       []string{"-h"},
 			wantStatus: 0,

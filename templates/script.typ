@@ -78,8 +78,18 @@
   #text(font: "{{.SubtitleFont}}", size: {{.SubtitleSize}}, style: "{{.SubtitleStyle}}")[{{.Subtitle}}]
   {{end}}
   {{if .HasAuthor}}
+  {{if .AuthorPrefixLines}}
   #v({{.AuthorSpace}})
-  #text(font: "{{.AuthorFont}}", size: {{.AuthorSize}}, style: "{{.AuthorStyle}}")[{{.AuthorPrefix}}{{.Author}}]
+  {{range $index, $line := .AuthorPrefixLines}}
+  {{if $index}}#v(0.3em){{end}}
+  #text(font: "{{$.AuthorFont}}", size: {{$.AuthorSize}})[{{$line}}]
+  {{end}}
+  #v(0.3em)
+  #text(font: "{{.AuthorFont}}", size: {{.AuthorSize}}, style: "{{.AuthorStyle}}")[{{.Author}}]
+  {{else}}
+  #v({{.AuthorSpace}})
+  #text(font: "{{.AuthorFont}}", size: {{.AuthorSize}}, style: "{{.AuthorStyle}}")[{{.AuthorPrefixInline}}{{.Author}}]
+  {{end}}
   {{end}}
 ]
 #pagebreak()

@@ -84,7 +84,7 @@ func TestConvertPDFCompiles(t *testing.T) {
 	}
 }
 
-func TestScriptSourceFormatsRasterizeInBritishAndUSStyles(t *testing.T) {
+func TestScriptSourceFormatsRasterizeInAllStyles(t *testing.T) {
 	toolHome := os.Getenv("HOME")
 	for _, tool := range []string{"typst", "pdf-to-png"} {
 		if _, err := exec.LookPath(tool); err != nil {
@@ -129,7 +129,7 @@ Hello.
 	}
 	extensions := map[string]string{"org": ".org", "md": ".md", "fountain": ".fountain"}
 	bodyRasters := map[string]map[string]image.Image{}
-	for _, style := range []string{"british", "us"} {
+	for _, style := range []string{"british", "us", "screenplay"} {
 		for format, sourceText := range sources {
 			t.Run(style+"/"+format, func(t *testing.T) {
 				if bodyRasters[format] == nil {
@@ -140,8 +140,10 @@ Hello.
 		}
 	}
 	for format, rasters := range bodyRasters {
-		if rasterPixelsEqual(rasters["british"], rasters["us"]) {
-			t.Errorf("%s British and US body-page rasters are pixel-identical", format)
+		for _, pair := range [][2]string{{"british", "us"}, {"british", "screenplay"}, {"us", "screenplay"}} {
+			if rasterPixelsEqual(rasters[pair[0]], rasters[pair[1]]) {
+				t.Errorf("%s %s and %s body-page rasters are pixel-identical", format, pair[0], pair[1])
+			}
 		}
 	}
 }

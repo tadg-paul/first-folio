@@ -54,7 +54,8 @@ type scriptTemplateData struct {
 	FrontmatterSize, FrontmatterWeight               string
 	HasTitle, HasSubtitle, HasAuthor                 bool
 	TitlePageNumber                                  bool
-	Title, Subtitle, Author, AuthorPrefix            string
+	Title, Subtitle, Author, AuthorPrefixInline      string
+	AuthorPrefixLines                                []string
 	TitleAlign, TitleOffset, TitleFont, TitleSize    string
 	TitleWeight, TitleStyle                          string
 	SubtitleSpace, SubtitleFont, SubtitleSize        string
@@ -137,8 +138,9 @@ func newScriptTemplateData(doc play.Document, cfg config.Config) (scriptTemplate
 		SubtitleSpace: cfg.String("folio.title-page.subtitle.space-before", "1em"), SubtitleFont: escapeTypstString(cfg.InheritedString("folio.title-page.subtitle", "font", font)),
 		SubtitleSize: cfg.String("folio.title-page.subtitle.font-size", "14pt"), SubtitleStyle: boolStyle(cfg.Bool("folio.title-page.subtitle.italic", true)),
 		AuthorSpace: cfg.String("folio.title-page.author.space-before", "2em"), AuthorFont: escapeTypstString(cfg.InheritedString("folio.title-page.author", "font", font)),
-		AuthorSize: cfg.String("folio.title-page.author.font-size", "12pt"), AuthorStyle: boolStyle(cfg.Bool("folio.title-page.author.italic", false)), AuthorPrefix: escapeTypstContent(cfg.String("folio.title-page.author.prefix", "")),
+		AuthorSize: cfg.String("folio.title-page.author.font-size", "12pt"), AuthorStyle: boolStyle(cfg.Bool("folio.title-page.author.italic", false)),
 	}
+	data.AuthorPrefixInline, data.AuthorPrefixLines = authorPrefix(cfg.String("folio.title-page.author.prefix", ""))
 	data.HasTitle, data.HasSubtitle, data.HasAuthor = data.Title != "", data.Subtitle != "", data.Author != ""
 	if cfg.Bool("folio.positioning.stage-direction.italic", true) {
 		data.DirectionOpen, data.DirectionClose = "_", " _"
@@ -161,6 +163,19 @@ func newScriptTemplateData(doc play.Document, cfg config.Config) (scriptTemplate
 		return scriptTemplateData{}, err
 	}
 	return data, nil
+}
+
+func authorPrefix(value string) (string, []string) {
+	if !strings.Contains(value, "\n") {
+		return escapeTypstContent(value), nil
+	}
+	var lines []string
+	for _, line := range strings.Split(value, "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			lines = append(lines, escapeTypstContent(line))
+		}
+	}
+	return "", lines
 }
 
 func renderPlayBody(doc play.Document, cfg config.Config) string {

@@ -59,6 +59,23 @@ func TestInheritedValue(t *testing.T) {
 	}
 }
 
+func TestLoadScreenplayPresetAndStyleSpecificConfig(t *testing.T) {
+	project := t.TempDir()
+	writeYAML(t, filepath.Join(project, "script.yaml"), "folio:\n  style: screenplay\n")
+	writeYAML(t, filepath.Join(project, "script-screenplay.yaml"), "folio:\n  margin: 18mm\n")
+
+	cfg, err := Load(Options{Mode: ModeScript, Home: t.TempDir(), LocalDir: project})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertValue(t, cfg, "folio.style", "screenplay")
+	assertValue(t, cfg, "folio.font", "Courier Prime")
+	assertValue(t, cfg, "folio.title-page.title.font-size", "12pt")
+	assertValue(t, cfg, "folio.positioning.speech.speaker.align", "center")
+	assertValue(t, cfg, "folio.positioning.stage-direction.italic", false)
+	assertValue(t, cfg, "folio.margin", "18mm")
+}
+
 func TestMalformedYAMLNamesFile(t *testing.T) {
 	project := t.TempDir()
 	path := filepath.Join(project, "script.yaml")

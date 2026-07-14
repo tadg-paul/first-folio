@@ -8,7 +8,7 @@ Use --to to specify the output format for stdout mode.
 
 Options:
   --to FORMAT              Output format (org, md, fountain, pdf)
-  --style STYLE            Layout style: british (default) or us
+  --style STYLE            Layout style: british (default), us, or screenplay
   --force                  Force binary output to terminal
 
 PDF options ignored for non-PDF output:
