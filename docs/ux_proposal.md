@@ -8,6 +8,10 @@ A native macOS companion app that wraps the `folio` CLI and gives writers who ar
 
 This proposal covers layout, interaction, and the runtime architecture that connects SwiftUI views to the `folio` binary. It does not cover build/packaging (signing, notarization, App Store vs direct distribution), preview rendering, or in-app editing - those are separate decisions.
 
+## Core principle
+
+**The app is an abstraction layer over the CLI. It offers no capability the `folio` CLI cannot perform.** If a workflow requires new behaviour, the CLI grows first and the app catches up. This keeps the CLI authoritative, makes every app action reproducible on the command line, and prevents the two surfaces from drifting. Wherever the app appears to add something (recipient list, YAML editing, PDF auto-open), it is only presenting existing CLI capability in a friendlier form, or performing OS-level actions (Finder reveal, Preview open) that are not `folio`'s job.
+
 ## Scope and non-goals
 
 **In scope**
@@ -20,7 +24,7 @@ This proposal covers layout, interaction, and the runtime architecture that conn
 **Out of scope**
 - In-app text editing of source files
 - Live PDF preview (Vision mentions it as a future goal; treat as a follow-up)
-- Config file editing - the app reads config, it does not write to `script.yaml`
+- Config file editing in MVP - the app reads config, it does not yet write to `script.yaml`. A structured YAML editor is planned for a later release; see §Preferences (post-MVP).
 - Reimplementing any parsing/rendering in Swift; all conversion goes through `folio`
 
 ## The three paradigms
@@ -29,17 +33,17 @@ The commands have genuinely different shapes. The UI must reflect that rather th
 
 | Command | Input | Output | Style options | Distinctive UX need |
 |---|---|---|---|---|
-| `convert` | One script file (`.org` / `.md` / `.fountain`) | One file (any of the above plus `.pdf`) or stdout | Nation (British / US) × Variant (Stage / Screenplay) - four combinations | Target format picker; layout knobs behind a disclosure; open produced PDF in Preview on success |
+| `convert` | One script file (`.org` / `.md` / `.fountain`) | One file (any of the above plus `.pdf`) or stdout | `british` (British Stageplay, default) / `us` (US Stageplay) / `screenplay` (industry-standard screenplay, nation-agnostic) | Target format picker; layout knobs behind a disclosure; open produced PDF in Preview on success |
 | `letter` | One `.org` file containing `:letter:` sections | N PDFs, one per recipient, into a chosen directory | none | Recipient list surfaced from the source file; per-recipient toggles; prefix and directory |
-| `manuscript` | Many prose files (`.md` / `.org`), possibly a glob | One `.typ` or `.pdf` file | Nation (British / US) only - no variant axis | Ordered multi-file list, drag to reorder; metadata overrides form; dry-run |
+| `manuscript` | Many prose files (`.md` / `.org`), possibly a glob | One `.typ` or `.pdf` file | `british` (default) / `us` only - no screenplay | Ordered multi-file list, drag to reorder; metadata overrides form; dry-run |
 
 The style options are asymmetric on purpose:
 
-- `convert` has **four** styles because a script is defined by two independent choices: **nation** (British or US typographic conventions) and **variant** (Stage or Screenplay layout). All four combinations are meaningful.
-- `manuscript` has two because "screenplay" is a script variant and does not apply to prose. Prose manuscripts only vary by nation.
+- `convert` has three styles: **British Stageplay**, **US Stageplay**, and **Screenplay**. Stageplay layout differs by nation (typography, title-page conventions), which is why British and US are distinct. Screenplay is a single industry-standard format (Courier Prime, standard title-page conventions) that applies regardless of nation - there is no "British Screenplay" and none is intended. Verified in `internal/config/config.go:65-80` and `presets/us-screenplay-overrides.yaml`.
+- `manuscript` has two because "screenplay" is a script format and does not apply to prose. Prose manuscripts vary only by nation.
 - `letter` has no style flag at all; letters use one layout (see `docs/config.md` §Letter settings).
 
-The UI must not offer options the CLI would reject. **Gap:** the current CLI exposes a single flat `--style british|us|screenplay` flag, which cannot express British Screenplay, and the `presets/` directory contains `us-screenplay-overrides.yaml` but no British-screenplay counterpart. The UI's two-axis model implies a CLI change (either a second flag such as `--variant stage|screenplay` or four compound style values). This is called out again as an open question in §Open questions.
+The UI must not offer options the CLI would reject.
 
 ## Layout
 
@@ -79,8 +83,7 @@ Fields:
 - **Output** - segmented control: `Save as file` | `Preview as text`.
   - `Save as file` reveals a save-as picker and infers target format from extension (matches CLI behaviour).
   - `Preview as text` reveals a format picker (`org` / `md` / `fountain` - no `pdf` for stdout), and renders output into the log area rather than to disk.
-- **Nation** - segmented control: `British` (default) | `US`.
-- **Variant** - segmented control: `Stage` (default) | `Screenplay`. All four Nation × Variant combinations are permitted.
+- **Style** - segmented control: `British Stageplay` (default) | `US Stageplay` | `Screenplay`. Screenplay is nation-agnostic (one industry-standard layout for both geographies).
 - **PDF layout** - disclosure group, only enabled when target is `.pdf`. Contains: `Font`, `Font size`, `Margin`, `Page size`, `Dialogue indent`, `Dialogue spacing`, `Direction spacing`, plus two toggles for `Italic directions` and `Centre directions`. These map 1:1 to the `--font`, `--font-size`, `--margin`, `--page`, `--indent`, `--dialogue-spacing`, `--direction-spacing`, `--[no-]direction-italic`, `--[no-]direction-centre` CLI flags. Fields left blank are omitted from the invocation so config-file values apply.
 
 Primary action: `Convert`.
@@ -133,7 +136,72 @@ The app does not write config files (matches the CLI contract in `docs/config.md
 - Read `~/.config/first-folio/script.yaml` at launch, if present, to prefill default style, font, and page size in the Convert screen.
 - Show the resolved config sources in a Preferences sheet (`⚙`): global path, local path (if a source file is loaded), and the CLI overrides that will be added by the app's current field values. This is a diagnostic aid so a writer can see why an output looks the way it does.
 
-The app never edits `script.yaml`. Users who want a persistent change edit the file themselves; the app rereads it on next launch or when explicitly refreshed.
+The app never edits `script.yaml` in MVP. Users who want a persistent change edit the file themselves; the app rereads it on next launch or when explicitly refreshed.
+
+## Preferences (post-MVP)
+
+**Status:** design captured now for direction, not scoped for the first release. MVP treats `script.yaml` as read-only.
+
+The Preferences pane is a structured YAML editor for the `folio:` namespace. It is not a free-text editor - the app writes valid YAML back to disk on save, and each field is constrained to values the CLI accepts.
+
+### Scope toggle
+
+At the top of the pane, a two-position toggle:
+
+- **Prefs for this doc set** - enabled only when a source file (Convert / Letter) or set of source files (Manuscript) is currently loaded. Edits the local `script.yaml` in the source file's directory. If none exists, `Save` creates one containing only the keys the user has set - it does not copy the merged config into a new file (that would freeze defaults and defeat inheritance).
+- **Default config** - always enabled. Edits `~/.config/first-folio/script.yaml`. Same principle: writes only the keys the user has actually set.
+
+The toggle also changes the "resolved value" annotation next to each field so the user can see which layer wins after their edit (see §Field rows).
+
+### Layout
+
+The pane is a scroll view of collapsible blocks matching the config schema in `docs/config.md`:
+
+- **Shared metadata** (`title`, `subtitle`, `author`, `date`, `version`)
+- **Shared rendering options** (`render.*` toggles)
+- **PDF settings** (`folio.font`, `folio.font-size`, `folio.margin`, `folio.page`, `folio.style`, `folio.default-format`)
+- **Title page** (`folio.title-page.*`)
+- **Positioning** (`folio.positioning.*`, itself nested: `speech`, `stage-direction`, `transition`, headers)
+- **Letter** (`folio.letter.*`)
+- **Manuscript** (`folio.manuscript.*`, with sub-blocks for `page-header`, `toc`, and its own overrides)
+
+Each block header is a `DisclosureGroup`. All blocks are collapsed by default; the user opens the ones they want. Opening a block reveals its field rows underneath. Nested blocks (e.g. `folio.positioning.speech`) render as nested disclosure groups.
+
+### Field rows
+
+Each field row shows:
+
+- The dotted key (e.g. `folio.positioning.speech.speaker.case`)
+- A control appropriate to the field's type, with **dropdown options** wherever the CLI accepts a fixed set:
+  - Enums (`style`, `page`, `case`, `alignment`, `position`) → `Picker` with the CLI-accepted values
+  - Booleans (`render.*`, `direction-italic`, `direction-centre`) → `Toggle`
+  - Sizes (`font-size`, `margin`, `indent`) → text field with a dropdown of common values (`10pt`, `11pt`, `12pt`; `20mm`, `25mm`, `30mm`) plus free text for anything else
+  - Fonts → text field with a dropdown of fonts installed on the system that Typst can see
+  - Free-form strings (`title`, `author`) → plain text field
+- A subtle secondary line showing the resolved value under the current scope, and which layer it came from (`from global`, `from local`, `from built-in`) - so users can tell whether their edit will actually take effect.
+- A revert-to-inherited affordance (small `↺` icon) that removes the key from this scope and lets a lower layer win again.
+
+### Validation
+
+The editor validates and rejects invalid config before writing to disk. No `Save` action can produce a `script.yaml` that `folio` would refuse to load.
+
+- Enum fields are constrained at the control level - a dropdown cannot yield an out-of-set value.
+- Size fields (`font-size`, `margin`, `indent`) are validated against Typst's length syntax; anything typed free-form is checked before save.
+- Cross-field constraints (for example, `folio.style: screenplay` disabling `folio.positioning.speech.speaker.case` if the screenplay preset pins it) are surfaced as inline warnings, not silent overrides.
+- The final gate is a dry-run: on `Save`, the app writes the candidate YAML to a temporary file and invokes `folio` in a validate-only mode against it. If the CLI rejects the file, the app shows the CLI's error, does not touch the real `script.yaml`, and keeps the pane in edit state. This requires a validate-only mode on the CLI (e.g. `folio config --validate PATH`); see Open Question 6.
+- Malformed YAML that reaches the editor (from an external edit) is displayed with the parser's line/column error and the pane refuses to enter edit mode until the user either fixes the file externally or discards changes.
+
+### Save behaviour
+
+- `Save` writes only the keys the user has touched, using `gopkg.in/yaml.v3`-compatible output. The app preserves any keys it does not recognize (forward compatibility with future `folio` versions and with the shared `yapper:` namespace).
+- The app never touches `yapper:` blocks.
+- On save, the app re-reads the resolved config so all displayed "resolved value" lines refresh.
+
+### Why this is post-MVP
+
+- The MVP already delivers file selection, style choice, and one-click conversion, which is the Vision doc's stated bar.
+- A structured YAML editor with per-field vocabularies needs a schema source (see Open Question 6). Hand-maintaining one in Swift is possible but is an ongoing sync burden.
+- Editing shared config while the CLI is the source of truth is a legitimate contract change (see `docs/config.md`: "First Folio ... never creates, modifies, or writes to config files"). That contract needs to be revisited before the app writes to `script.yaml`.
 
 ## Architecture
 
@@ -206,12 +274,12 @@ The binary is discovered by, in order: bundled path (if we ship one), `~/.local/
 
 ## Open questions
 
-1. **Style axis vs flat style flag** - the UI's Nation × Variant model produces four combinations, but the current CLI exposes a flat `--style british|us|screenplay` flag and `presets/` has no British-screenplay override. Options: (a) add a second CLI flag such as `--variant stage|screenplay` and a matching `british-screenplay-overrides.yaml` preset; (b) grow the existing flag to accept compound values (`british-stage`, `british-screenplay`, `us-stage`, `us-screenplay`) with the old values as aliases. The UI depends on this decision.
-2. **Recipient listing** - parse in Swift, or add `folio letter --list` to the CLI? Cleaner upstream, but adds surface area.
-3. **Preview** - the Vision doc mentions live-rendered preview as a future goal. Do we ship the app without it, or block on a PDF preview implementation? A first release without preview is honest to scope; a `Preview as text` mode on the Convert screen is a low-cost partial step. Auto-opening the produced PDF in macOS Preview covers the "see the result immediately" need without embedding a preview surface.
-4. **Landing page vs sidebar** - the sidebar is proposed as primary; is a landing page needed for first-run guidance, or does a first-run sheet inside the Convert view suffice?
-5. **App discovery of Typst/Pandoc** - if `folio` exits with a "typst not found" error, should the app offer install guidance (e.g. brew commands) or just relay the error? Relaying is safer; guidance risks going stale.
-6. **Sandboxing** - full sandboxing constrains subprocess execution and PATH lookups. Decide early whether the app is distributed via App Store (sandbox mandatory) or direct download (sandbox optional). This shapes how `FolioRunner` locates the binary.
+1. **Recipient listing** - parse in Swift, or add `folio letter --list` to the CLI? Cleaner upstream, but adds surface area.
+2. **Preview** - the Vision doc mentions live-rendered preview as a future goal. Do we ship the app without it, or block on a PDF preview implementation? A first release without preview is honest to scope; a `Preview as text` mode on the Convert screen is a low-cost partial step. Auto-opening the produced PDF in macOS Preview covers the "see the result immediately" need without embedding a preview surface.
+3. **Landing page vs sidebar** - the sidebar is proposed as primary; is a landing page needed for first-run guidance, or does a first-run sheet inside the Convert view suffice?
+4. **App discovery of Typst/Pandoc** - if `folio` exits with a "typst not found" error, should the app offer install guidance (e.g. brew commands) or just relay the error? Relaying is safer; guidance risks going stale.
+5. **Sandboxing** - full sandboxing constrains subprocess execution and PATH lookups. Decide early whether the app is distributed via App Store (sandbox mandatory) or direct download (sandbox optional). This shapes how `FolioRunner` locates the binary.
+6. **CLI additions needed by the post-MVP Preferences pane** - the structured YAML editor needs two things from the CLI: (a) a machine-readable schema of allowed values per key (e.g. `folio config --schema` emitting JSON) to drive dropdown vocabularies without hand-maintained Swift duplicates; (b) a validate-only mode (e.g. `folio config --validate PATH`) that checks a candidate `script.yaml` and exits non-zero with a descriptive error, so the app can gate `Save`. Both preserve the "no capability the CLI cannot perform" principle by keeping validation authoritative in `folio`.
 
 ## What this proposal does not commit to
 
