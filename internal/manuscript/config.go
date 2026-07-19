@@ -3,10 +3,75 @@
 package manuscript
 
 import (
+	"fmt"
 	"os"
 
 	sharedconfig "github.com/tigger-developer/first-folio/internal/config"
+	"gopkg.in/yaml.v3"
 )
+
+// BlankPageMode describes how the blank-page-before / blank-page-after field is resolved.
+// Accepted YAML values are the bools `true`/`false` and the strings `"true"`, `"false"`,
+// `"enforce-right"`, `"enforce-left"`. An empty value behaves as `"false"` (no blank page).
+type BlankPageMode string
+
+const (
+	BlankPageFalse        BlankPageMode = ""
+	BlankPageTrue         BlankPageMode = "true"
+	BlankPageEnforceRight BlankPageMode = "enforce-right"
+	BlankPageEnforceLeft  BlankPageMode = "enforce-left"
+)
+
+func (b *BlankPageMode) UnmarshalYAML(node *yaml.Node) error {
+	if node.Tag == "!!bool" {
+		var boolVal bool
+		if err := node.Decode(&boolVal); err != nil {
+			return err
+		}
+		if boolVal {
+			*b = BlankPageTrue
+		} else {
+			*b = BlankPageFalse
+		}
+		return nil
+	}
+	var strVal string
+	if err := node.Decode(&strVal); err != nil {
+		return err
+	}
+	switch strVal {
+	case "", "false", "no":
+		*b = BlankPageFalse
+	case "true", "yes":
+		*b = BlankPageTrue
+	case "enforce-right":
+		*b = BlankPageEnforceRight
+	case "enforce-left":
+		*b = BlankPageEnforceLeft
+	default:
+		return fmt.Errorf("invalid blank-page value %q: expected true, false, enforce-right, or enforce-left", strVal)
+	}
+	return nil
+}
+
+// TypstDirective returns the Typst source line(s) to emit for this mode, or the empty string
+// when no blank/parity break is required. For enforce-right / enforce-left, the emitted code
+// records the page number of any inserted parity blank into folio-skip-header-pages /
+// folio-skip-footer-pages so the running header/footer stays hidden on that blank page too.
+func (b BlankPageMode) TypstDirective() string {
+	switch b {
+	case BlankPageTrue:
+		return "#folio-blank-page()"
+	case BlankPageEnforceRight:
+		return `#context { let pg = counter(page).at(here()).first(); if calc.odd(pg) { state("folio-skip-header-pages", ()).update(pages => pages + (pg + 1,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg + 1,)) } }
+#pagebreak(to: "odd")`
+	case BlankPageEnforceLeft:
+		return `#context { let pg = counter(page).at(here()).first(); if calc.even(pg) { state("folio-skip-header-pages", ()).update(pages => pages + (pg + 1,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg + 1,)) } }
+#pagebreak(to: "even")`
+	default:
+		return ""
+	}
+}
 
 type Config struct {
 	Title             string `yaml:"title"`
@@ -147,23 +212,25 @@ type PageFooterConfig struct {
 }
 
 type TOCConfig struct {
-	Enabled           bool   `yaml:"enabled"`
-	Title             string `yaml:"title"`
-	Font              string `yaml:"font"`
-	FontSize          string `yaml:"font-size"`
-	FontWeight        string `yaml:"font-weight"`
-	HeadingFont       string `yaml:"heading-font"`
-	HeadingFontSize   string `yaml:"heading-font-size"`
-	HeadingFontWeight string `yaml:"heading-font-weight"`
-	IncludeParts      bool   `yaml:"include-parts"`
-	IncludeChapters   bool   `yaml:"include-chapters"`
-	IncludeSections   bool   `yaml:"include-sections"`
-	DotLeaders        bool   `yaml:"dot-leaders"`
-	PageNumbers       bool   `yaml:"page-numbers"`
-	PageBreakBefore   bool   `yaml:"page-break-before"`
-	LineSpacing       string `yaml:"line-spacing"`
-	PartGapBefore     string `yaml:"part-gap-before"`
-	PartBold          bool   `yaml:"part-bold"`
+	Enabled           bool          `yaml:"enabled"`
+	Title             string        `yaml:"title"`
+	Font              string        `yaml:"font"`
+	FontSize          string        `yaml:"font-size"`
+	FontWeight        string        `yaml:"font-weight"`
+	HeadingFont       string        `yaml:"heading-font"`
+	HeadingFontSize   string        `yaml:"heading-font-size"`
+	HeadingFontWeight string        `yaml:"heading-font-weight"`
+	IncludeParts      bool          `yaml:"include-parts"`
+	IncludeChapters   bool          `yaml:"include-chapters"`
+	IncludeSections   bool          `yaml:"include-sections"`
+	DotLeaders        bool          `yaml:"dot-leaders"`
+	PageNumbers       bool          `yaml:"page-numbers"`
+	PageBreakBefore   bool          `yaml:"page-break-before"`
+	BlankPageBefore   BlankPageMode `yaml:"blank-page-before"`
+	BlankPageAfter    BlankPageMode `yaml:"blank-page-after"`
+	LineSpacing       string        `yaml:"line-spacing"`
+	PartGapBefore     string        `yaml:"part-gap-before"`
+	PartBold          bool          `yaml:"part-bold"`
 }
 
 type SceneBreakConfig struct {
@@ -176,14 +243,16 @@ type SpacedBlockConfig struct {
 }
 
 type HeadingConfig struct {
-	PageBreakBefore bool   `yaml:"page-break-before"`
-	BlankPageBefore bool   `yaml:"blank-page-before"`
-	BlankPageAfter  bool   `yaml:"blank-page-after"`
-	VerticalAlign   string `yaml:"vertical-align"`
-	Position        string `yaml:"position"`
-	Align           string `yaml:"align"`
-	CaseTransform   string `yaml:"case-transform"`
-	SpaceAfter      string `yaml:"space-after"`
+	PageBreakBefore bool          `yaml:"page-break-before"`
+	BlankPageBefore BlankPageMode `yaml:"blank-page-before"`
+	BlankPageAfter  BlankPageMode `yaml:"blank-page-after"`
+	SkipHeader      bool          `yaml:"skip-header"`
+	SkipFooter      bool          `yaml:"skip-footer"`
+	VerticalAlign   string        `yaml:"vertical-align"`
+	Position        string        `yaml:"position"`
+	Align           string        `yaml:"align"`
+	CaseTransform   string        `yaml:"case-transform"`
+	SpaceAfter      string        `yaml:"space-after"`
 }
 
 func LoadConfig(sourceDir string, opts Options) (Config, error) {

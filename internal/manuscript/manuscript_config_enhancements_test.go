@@ -68,7 +68,8 @@ func TestRT_15_6_PageFooterEnabledRendersFooter(t *testing.T) {
 		"",
 	}, "\n"))
 	assertContains(t, typst, `footer-marker-abc`)
-	assertContains(t, typst, `footer: align(`)
+	// The footer is emitted inside a context {} block that conditionally hides via skip-footer state.
+	assertContains(t, typst, `footer: context {`)
 }
 
 // RT-15.7 [🚫 removed]: The default page-footer.enabled was originally documented as false. The
@@ -131,7 +132,8 @@ func TestRT_15_10_PageFooterPositioningPropagates(t *testing.T) {
 		"",
 	}, "\n"))
 	body := extractBodyPageBlock(t, typst)
-	assertContains(t, body, `footer: align(center)[`)
+	// The footer align expression is wrapped in a context block for skip-footer support.
+	assertContains(t, body, `align(center)[`)
 	assertContains(t, body, `bottom: 18mm + 12mm`)
 	assertContains(t, body, `footer-descent: 12mm`)
 }
@@ -238,7 +240,8 @@ func TestRT_15_21_ChapterBlankPageBefore(t *testing.T) {
 	}, "\n"))
 	assertContains(t, typst, `#folio-blank-page()`)
 	// Blank page markers must appear BEFORE the chapter emit.
-	assertBefore(t, typst, `#folio-blank-page()`, `#folio-chapter(first: false)[Chapter 1]`)
+	assertBefore(t, typst, `#folio-blank-page()`, `#folio-chapter(first: false,`)
+	assertContains(t, typst, `)[Chapter 1]`)
 }
 
 // RT-15.22: chapter.blank-page-after: true inserts a blank page after each chapter.
@@ -251,7 +254,8 @@ func TestRT_15_22_ChapterBlankPageAfter(t *testing.T) {
 		"",
 	}, "\n"))
 	assertContains(t, typst, `#folio-blank-page()`)
-	assertBefore(t, typst, `#folio-chapter(first: false)[Chapter 1]`, `#folio-blank-page()`)
+	assertBefore(t, typst, `#folio-chapter(first: false,`, `#folio-blank-page()`)
+	assertContains(t, typst, `)[Chapter 1]`)
 }
 
 // RT-15.23: part.blank-page-before: true inserts a blank page before each part.
@@ -264,7 +268,8 @@ func TestRT_15_23_PartBlankPageBefore(t *testing.T) {
 		"",
 	}, "\n"))
 	assertContains(t, typst, `#folio-blank-page()`)
-	assertBefore(t, typst, `#folio-blank-page()`, `#folio-part(first: true)[PART ONE]`)
+	assertBefore(t, typst, `#folio-blank-page()`, `#folio-part(first: true,`)
+	assertContains(t, typst, `)[PART ONE]`)
 }
 
 // RT-15.24: part.blank-page-after: true inserts a blank page after each part.
@@ -277,7 +282,8 @@ func TestRT_15_24_PartBlankPageAfter(t *testing.T) {
 		"",
 	}, "\n"))
 	assertContains(t, typst, `#folio-blank-page()`)
-	assertBefore(t, typst, `#folio-part(first: true)[PART ONE]`, `#folio-blank-page()`)
+	assertBefore(t, typst, `#folio-part(first: true,`, `#folio-blank-page()`)
+	assertContains(t, typst, `)[PART ONE]`)
 }
 
 // RT-15.25: blank-page-before + page-break-before both set produces one blank + one heading page.
@@ -471,6 +477,40 @@ func TestRT_15_38_InvalidHorizontalAlignRejected(t *testing.T) {
 	}, "\n"), "bottom-diagonal")
 }
 
+// Supplement to RT-15.33/34: an item with a per-item align must not also render in the pre-existing
+// British title-page grid footer or the US bottom-center wordcount placement. This prevents the
+// duplication a human reviewer flagged during UT-15.4 presentation.
+func TestRT_15_5_PerItemAlignSuppressesLegacyGridDuplication(t *testing.T) {
+	typst := renderIssue15Manuscript(t, strings.Join([]string{
+		"folio:",
+		"  manuscript:",
+		"    title-page:",
+		"      version:",
+		"        align: top-left",
+		"      wordcount:",
+		"        align: bottom-right",
+		"      date:",
+		"        align: bottom-left",
+		"",
+	}, "\n"))
+	titleTOC := extractTitleAndTOCBlock(t, typst)
+	// Each item text should appear at its per-item place block, never inside the grid footer.
+	// The grid columns are marked by `columns: (1fr, 1fr, 1fr)`; ensure each item text only
+	// appears once in the title/TOC region.
+	countVersion := strings.Count(titleTOC, "Draft 4")
+	countWordCount := strings.Count(titleTOC, "90000")
+	countDate := strings.Count(titleTOC, "6 July 2026")
+	if countVersion > 1 {
+		t.Fatalf("version text appears %d times; expected once (no grid-footer duplication)\n%s", countVersion, titleTOC)
+	}
+	if countWordCount > 1 {
+		t.Fatalf("word-count text appears %d times; expected once (no grid-footer duplication)\n%s", countWordCount, titleTOC)
+	}
+	if countDate > 1 {
+		t.Fatalf("date text appears %d times; expected once (no grid-footer duplication)\n%s", countDate, titleTOC)
+	}
+}
+
 // RT-15.39: legacy title-block-align and footer-align continue to work when per-item align is unset.
 func TestRT_15_39_LegacyTitleBlockAlignFallback(t *testing.T) {
 	typst := renderIssue15Manuscript(t, strings.Join([]string{
@@ -499,23 +539,23 @@ func TestRT_15_40_HeaderPairLeftRight(t *testing.T) {
 	assertContains(t, body, `right`)
 }
 
-// RT-15.41: page-header.align: right-left yields right on odd and left on even.
+// RT-15.41: page-header.align: right-left -- left-page (verso, even) right, right-page (recto, odd) left.
+// Template emits `if calc.odd(...) { <recto> } else { <verso> }` = `{ left } else { right }`.
 func TestRT_15_41_HeaderPairRightLeft(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-header:\n      align: right-left\n")
 	body := extractBodyPageBlock(t, typst)
 	assertContains(t, body, `calc.odd(counter(page).at(here()).first())`)
-	// The pair order is (odd, even) = (right, left).
-	assertContains(t, body, `{ right } else { left }`)
+	assertContains(t, body, `{ left } else { right }`)
 }
 
-// RT-15.42: page-header.align: center-left yields centre on odd and left on even.
+// RT-15.42: page-header.align: center-left -- left-page (verso) center, right-page (recto) left.
 func TestRT_15_42_HeaderPairCenterLeft(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-header:\n      align: center-left\n")
 	body := extractBodyPageBlock(t, typst)
-	assertContains(t, body, `{ center } else { left }`)
+	assertContains(t, body, `{ left } else { center }`)
 }
 
-// RT-15.43: page-footer.align: right-center yields right on odd and centre on even.
+// RT-15.43: page-footer.align: right-center -- left-page (verso) right, right-page (recto) center.
 func TestRT_15_43_FooterPairRightCenter(t *testing.T) {
 	typst := renderIssue15Manuscript(t, strings.Join([]string{
 		"folio:",
@@ -528,14 +568,17 @@ func TestRT_15_43_FooterPairRightCenter(t *testing.T) {
 	}, "\n"))
 	body := extractBodyPageBlock(t, typst)
 	assertContains(t, body, `calc.odd(counter(page).at(here()).first())`)
-	assertContains(t, body, `{ right } else { center }`)
+	assertContains(t, body, `{ center } else { right }`)
 }
 
 // RT-15.44: scalar align: right continues to apply uniformly (backwards compatible).
+// Under the state-based skip-header wrapper, the header line becomes:
+//   header: context { if state("folio-skip-header").get() { none } else { align(right)[...] } },
+// which no longer contains calc.odd (the pair conditional).
 func TestRT_15_44_ScalarAlignAppliesUniformly(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-header:\n      align: right\n")
 	body := extractBodyPageBlock(t, typst)
-	assertContains(t, body, `header: align(right)[`)
+	assertContains(t, body, `align(right)[`)
 	assertNotContains(t, body, `calc.odd(`)
 }
 
@@ -549,15 +592,128 @@ func TestRT_15_46_HeaderPairThreeTokensRejected(t *testing.T) {
 	assertIssue15ConfigRejected(t, "folio:\n  manuscript:\n    page-header:\n      align: left-right-center\n", "left-right-center")
 }
 
-// RT-15.47: on a single-page manuscript, the odd-page rule applies.
+// RT-15.47: on a single-page manuscript, the odd-page rule applies. The odd branch corresponds
+// to the SECOND compound token (right-page). `right-left` -> right-page = left, so odd branch = left.
 func TestRT_15_47_SinglePageUsesOddRule(t *testing.T) {
-	// Emit is source-level; parity is resolved by Typst at render time. The Typst source itself
-	// must contain the odd-branch alignment. RT-15.40..43 already assert both branches are present.
-	// This test confirms the odd branch corresponds to the first compound token via a distinct pair.
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-header:\n      align: right-left\n")
 	body := extractBodyPageBlock(t, typst)
-	// { <odd> } else { <even> } with odd = right.
-	assertContains(t, body, `{ right } else { left }`)
+	assertContains(t, body, `{ left } else { right }`)
+}
+
+// -----------------------------------------------------------------------------
+// AC15.11 -- blank-page-before / blank-page-after enum on part / chapter / toc
+// -----------------------------------------------------------------------------
+
+// RT-15.63: chapter.blank-page-before: enforce-right emits a Typst pagebreak(to: "odd") directive.
+func TestRT_15_63_ChapterBlankPageEnforceRight(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      blank-page-before: enforce-right\n")
+	assertContains(t, typst, `#pagebreak(to: "odd")`)
+	assertBefore(t, typst, `#pagebreak(to: "odd")`, `#folio-chapter(first: false,`)
+}
+
+// RT-15.64: chapter.blank-page-after: enforce-left emits a Typst pagebreak(to: "even") directive after chapter.
+func TestRT_15_64_ChapterBlankPageEnforceLeft(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      blank-page-after: enforce-left\n")
+	assertContains(t, typst, `#pagebreak(to: "even")`)
+	assertBefore(t, typst, `#folio-chapter(first: false,`, `#pagebreak(to: "even")`)
+}
+
+// RT-15.65: part.blank-page-before: enforce-right emits pagebreak(to: "odd") before part.
+func TestRT_15_65_PartBlankPageEnforceRight(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    part:\n      blank-page-before: enforce-right\n")
+	assertContains(t, typst, `#pagebreak(to: "odd")`)
+	assertBefore(t, typst, `#pagebreak(to: "odd")`, `#folio-part(first: true,`)
+}
+
+// RT-15.66: toc.blank-page-before: enforce-right emits pagebreak(to: "odd") before the TOC section.
+func TestRT_15_66_TOCBlankPageEnforceRight(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    toc:\n      blank-page-before: enforce-right\n")
+	assertContains(t, typst, `#pagebreak(to: "odd")`)
+	// The directive must appear in the title/TOC region and precede the TOC heading.
+	titleTOC := extractTitleAndTOCBlock(t, typst)
+	assertContains(t, titleTOC, `#pagebreak(to: "odd")`)
+}
+
+// RT-15.67: toc.blank-page-after: true emits an unconditional blank page after the TOC.
+func TestRT_15_67_TOCBlankPageAfterTrue(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    toc:\n      blank-page-after: true\n")
+	assertContains(t, typst, `#folio-blank-page()`)
+	// It should appear in the TOC region (between title-page area and the body counter reset).
+	titleTOC := extractTitleAndTOCBlock(t, typst)
+	assertContains(t, titleTOC, `#folio-blank-page()`)
+}
+
+// RT-15.68: invalid blank-page value fails config load with a diagnostic naming the offending value.
+func TestRT_15_68_InvalidBlankPageValueRejected(t *testing.T) {
+	assertIssue15ConfigRejected(t, "folio:\n  manuscript:\n    chapter:\n      blank-page-before: enforce-diagonal\n", "enforce-diagonal")
+}
+
+// RT-15.69: unconditional bool true still works alongside the enum values (backwards compat).
+func TestRT_15_69_BoolTrueStillEmitsUnconditionalBlankPage(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      blank-page-before: true\n")
+	assertContains(t, typst, `#folio-blank-page()`)
+	assertNotContains(t, typst, `#pagebreak(to: "odd")`)
+}
+
+// -----------------------------------------------------------------------------
+// AC15.9 -- skip-header / skip-footer on part and chapter blocks
+// -----------------------------------------------------------------------------
+
+// RT-15.56: chapter.skip-header: true is threaded to the folio-chapter macro.
+func TestRT_15_56_ChapterSkipHeader(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      skip-header: true\n")
+	assertContains(t, typst, `skip-header: true`)
+	assertContains(t, typst, `#folio-chapter(first: false, skip-header: true`)
+}
+
+// RT-15.57: chapter.skip-footer: true is threaded to the folio-chapter macro.
+func TestRT_15_57_ChapterSkipFooter(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      skip-footer: true\n")
+	assertContains(t, typst, `skip-footer: true`)
+	assertContains(t, typst, `#folio-chapter(first: false, `)
+}
+
+// RT-15.58: part.skip-header: true is threaded to the folio-part macro.
+func TestRT_15_58_PartSkipHeader(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    part:\n      skip-header: true\n")
+	assertContains(t, typst, `#folio-part(first: true, skip-header: true`)
+}
+
+// RT-15.59: part.skip-footer: true is threaded to the folio-part macro.
+func TestRT_15_59_PartSkipFooter(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    part:\n      skip-footer: true\n")
+	assertContains(t, typst, `#folio-part(first: true, `)
+	assertContains(t, typst, `skip-footer: true`)
+}
+
+// RT-15.60: skip-header/skip-footer default false; folio-part/folio-chapter calls omit the
+// skip params (their template defaults are false).
+func TestRT_15_60_SkipDefaultsFalse(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "")
+	// Default calls carry no skip-header or skip-footer keyword arguments.
+	assertNotContains(t, typst, `skip-header: true`)
+	assertNotContains(t, typst, `skip-footer: true`)
+}
+
+// RT-15.61: template folio-part macro accepts skip-header and skip-footer parameters. The
+// suppression itself is done via the folio-skip-header-pages / folio-skip-footer-pages
+// state lists: folio-part / folio-chapter push their current page number to the appropriate
+// list when their flag is true, and the header/footer context checks list membership so only
+// the specific heading page is hidden (not subsequent multi-page body pages).
+func TestRT_15_61_TemplateFolioPartMacroSupportsSkip(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "")
+	assertContains(t, typst, `#let folio-part(first: false, skip-header: false, skip-footer: false`)
+	assertContains(t, typst, `state("folio-skip-header-pages"`)
+	assertContains(t, typst, `state("folio-skip-footer-pages"`)
+	// Header/footer contexts check membership of the current page in the skip list.
+	assertContains(t, typst, `pg in state("folio-skip-header-pages", ()).final()`)
+	assertContains(t, typst, `pg in state("folio-skip-footer-pages", ()).final()`)
+}
+
+// RT-15.62: template folio-chapter macro accepts skip-header and skip-footer parameters.
+func TestRT_15_62_TemplateFolioChapterMacroSupportsSkip(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "")
+	assertContains(t, typst, `#let folio-chapter(first: false, skip-header: false, skip-footer: false`)
 }
 
 // -----------------------------------------------------------------------------
@@ -614,19 +770,22 @@ func TestRT_15_52_DefaultHeaderFormatIsTitleChapterAuthor(t *testing.T) {
 	assertContains(t, body, `state("folio-current-chapter").get()`)
 }
 
-// RT-15.53: the default page-header.align is left-right (mirror pair).
+// RT-15.53: the default page-header.align is left-right -- left-page (verso) left, right-page
+// (recto) right. Template emits `{ right } else { left }` (odd branch = second token = right).
+// This is the classical outer-edge running-head convention.
 func TestRT_15_53_DefaultHeaderAlignIsLeftRight(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "")
 	body := extractBodyPageBlock(t, typst)
 	assertContains(t, body, `calc.odd(counter(page).at(here()).first())`)
-	assertContains(t, body, `{ left } else { right }`)
+	assertContains(t, body, `{ right } else { left }`)
 }
 
 // RT-15.54: the default page-footer is enabled with format "[page]" and align center.
 func TestRT_15_54_DefaultFooterIsCenteredPageNumber(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "")
 	body := extractBodyPageBlock(t, typst)
-	assertContains(t, body, `footer: align(center)[`)
+	assertContains(t, body, `footer: context {`)
+	assertContains(t, body, `align(center)[`)
 	assertContains(t, body, `#context counter(page).display()`)
 }
 
@@ -634,7 +793,7 @@ func TestRT_15_54_DefaultFooterIsCenteredPageNumber(t *testing.T) {
 func TestRT_15_55_ExplicitFooterDisableOmitsFooter(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-footer:\n      enabled: false\n")
 	body := extractBodyPageBlock(t, typst)
-	if strings.Contains(body, `footer: align(`) {
+	if strings.Contains(body, `footer: context {`) {
 		t.Fatalf("expected explicit page-footer.enabled: false to omit footer, got:\n%s", body)
 	}
 	assertContains(t, body, `footer: none`)

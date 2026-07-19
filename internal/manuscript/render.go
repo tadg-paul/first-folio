@@ -42,14 +42,24 @@ type templateData struct {
 	FooterAlignIsPair  bool
 	PageFooterEnabled  bool
 
-	// Title-page per-item alignment expressions (empty = use legacy group fallback).
-	TitleAlignExpr     string
-	SubtitleAlignExpr  string
-	AuthorAlignExpr    string
-	DateAlignExpr      string
-	WordCountAlignExpr string
-	VersionAlignExpr   string
-	ContactAlignExpr   string
+
+	// Title-page per-item alignment expressions (empty = use legacy group fallback) and a
+	// paired Floatable boolean per item so the template can emit `float: true` only when the
+	// vertical axis is top or bottom (Typst's floating placement forbids center).
+	TitleAlignExpr        string
+	TitleFloatable        bool
+	SubtitleAlignExpr     string
+	SubtitleFloatable     bool
+	AuthorAlignExpr       string
+	AuthorFloatable       bool
+	DateAlignExpr         string
+	DateFloatable         bool
+	WordCountAlignExpr    string
+	WordCountFloatable    bool
+	VersionAlignExpr      string
+	VersionFloatable      bool
+	ContactAlignExpr      string
+	ContactFloatable      bool
 
 	// Legacy title-block-align, used for the title/subtitle/author group when no per-item align is set.
 	TitleBlockAlignExpr string
@@ -137,12 +147,19 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		FooterAlignIsPair:   footerAlign.IsPair,
 		PageFooterEnabled:   pageFooterEnabled,
 		TitleAlignExpr:      titleExpr,
+		TitleFloatable:      TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.Title.Align),
 		SubtitleAlignExpr:   subtitleExpr,
+		SubtitleFloatable:   TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.Subtitle.Align),
 		AuthorAlignExpr:     authorExpr,
+		AuthorFloatable:     TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.Author.Align),
 		DateAlignExpr:       dateExpr,
+		DateFloatable:       TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.Date.Align),
 		WordCountAlignExpr:  wordCountExpr,
+		WordCountFloatable:  TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.WordCount.Align),
 		VersionAlignExpr:    versionExpr,
+		VersionFloatable:    TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.Version.Align),
 		ContactAlignExpr:    contactExpr,
+		ContactFloatable:    TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.Contact.Align),
 		TitleBlockAlignExpr: titleBlockExpr,
 		FooterGroupAlignExpr: footerGroupExpr,
 	}
@@ -205,36 +222,43 @@ func paragraphSpacing(spacing string, leading string) string {
 }
 
 func renderBlocks(blocks []Block, cfg Config) (string, error) {
-	partBlankBefore := cfg.Folio.Manuscript.Part.BlankPageBefore
-	partBlankAfter := cfg.Folio.Manuscript.Part.BlankPageAfter
-	chapterBlankBefore := cfg.Folio.Manuscript.Chapter.BlankPageBefore
-	chapterBlankAfter := cfg.Folio.Manuscript.Chapter.BlankPageAfter
+	partSkipHeader := cfg.Folio.Manuscript.Part.SkipHeader
+	partSkipFooter := cfg.Folio.Manuscript.Part.SkipFooter
+	chapterSkipHeader := cfg.Folio.Manuscript.Chapter.SkipHeader
+	chapterSkipFooter := cfg.Folio.Manuscript.Chapter.SkipFooter
 
+	emitDirective := func(lines []string, directive string) []string {
+		if directive == "" {
+			return lines
+		}
+		return append(lines, directive)
+	}
+
+	// Skip flags are propagated to folio-part / folio-chapter which record the resulting
+	// page number in `folio-skip-header-pages` / `folio-skip-footer-pages` at context time.
+	// The header/footer context reads that list via `.final()` and hides the running band only
+	// on those pages, leaving subsequent body pages of a multi-page block unaffected.
 	var lines []string
 	firstPageBlock := true
 	for _, block := range blocks {
 		switch block.Kind {
 		case "part":
-			if partBlankBefore {
-				lines = append(lines, "#folio-blank-page()")
-			}
-			lines = append(lines, fmt.Sprintf("#folio-part(first: %t)[%s]",
+			lines = emitDirective(lines, cfg.Folio.Manuscript.Part.BlankPageBefore.TypstDirective())
+			lines = append(lines, fmt.Sprintf("#folio-part(first: %t, skip-header: %t, skip-footer: %t)[%s]",
 				firstPageBlock,
+				partSkipHeader,
+				partSkipFooter,
 				caseTransform(block.Text, cfg.Folio.Manuscript.Part.CaseTransform)))
-			if partBlankAfter {
-				lines = append(lines, "#folio-blank-page()")
-			}
+			lines = emitDirective(lines, cfg.Folio.Manuscript.Part.BlankPageAfter.TypstDirective())
 			firstPageBlock = false
 		case "chapter":
-			if chapterBlankBefore {
-				lines = append(lines, "#folio-blank-page()")
-			}
-			lines = append(lines, fmt.Sprintf("#folio-chapter(first: %t)[%s]",
+			lines = emitDirective(lines, cfg.Folio.Manuscript.Chapter.BlankPageBefore.TypstDirective())
+			lines = append(lines, fmt.Sprintf("#folio-chapter(first: %t, skip-header: %t, skip-footer: %t)[%s]",
 				firstPageBlock,
+				chapterSkipHeader,
+				chapterSkipFooter,
 				caseTransform(block.Text, cfg.Folio.Manuscript.Chapter.CaseTransform)))
-			if chapterBlankAfter {
-				lines = append(lines, "#folio-blank-page()")
-			}
+			lines = emitDirective(lines, cfg.Folio.Manuscript.Chapter.BlankPageAfter.TypstDirective())
 			firstPageBlock = false
 		case "section":
 			lines = append(lines, "#folio-section["+typstInline(block.Text, cfg)+"]")

@@ -141,9 +141,9 @@ The British and US presets both default to `format: "[title] • [chapter] • [
 `page-header.align` and `page-footer.align` accept:
 
 - a compass keyword: `left`, `center`, `right` -- applied uniformly to every page
-- a compound page-pair alias: `left-right`, `right-left`, `left-center`, `right-center`, `center-left`, `center-right` -- the first token controls alignment on odd (right-hand) pages, the second on even (left-hand) pages, with page 1 assumed to be a right-hand page.
+- a compound page-pair alias: `left-right`, `right-left`, `left-center`, `right-center`, `center-left`, `center-right` -- **first token = LEFT (verso, even) page, second token = RIGHT (recto, odd) page**, matching the reader's view of an open book. `left-right` therefore places left-alignment on verso pages and right-alignment on recto pages, which is the classical outer-edge running-head convention.
 
-Default: `align: left-right` for the header, `align: center` for the footer.
+Default: `align: left-right` for the header (outer-edge, both sides), `align: center` for the footer.
 
 ### Custom page dimensions
 
@@ -173,7 +173,18 @@ A `0mm` gutter leaves the running-page margin configuration byte-identical to th
 
 ### Blank pages before or after headings
 
-`folio.manuscript.part.blank-page-before`, `part.blank-page-after`, `chapter.blank-page-before`, and `chapter.blank-page-after` (all default `false`) insert an unnumbered, empty page adjacent to each part or chapter heading. These are independent of `page-break-before`; combining `page-break-before: true` and `blank-page-before: true` produces one blank page and one heading page (no doubling).
+`folio.manuscript.part.blank-page-before`, `part.blank-page-after`, `chapter.blank-page-before`, `chapter.blank-page-after`, `toc.blank-page-before`, and `toc.blank-page-after` accept:
+
+- `false` (default) -- no blank page.
+- `true` -- insert one unconditional unnumbered blank page adjacent to the heading.
+- `enforce-right` -- ensure the next section starts on a right-hand (recto/odd) page; a blank page is inserted only if needed to reach that parity. Uses Typst's `pagebreak(to: "odd")`.
+- `enforce-left` -- ensure the next section starts on a left-hand (verso/even) page. Uses Typst's `pagebreak(to: "even")`.
+
+Independent of `page-break-before`; combining `page-break-before: true` with `blank-page-before: true` produces one blank page and one heading page (no doubling). Combining with `enforce-right` / `enforce-left` inserts the parity blank if and only if the natural next page has the wrong parity.
+
+### Skipping running header or footer on part / chapter pages
+
+`folio.manuscript.part.skip-header`, `part.skip-footer`, `chapter.skip-header`, and `chapter.skip-footer` (all default `false`) suppress the corresponding running header or footer on any page that renders the corresponding heading. Combined with a heading that has `page-break-before: true`, this cleanly hides the header/footer on the dedicated part or chapter page; combined with a heading that shares a page with a chapter, this hides the header/footer for that shared page.
 
 ### Title-page item alignment
 

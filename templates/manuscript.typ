@@ -5,6 +5,13 @@
 #let _folio_part_state_init = state("folio-current-part", "")
 #let _folio_chapter_state_init = state("folio-current-chapter", "")
 
+// Skip records for the running header/footer on part/chapter title pages. Each part/chapter
+// macro records the page number it lands on if its skip-header / skip-footer flag is true;
+// the header/footer context reads the final list via `.final()` and hides the running band
+// only on those specific pages. This keeps subsequent body pages of a multi-page chapter
+// showing their normal running header and footer. The default value `()` is provided at the
+// call sites (both `.final()` and `.update()`) so no explicit initialization is needed here.
+
 // A blank page macro used to satisfy folio.manuscript.{part,chapter}.blank-page-{before,after}.
 // A weak pagebreak avoids doubling with an adjacent hard break; the empty page() scope removes
 // numbering, header, and footer so the blank page is visually blank and unnumbered.
@@ -23,11 +30,22 @@
   v(0.4em)
 }
 
-#let folio-part(first: false, body) = {
+#let folio-part(first: false, skip-header: false, skip-footer: false, body) = {
   state("folio-current-part").update(body)
   state("folio-current-chapter").update([])
   if not first and {{.Config.Folio.Manuscript.Part.PageBreakBefore}} {
     pagebreak()
+  }
+  // After any pagebreak, record this heading's page number in the skip lists
+  // when its flags are set. The header/footer context checks membership.
+  context {
+    let pg = counter(page).at(here()).first()
+    if skip-header {
+      state("folio-skip-header-pages", ()).update(pages => pages + (pg,))
+    }
+    if skip-footer {
+      state("folio-skip-footer-pages", ()).update(pages => pages + (pg,))
+    }
   }
   align({{.Config.Folio.Manuscript.Part.Align}} + {{.PartVertical}})[
     #text(
@@ -40,10 +58,19 @@
   ]
 }
 
-#let folio-chapter(first: false, body) = {
+#let folio-chapter(first: false, skip-header: false, skip-footer: false, body) = {
   state("folio-current-chapter").update(body)
   if not first and {{.Config.Folio.Manuscript.Chapter.PageBreakBefore}} {
     pagebreak()
+  }
+  context {
+    let pg = counter(page).at(here()).first()
+    if skip-header {
+      state("folio-skip-header-pages", ()).update(pages => pages + (pg,))
+    }
+    if skip-footer {
+      state("folio-skip-footer-pages", ()).update(pages => pages + (pg,))
+    }
   }
   v({{.ChapterPosition}})
   align({{.Config.Folio.Manuscript.Chapter.Align}})[
@@ -132,15 +159,15 @@
       columns: (1fr, 1fr, 1fr),
       align: (left, {{.FooterGroupAlignExpr}}, right),
       [
-        {{if .Config.Folio.Manuscript.TitlePage.IncludeVersion}}#text(font: "{{.Config.Folio.Manuscript.VersionFont}}", size: {{.Config.Folio.Manuscript.VersionFontSize}}, weight: "{{.Config.Folio.Manuscript.VersionFontWeight}}")[{{.Meta.Version}}]{{end}}
+        {{if and .Config.Folio.Manuscript.TitlePage.IncludeVersion (not .VersionAlignExpr)}}#text(font: "{{.Config.Folio.Manuscript.VersionFont}}", size: {{.Config.Folio.Manuscript.VersionFontSize}}, weight: "{{.Config.Folio.Manuscript.VersionFontWeight}}")[{{.Meta.Version}}]{{end}}
       ],
       [
-        {{if .Config.Folio.Manuscript.TitlePage.IncludeWordCount}}#text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}}, weight: "{{.Config.Folio.Manuscript.WordCountFontWeight}}")[
+        {{if and .Config.Folio.Manuscript.TitlePage.IncludeWordCount (not .WordCountAlignExpr)}}#text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}}, weight: "{{.Config.Folio.Manuscript.WordCountFontWeight}}")[
           #if "{{.Meta.WordCount}}" != "" [{{.Meta.WordCount}}]
         ]{{end}}
       ],
       [
-        {{if .Config.Folio.Manuscript.TitlePage.IncludeDate}}#text(font: "{{.Config.Folio.Manuscript.DateFont}}", size: {{.Config.Folio.Manuscript.DateFontSize}}, weight: "{{.Config.Folio.Manuscript.DateFontWeight}}")[{{.Meta.Date}}]{{end}}
+        {{if and .Config.Folio.Manuscript.TitlePage.IncludeDate (not .DateAlignExpr)}}#text(font: "{{.Config.Folio.Manuscript.DateFont}}", size: {{.Config.Folio.Manuscript.DateFontSize}}, weight: "{{.Config.Folio.Manuscript.DateFontWeight}}")[{{.Meta.Date}}]{{end}}
       ],
     )
   ],
@@ -148,7 +175,7 @@
 {{end}}
 
 {{if .Config.Folio.Manuscript.TitlePage.Enabled}}
-{{if .HasContact}}#place({{if .ContactAlignExpr}}{{.ContactAlignExpr}}{{else}}top + left{{end}}, float: true)[
+{{if .HasContact}}#place({{if .ContactAlignExpr}}{{.ContactAlignExpr}}{{else}}top + left{{end}}{{if .ContactFloatable}}, float: true{{else}}{{if not .ContactAlignExpr}}, float: true{{end}}{{end}})[
   #stack(
     dir: ttb,
     spacing: 0.25em,
@@ -160,7 +187,7 @@
   )
 ]
 {{end}}
-{{if .TitleAlignExpr}}#place({{.TitleAlignExpr}})[
+{{if .TitleAlignExpr}}#place({{.TitleAlignExpr}}{{if .TitleFloatable}}, float: true{{end}})[
   {{if .Config.Folio.Manuscript.TitlePage.IncludeTitle}}
   #text(
     font: "{{.Config.Folio.Manuscript.TitleFont}}",
@@ -169,7 +196,7 @@
   )[{{.Meta.Title}}]
   {{end}}
 ]{{end}}
-{{if .SubtitleAlignExpr}}#place({{.SubtitleAlignExpr}})[
+{{if .SubtitleAlignExpr}}#place({{.SubtitleAlignExpr}}{{if .SubtitleFloatable}}, float: true{{end}})[
   {{if .Config.Folio.Manuscript.TitlePage.IncludeSubtitle}}#if "{{.Meta.Subtitle}}" != "" [
     #text(
       font: "{{.Config.Folio.Manuscript.SubtitleFont}}",
@@ -179,18 +206,18 @@
     )[{{.Meta.Subtitle}}]
   ]{{end}}
 ]{{end}}
-{{if .AuthorAlignExpr}}#place({{.AuthorAlignExpr}})[
+{{if .AuthorAlignExpr}}#place({{.AuthorAlignExpr}}{{if .AuthorFloatable}}, float: true{{end}})[
   {{if .Config.Folio.Manuscript.TitlePage.IncludeAuthor}}#if "{{.Meta.Author}}" != "" [
     #text(font: "{{.Config.Folio.Manuscript.AuthorFont}}", size: {{.Config.Folio.Manuscript.AuthorFontSize}}, weight: "{{.Config.Folio.Manuscript.AuthorFontWeight}}")[{{if .Meta.AuthorAttribution}}{{.Meta.AuthorAttribution}} {{end}}{{.Meta.Author}}]
   ]{{end}}
 ]{{end}}
-{{if .DateAlignExpr}}#place({{.DateAlignExpr}})[
+{{if .DateAlignExpr}}#place({{.DateAlignExpr}}{{if .DateFloatable}}, float: true{{end}})[
   {{if .Config.Folio.Manuscript.TitlePage.IncludeDate}}#text(font: "{{.Config.Folio.Manuscript.DateFont}}", size: {{.Config.Folio.Manuscript.DateFontSize}}, weight: "{{.Config.Folio.Manuscript.DateFontWeight}}")[{{.Meta.Date}}]{{end}}
 ]{{end}}
-{{if .WordCountAlignExpr}}#place({{.WordCountAlignExpr}})[
+{{if .WordCountAlignExpr}}#place({{.WordCountAlignExpr}}{{if .WordCountFloatable}}, float: true{{end}})[
   {{if .Config.Folio.Manuscript.TitlePage.IncludeWordCount}}#text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}}, weight: "{{.Config.Folio.Manuscript.WordCountFontWeight}}")[{{.Meta.WordCount}}]{{end}}
 ]{{end}}
-{{if .VersionAlignExpr}}#place({{.VersionAlignExpr}})[
+{{if .VersionAlignExpr}}#place({{.VersionAlignExpr}}{{if .VersionFloatable}}, float: true{{end}})[
   {{if .Config.Folio.Manuscript.TitlePage.IncludeVersion}}#text(font: "{{.Config.Folio.Manuscript.VersionFont}}", size: {{.Config.Folio.Manuscript.VersionFontSize}}, weight: "{{.Config.Folio.Manuscript.VersionFontWeight}}")[{{.Meta.Version}}]{{end}}
 ]{{end}}
 #align({{.TitleBlockAlignExpr}})[
@@ -216,7 +243,7 @@
   ]{{end}}
 ]
 
-{{if .IsUS}}
+{{if and .IsUS (not .WordCountAlignExpr)}}
 {{if .Config.Folio.Manuscript.TitlePage.IncludeWordCount}}#if "{{.Meta.WordCount}}" != "" [
   #place(bottom + center, float: true)[
     #text(font: "{{.Config.Folio.Manuscript.WordCountFont}}", size: {{.Config.Folio.Manuscript.WordCountFontSize}}, weight: "{{.Config.Folio.Manuscript.WordCountFontWeight}}")[{{.Meta.WordCount}}]
@@ -228,7 +255,10 @@
 {{end}}
 
 {{if .Config.Folio.Manuscript.TOC.Enabled}}
+// Clear the title-page footer before the TOC's blank-page-before directive so any inserted
+// parity blank does not inherit the British title-page grid footer.
 #set page(numbering: none, footer: none)
+{{.Config.Folio.Manuscript.TOC.BlankPageBefore.TypstDirective}}
 #text(
   font: "{{.Config.Folio.Manuscript.TOC.HeadingFont}}",
   size: {{.Config.Folio.Manuscript.TOC.HeadingFontSize}},
@@ -250,6 +280,7 @@
   #outline(title: none)
 ]
 #pagebreak()
+{{.Config.Folio.Manuscript.TOC.BlankPageAfter.TypstDirective}}
 {{end}}
 
 #counter(page).update(1)
@@ -278,22 +309,34 @@
   ),
   {{if .PageFooterEnabled}}footer-descent: {{.Config.Folio.Manuscript.PageFooter.ContentPaddingAfter}},{{end}}{{end}}
   numbering: none,
-  {{if .PageFooterEnabled}}footer: {{if .FooterAlignIsPair}}context {{end}}align({{.FooterAlignExpr}})[
-    #text(
-      font: "{{.Config.Folio.Manuscript.PageFooter.Font}}",
-      size: {{.Config.Folio.Manuscript.PageFooter.FontSize}},
-      weight: "{{.Config.Folio.Manuscript.PageFooter.FontWeight}}",
-    )[{{.Footer}}]
-  ],{{else}}footer: none,{{end}}
-  {{if .Config.Folio.Manuscript.PageHeader.Enabled}}header: {{if .HeaderAlignIsPair}}context {{end}}align({{.HeaderAlignExpr}})[
-    #pad(right: calc.max({{.Config.Folio.Manuscript.PageHeader.DistanceFromEdge}} - {{.Config.Folio.Manuscript.Margin}}, 0pt) + 0.5em)[
-      #text(
-        font: "{{.Config.Folio.Manuscript.PageHeader.Font}}",
-        size: {{.Config.Folio.Manuscript.PageHeader.FontSize}},
-        weight: "{{.Config.Folio.Manuscript.PageHeader.FontWeight}}",
-      )[{{.Header}}]
-    ]
-  ],{{else}}header: none,{{end}}
+  {{if .PageFooterEnabled}}footer: context {
+    let pg = counter(page).at(here()).first()
+    if pg in state("folio-skip-footer-pages", ()).final() {
+      none
+    } else {
+      align({{.FooterAlignExpr}})[
+        #text(
+          font: "{{.Config.Folio.Manuscript.PageFooter.Font}}",
+          size: {{.Config.Folio.Manuscript.PageFooter.FontSize}},
+          weight: "{{.Config.Folio.Manuscript.PageFooter.FontWeight}}",
+        )[{{.Footer}}]
+      ]
+    }
+  },{{else}}footer: none,{{end}}
+  {{if .Config.Folio.Manuscript.PageHeader.Enabled}}header: context {
+    let pg = counter(page).at(here()).first()
+    if pg in state("folio-skip-header-pages", ()).final() {
+      none
+    } else {
+      align({{.HeaderAlignExpr}})[
+        #text(
+          font: "{{.Config.Folio.Manuscript.PageHeader.Font}}",
+          size: {{.Config.Folio.Manuscript.PageHeader.FontSize}},
+          weight: "{{.Config.Folio.Manuscript.PageHeader.FontWeight}}",
+        )[{{.Header}}]
+      ]
+    }
+  },{{else}}header: none,{{end}}
 )
 
 {{.Body}}

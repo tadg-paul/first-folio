@@ -41,6 +41,25 @@ func TitleItemAlign(value string) (string, error) {
 	return vert + " + " + horiz, nil
 }
 
+// TitleItemFloatable reports whether an item alignment is safe to place with `float: true`.
+// Typst's `#place(alignment, float: true)` requires the vertical component to be `top` or
+// `bottom`; anything else (including the compass center's `horizon` mapping) rejects float.
+func TitleItemFloatable(value string) bool {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return false
+	}
+	// Bare compass keyword maps to `X + horizon` -- not floatable.
+	if _, ok := horizontalCompass[value]; ok {
+		return false
+	}
+	parts := strings.Split(value, "-")
+	if len(parts) != 2 {
+		return false
+	}
+	return parts[0] == "top" || parts[0] == "bottom"
+}
+
 var (
 	titleVertical = map[string]string{
 		"top":    "top",
@@ -60,7 +79,10 @@ var (
 )
 
 // HeaderFooterAlignSpec is the parsed shape of a page-header or page-footer align value.
-// When IsPair is true, OddArm applies on right-hand (odd) pages and EvenArm on left-hand (even).
+// When IsPair is true, EvenArm applies on left-hand (verso, even) pages and OddArm on right-hand
+// (recto, odd) pages. In the source syntax the FIRST token is the LEFT (verso, even) page's
+// alignment and the SECOND token is the RIGHT (recto, odd) page's alignment -- matching the
+// visual layout of an open book (left of reader = even, right of reader = odd), per issue #15.
 // When IsPair is false, Scalar applies on every page (uniform alignment).
 type HeaderFooterAlignSpec struct {
 	IsPair  bool
@@ -73,7 +95,9 @@ type HeaderFooterAlignSpec struct {
 // Accepted forms:
 //   - scalar compass keyword: left | center | right -> uniform alignment
 //   - compound page-pair: A-B where both tokens are in {left, center, right}, treated as
-//     (odd-page, even-page) alignments
+//     (left-page, right-page) alignments -- i.e. (even-page, odd-page). The compound `left-right`
+//     therefore places left-alignment on verso pages and right-alignment on recto pages, which is
+//     the classical outer-edge running-head convention.
 //
 // Returns an error naming the offending value if the input is not recognized.
 func ParseHeaderFooterAlign(value string) (HeaderFooterAlignSpec, error) {
@@ -89,12 +113,13 @@ func ParseHeaderFooterAlign(value string) (HeaderFooterAlignSpec, error) {
 		return HeaderFooterAlignSpec{}, fmt.Errorf("invalid page-header/page-footer alignment %q: expected compass keyword (left|center|right) or compound page-pair (e.g. left-right, center-left)", value)
 	}
 	if _, ok := horizontalCompass[parts[0]]; !ok {
-		return HeaderFooterAlignSpec{}, fmt.Errorf("invalid page-header/page-footer alignment %q: unknown odd-page token %q (expected left, center, or right)", value, parts[0])
+		return HeaderFooterAlignSpec{}, fmt.Errorf("invalid page-header/page-footer alignment %q: unknown left-page token %q (expected left, center, or right)", value, parts[0])
 	}
 	if _, ok := horizontalCompass[parts[1]]; !ok {
-		return HeaderFooterAlignSpec{}, fmt.Errorf("invalid page-header/page-footer alignment %q: unknown even-page token %q (expected left, center, or right)", value, parts[1])
+		return HeaderFooterAlignSpec{}, fmt.Errorf("invalid page-header/page-footer alignment %q: unknown right-page token %q (expected left, center, or right)", value, parts[1])
 	}
-	return HeaderFooterAlignSpec{IsPair: true, OddArm: parts[0], EvenArm: parts[1]}, nil
+	// First token = LEFT page (verso, even). Second token = RIGHT page (recto, odd).
+	return HeaderFooterAlignSpec{IsPair: true, EvenArm: parts[0], OddArm: parts[1]}, nil
 }
 
 // TypstAlignExpression returns the Typst expression to use inside `align(...)` for a
