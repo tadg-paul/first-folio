@@ -71,15 +71,11 @@ func TestRT_15_6_PageFooterEnabledRendersFooter(t *testing.T) {
 	assertContains(t, typst, `footer: align(`)
 }
 
-// RT-15.7: default page-footer.enabled is false, no footer configured for body pages.
+// RT-15.7 [🚫 removed]: The default page-footer.enabled was originally documented as false. The
+// amended Feature 2 defaults (see AC15.8) enable the footer with a centered [page] format. The ID
+// is preserved here per SDLC immutability; the current default behaviour is covered by RT-15.54.
 func TestRT_15_7_PageFooterDefaultDisabled(t *testing.T) {
-	typst := renderIssue15Manuscript(t, "")
-	// The body-page #set page(...) block must include footer: none, not footer: align(...).
-	body := extractBodyPageBlock(t, typst)
-	if strings.Contains(body, `footer: align(`) {
-		t.Fatalf("expected default body-page config to have footer: none, got:\n%s", body)
-	}
-	assertContains(t, body, `footer: none`)
+	t.Skip("RT-15.7 removed: page-footer default changed to enabled with centered [page] -- see RT-15.54")
 }
 
 // RT-15.8: page-footer.font, font-size, font-weight propagate to footer typography.
@@ -603,6 +599,48 @@ func TestRT_15_51_ExplicitZeroGutterMatchesUnconfigured(t *testing.T) {
 }
 
 // -----------------------------------------------------------------------------
+// AC15.8 -- amended default header format/align and default footer
+// -----------------------------------------------------------------------------
+
+// RT-15.52: the default page-header.format is "[title] • [chapter] • [author]".
+// The generated Typst substitutes [title]/[author] literally and [chapter] via state.
+func TestRT_15_52_DefaultHeaderFormatIsTitleChapterAuthor(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "")
+	body := extractBodyPageBlock(t, typst)
+	// Header text contains the bullet separator and both literal substitutions.
+	assertContains(t, body, `The Glass Orchard • `)
+	assertContains(t, body, ` • Example Author`)
+	// The chapter placeholder is preserved as a state read (no chapter yet on this header line).
+	assertContains(t, body, `state("folio-current-chapter").get()`)
+}
+
+// RT-15.53: the default page-header.align is left-right (mirror pair).
+func TestRT_15_53_DefaultHeaderAlignIsLeftRight(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "")
+	body := extractBodyPageBlock(t, typst)
+	assertContains(t, body, `calc.odd(counter(page).at(here()).first())`)
+	assertContains(t, body, `{ left } else { right }`)
+}
+
+// RT-15.54: the default page-footer is enabled with format "[page]" and align center.
+func TestRT_15_54_DefaultFooterIsCenteredPageNumber(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "")
+	body := extractBodyPageBlock(t, typst)
+	assertContains(t, body, `footer: align(center)[`)
+	assertContains(t, body, `#context counter(page).display()`)
+}
+
+// RT-15.55: page-footer.enabled: false explicitly configured omits the running footer.
+func TestRT_15_55_ExplicitFooterDisableOmitsFooter(t *testing.T) {
+	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-footer:\n      enabled: false\n")
+	body := extractBodyPageBlock(t, typst)
+	if strings.Contains(body, `footer: align(`) {
+		t.Fatalf("expected explicit page-footer.enabled: false to omit footer, got:\n%s", body)
+	}
+	assertContains(t, body, `footer: none`)
+}
+
+// -----------------------------------------------------------------------------
 // Shared helpers
 // -----------------------------------------------------------------------------
 
@@ -610,8 +648,10 @@ func renderIssue15Manuscript(t *testing.T, scriptYAML string) string {
 	t.Helper()
 	t.Setenv("HOME", t.TempDir())
 	dir := t.TempDir()
+	// The manuscript loader reads script.yaml from the source directory of the first input file.
+	// Put the config file alongside the chapters so overrides apply.
 	if scriptYAML != "" {
-		writeFile(t, filepath.Join(dir, "script.yaml"), scriptYAML)
+		writeFile(t, filepath.Join(dir, "part1", "script.yaml"), scriptYAML)
 	}
 	writeFile(t, filepath.Join(dir, "part1", "ch01.md"), markdownChapterOne())
 	writeFile(t, filepath.Join(dir, "part1", "ch02.md"), markdownChapterTwo())

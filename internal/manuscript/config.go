@@ -79,6 +79,8 @@ type ManuscriptConfig struct {
 	ParagraphIndent     string            `yaml:"paragraph-indent"`
 	ParagraphSpacing    string            `yaml:"paragraph-spacing"`
 	PageHeader          PageHeaderConfig  `yaml:"page-header"`
+	PageFooter          PageFooterConfig  `yaml:"page-footer"`
+	Gutter              string            `yaml:"gutter"`
 	TOC                 TOCConfig         `yaml:"toc"`
 	TitlePage           TitlePageConfig   `yaml:"title-page"`
 	SceneBreak          SceneBreakConfig  `yaml:"scene-break"`
@@ -90,25 +92,51 @@ type ManuscriptConfig struct {
 }
 
 type TitlePageConfig struct {
-	Enabled            bool   `yaml:"enabled"`
-	PageNumber         bool   `yaml:"page-number"`
-	IncludeTitle       bool   `yaml:"include-title"`
-	IncludeSubtitle    bool   `yaml:"include-subtitle"`
-	IncludeAuthor      bool   `yaml:"include-author"`
-	IncludeDate        bool   `yaml:"include-date"`
-	IncludeWordCount   bool   `yaml:"include-wordcount"`
-	IncludeContactName bool   `yaml:"include-contact-name"`
-	IncludeAddress     bool   `yaml:"include-address"`
-	IncludePhone       bool   `yaml:"include-phone"`
-	IncludeEmail       bool   `yaml:"include-email"`
-	IncludeWebsite     bool   `yaml:"include-website"`
-	IncludeVersion     bool   `yaml:"include-version"`
-	TitleBlockAlign    string `yaml:"title-block-align"`
-	FooterAlign        string `yaml:"footer-align"`
+	Enabled            bool                    `yaml:"enabled"`
+	PageNumber         bool                    `yaml:"page-number"`
+	IncludeTitle       bool                    `yaml:"include-title"`
+	IncludeSubtitle    bool                    `yaml:"include-subtitle"`
+	IncludeAuthor      bool                    `yaml:"include-author"`
+	IncludeDate        bool                    `yaml:"include-date"`
+	IncludeWordCount   bool                    `yaml:"include-wordcount"`
+	IncludeContactName bool                    `yaml:"include-contact-name"`
+	IncludeAddress     bool                    `yaml:"include-address"`
+	IncludePhone       bool                    `yaml:"include-phone"`
+	IncludeEmail       bool                    `yaml:"include-email"`
+	IncludeWebsite     bool                    `yaml:"include-website"`
+	IncludeVersion     bool                    `yaml:"include-version"`
+	TitleBlockAlign    string                  `yaml:"title-block-align"`
+	FooterAlign        string                  `yaml:"footer-align"`
+	Title              TitlePageItemConfig     `yaml:"title"`
+	Subtitle           TitlePageItemConfig     `yaml:"subtitle"`
+	Author             TitlePageItemConfig     `yaml:"author"`
+	Date               TitlePageItemConfig     `yaml:"date"`
+	WordCount          TitlePageItemConfig     `yaml:"wordcount"`
+	Version            TitlePageItemConfig     `yaml:"version"`
+	Contact            TitlePageItemConfig     `yaml:"contact"`
+}
+
+type TitlePageItemConfig struct {
+	Align string `yaml:"align"`
 }
 
 type PageHeaderConfig struct {
 	Enabled             bool   `yaml:"enabled"`
+	Font                string `yaml:"font"`
+	FontSize            string `yaml:"font-size"`
+	FontWeight          string `yaml:"font-weight"`
+	Format              string `yaml:"format"`
+	Align               string `yaml:"align"`
+	DistanceFromEdge    string `yaml:"distance-from-edge"`
+	ContentPaddingAfter string `yaml:"content-padding-after"`
+}
+
+// PageFooterConfig mirrors PageHeaderConfig. Fields left empty inherit from PageHeaderConfig
+// during normalization; PageHeader values in turn inherit from root folio settings.
+// Enabled is a *bool so normalizeConfig can distinguish "unset" (default true) from
+// an explicit `enabled: false`.
+type PageFooterConfig struct {
+	Enabled             *bool  `yaml:"enabled,omitempty"`
 	Font                string `yaml:"font"`
 	FontSize            string `yaml:"font-size"`
 	FontWeight          string `yaml:"font-weight"`
@@ -149,6 +177,8 @@ type SpacedBlockConfig struct {
 
 type HeadingConfig struct {
 	PageBreakBefore bool   `yaml:"page-break-before"`
+	BlankPageBefore bool   `yaml:"blank-page-before"`
+	BlankPageAfter  bool   `yaml:"blank-page-after"`
 	VerticalAlign   string `yaml:"vertical-align"`
 	Position        string `yaml:"position"`
 	Align           string `yaml:"align"`
@@ -175,7 +205,47 @@ func LoadConfig(sourceDir string, opts Options) (Config, error) {
 		return Config{}, err
 	}
 	normalizeConfig(&cfg)
+	if err := validateConfig(&cfg); err != nil {
+		return Config{}, err
+	}
 	return cfg, nil
+}
+
+func validateConfig(cfg *Config) error {
+	ms := &cfg.Folio.Manuscript
+	if _, err := ParsePageSpec(ms.Page); err != nil {
+		return err
+	}
+	if _, err := ParseHeaderFooterAlign(ms.PageHeader.Align); err != nil {
+		return err
+	}
+	if _, err := ParseHeaderFooterAlign(ms.PageFooter.Align); err != nil {
+		return err
+	}
+	if _, err := TitleItemAlign(ms.TitlePage.TitleBlockAlign); err != nil {
+		return err
+	}
+	if _, err := TitleItemAlign(ms.TitlePage.FooterAlign); err != nil {
+		return err
+	}
+	for _, item := range []struct {
+		name  string
+		value string
+	}{
+		{"title", ms.TitlePage.Title.Align},
+		{"subtitle", ms.TitlePage.Subtitle.Align},
+		{"author", ms.TitlePage.Author.Align},
+		{"date", ms.TitlePage.Date.Align},
+		{"wordcount", ms.TitlePage.WordCount.Align},
+		{"version", ms.TitlePage.Version.Align},
+		{"contact", ms.TitlePage.Contact.Align},
+	} {
+		if _, err := TitleItemAlign(item.value); err != nil {
+			return err
+		}
+		_ = item.name
+	}
+	return nil
 }
 
 func normalizeConfig(cfg *Config) {
@@ -230,10 +300,23 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.PageHeader.Font, ms.HeadingFont)
 	fill(&ms.PageHeader.FontSize, "10pt")
 	fill(&ms.PageHeader.FontWeight, "regular")
-	fill(&ms.PageHeader.Format, "[author] / [title] / [page]")
-	fill(&ms.PageHeader.Align, "right")
+	fill(&ms.PageHeader.Format, "[title] • [chapter] • [author]")
+	fill(&ms.PageHeader.Align, "left-right")
 	fill(&ms.PageHeader.DistanceFromEdge, ms.Margin)
 	fill(&ms.PageHeader.ContentPaddingAfter, "10mm")
+	if ms.PageFooter.Enabled == nil {
+		t := true
+		ms.PageFooter.Enabled = &t
+	}
+	fill(&ms.PageFooter.Font, ms.PageHeader.Font)
+	fill(&ms.PageFooter.FontSize, ms.PageHeader.FontSize)
+	fill(&ms.PageFooter.FontWeight, ms.PageHeader.FontWeight)
+	fill(&ms.PageFooter.Format, "[page]")
+	fill(&ms.PageFooter.Align, "center")
+	fill(&ms.PageFooter.DistanceFromEdge, ms.Margin)
+	fill(&ms.PageFooter.ContentPaddingAfter, "10mm")
+	fill(&ms.Gutter, "0mm")
+	fill(&ms.TitlePage.Contact.Align, "top-left")
 	fill(&ms.TOC.Title, "Contents")
 	fill(&ms.TOC.Font, ms.HeadingFont)
 	fill(&ms.TOC.FontSize, "11pt")

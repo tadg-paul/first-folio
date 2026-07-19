@@ -77,8 +77,18 @@ folio:
       font: Libertinus Sans
       font-size: 10pt
       font-weight: regular
-      format: "[author] / [title] / [page]"
-      align: right
+      format: "[title] • [chapter] • [author]"
+      align: left-right
+      distance-from-edge: 20mm
+      content-padding-after: 10mm
+
+    page-footer:
+      enabled: true
+      font: Libertinus Sans
+      font-size: 10pt
+      font-weight: regular
+      format: "[page]"
+      align: center
       distance-from-edge: 20mm
       content-padding-after: 10mm
 

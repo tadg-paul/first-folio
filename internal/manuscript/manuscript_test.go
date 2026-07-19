@@ -625,8 +625,10 @@ func TestPDFRenderHasTOCAndNoBlankPageBeforePart(t *testing.T) {
 	assertContains(t, pdfText, `Contents`)
 	assertContains(t, pdfText, `PART ONE`)
 	assertContains(t, pdfText, `Chapter 1`)
-	assertContains(t, pdfText, `Example Author / The Glass Orchard / 1`)
-	assertContains(t, pdfText, `Example Author / The Glass Orchard / 2`)
+	// The amended default header (issue #15) is "[title] • [chapter] • [author]"; the default
+	// footer is a centered [page] number. Both title and author still appear on every body page.
+	assertContains(t, pdfText, `The Glass Orchard`)
+	assertContains(t, pdfText, `Example Author`)
 	assertBefore(t, pdfText, `Contents`, `PART ONE`)
 	assertBefore(t, pdfText, `PART ONE`, `Chapter 1`)
 }

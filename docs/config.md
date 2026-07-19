@@ -118,6 +118,71 @@ Common manuscript keys:
 
 `folio.manuscript.page-header.content-padding-after` controls the clearance between the running header and the manuscript body on every running-header page. It does not affect the title page or table of contents.
 
+### Page-header format placeholders
+
+`folio.manuscript.page-header.format` and `folio.manuscript.page-footer.format` accept the following placeholders, substituted at render time:
+
+- `[author]` -- the manuscript author
+- `[title]` -- the manuscript title
+- `[page]` -- the current page number
+- `[part]` -- the current part title (empty until the first part heading)
+- `[chapter]` -- the current chapter title (empty until the first chapter heading; reset when a new part starts)
+
+Unknown bracket tokens (e.g. `[unknown]`) are rendered as literal text.
+
+The British and US presets both default to `format: "[title] • [chapter] • [author]"` for the header and `format: "[page]"` for the footer.
+
+### Page-footer block
+
+`folio.manuscript.page-footer` mirrors the fields of `folio.manuscript.page-header`. Typography fields (`font`, `font-size`, `font-weight`) inherit from `page-header` when unset. Default: enabled with a centered `[page]` number, `distance-from-edge` and `content-padding-after` matching `page-header`. Set `page-footer.enabled: false` to omit the running footer.
+
+### Book-layout page-pair alignment
+
+`page-header.align` and `page-footer.align` accept:
+
+- a compass keyword: `left`, `center`, `right` -- applied uniformly to every page
+- a compound page-pair alias: `left-right`, `right-left`, `left-center`, `right-center`, `center-left`, `center-right` -- the first token controls alignment on odd (right-hand) pages, the second on even (left-hand) pages, with page 1 assumed to be a right-hand page.
+
+Default: `align: left-right` for the header, `align: center` for the footer.
+
+### Custom page dimensions
+
+`folio.manuscript.page` accepts either a named Typst preset (`a4`, `us-letter`, `uk-book-b`, ...) or a custom `WxHmm` / `WxHin` dimension:
+
+```yaml
+folio:
+  manuscript:
+    page: 5.5x8.5in    # trade paperback
+    # or
+    page: 200x300mm    # custom hardback
+```
+
+Both dimensions must share the same unit. Values that match neither shape (e.g. `200mm`, `5.5inx200mm`, `bogus`) are rejected at config load with a diagnostic naming the offending value.
+
+### Binding gutter
+
+`folio.manuscript.gutter` (default `0mm`) is a Typst length that is added to the inside (binding-side) margin on odd and even pages. Under the hood the running-page margin switches to Typst's `inside`/`outside` idiom, which mirrors sides automatically per page parity:
+
+```yaml
+folio:
+  manuscript:
+    gutter: 15mm
+```
+
+A `0mm` gutter leaves the running-page margin configuration byte-identical to the pre-gutter behaviour.
+
+### Blank pages before or after headings
+
+`folio.manuscript.part.blank-page-before`, `part.blank-page-after`, `chapter.blank-page-before`, and `chapter.blank-page-after` (all default `false`) insert an unnumbered, empty page adjacent to each part or chapter heading. These are independent of `page-break-before`; combining `page-break-before: true` and `blank-page-before: true` produces one blank page and one heading page (no doubling).
+
+### Title-page item alignment
+
+`folio.manuscript.title-page.<item>.align` accepts either a compass keyword (`left`, `center`, `right`) or a compound `V-H` value where V is in `{top, center, bottom}` and H is in `{left, center, right}` (for example `top-left`, `bottom-center`). Items placed with a per-item align hug the manuscript margin at the named corner. Supported items are `title`, `subtitle`, `author`, `date`, `wordcount`, `version`, and `contact`.
+
+Legacy `folio.manuscript.title-page.title-block-align` continues to control the title/subtitle/author group when no per-item align is set; `footer-align` continues to control the US grid footer (version/word-count/date row) on the title page.
+
+Unknown alignment values (e.g. `middle-middle`, `bottom-diagonal`) are rejected at config load with a diagnostic naming the offending value.
+
 `folio.manuscript.toc.enabled` defaults to `true`. Set it to `false` to suppress the generated table of contents.
 
 `folio.manuscript.toc.line-spacing` controls table-of-contents item line spacing. The British default is `1.15em`.
