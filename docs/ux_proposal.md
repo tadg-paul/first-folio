@@ -29,17 +29,17 @@ The commands have genuinely different shapes. The UI must reflect that rather th
 
 | Command | Input | Output | Style options | Distinctive UX need |
 |---|---|---|---|---|
-| `convert` | One script file (`.org` / `.md` / `.fountain`) | One file (any of the above plus `.pdf`) or stdout | `british` (default) / `us` / `screenplay` | Target format picker; layout knobs behind a disclosure |
+| `convert` | One script file (`.org` / `.md` / `.fountain`) | One file (any of the above plus `.pdf`) or stdout | Nation (British / US) × Variant (Stage / Screenplay) - four combinations | Target format picker; layout knobs behind a disclosure; open produced PDF in Preview on success |
 | `letter` | One `.org` file containing `:letter:` sections | N PDFs, one per recipient, into a chosen directory | none | Recipient list surfaced from the source file; per-recipient toggles; prefix and directory |
-| `manuscript` | Many prose files (`.md` / `.org`), possibly a glob | One `.typ` or `.pdf` file | `british` (default) / `us` only - no screenplay | Ordered multi-file list, drag to reorder; metadata overrides form; dry-run |
+| `manuscript` | Many prose files (`.md` / `.org`), possibly a glob | One `.typ` or `.pdf` file | Nation (British / US) only - no variant axis | Ordered multi-file list, drag to reorder; metadata overrides form; dry-run |
 
 The style options are asymmetric on purpose:
 
-- `convert` has three styles because stage plays have three widely-used layouts.
-- `manuscript` has two because "screenplay" is a script paradigm and does not apply to prose.
+- `convert` has **four** styles because a script is defined by two independent choices: **nation** (British or US typographic conventions) and **variant** (Stage or Screenplay layout). All four combinations are meaningful.
+- `manuscript` has two because "screenplay" is a script variant and does not apply to prose. Prose manuscripts only vary by nation.
 - `letter` has no style flag at all; letters use one layout (see `docs/config.md` §Letter settings).
 
-The UI must not offer options the CLI would reject.
+The UI must not offer options the CLI would reject. **Gap:** the current CLI exposes a single flat `--style british|us|screenplay` flag, which cannot express British Screenplay, and the `presets/` directory contains `us-screenplay-overrides.yaml` but no British-screenplay counterpart. The UI's two-axis model implies a CLI change (either a second flag such as `--variant stage|screenplay` or four compound style values). This is called out again as an open question in §Open questions.
 
 ## Layout
 
@@ -79,10 +79,13 @@ Fields:
 - **Output** - segmented control: `Save as file` | `Preview as text`.
   - `Save as file` reveals a save-as picker and infers target format from extension (matches CLI behaviour).
   - `Preview as text` reveals a format picker (`org` / `md` / `fountain` - no `pdf` for stdout), and renders output into the log area rather than to disk.
-- **Style** - segmented control: `British` (default) | `US` | `Screenplay`.
+- **Nation** - segmented control: `British` (default) | `US`.
+- **Variant** - segmented control: `Stage` (default) | `Screenplay`. All four Nation × Variant combinations are permitted.
 - **PDF layout** - disclosure group, only enabled when target is `.pdf`. Contains: `Font`, `Font size`, `Margin`, `Page size`, `Dialogue indent`, `Dialogue spacing`, `Direction spacing`, plus two toggles for `Italic directions` and `Centre directions`. These map 1:1 to the `--font`, `--font-size`, `--margin`, `--page`, `--indent`, `--dialogue-spacing`, `--direction-spacing`, `--[no-]direction-italic`, `--[no-]direction-centre` CLI flags. Fields left blank are omitted from the invocation so config-file values apply.
 
 Primary action: `Convert`.
+
+On success, if the produced target is a `.pdf`, the app opens it in macOS Preview automatically (via `NSWorkspace.shared.open(_:)`). For text targets it reveals the file in Finder; for `Preview as text` mode the output is already visible in the log. Auto-open is a preference (default on) so users doing batch work can disable it.
 
 ## Screen: Letter
 
@@ -117,7 +120,7 @@ Primary action: `Render Manuscript`.
 
 ## Shared UI concerns
 
-- **Output log**: a monospace scrolling text area at the bottom of every detail pane. Streams stdout and stderr from `folio`. On success, shows a `Reveal in Finder` button for each output path detected.
+- **Output log**: a monospace scrolling text area at the bottom of every detail pane. Streams stdout and stderr from `folio`. On success, shows a `Reveal in Finder` button for each output path detected, and an `Open in Preview` button next to any `.pdf` (Convert auto-opens; Letter and Manuscript require the click).
 - **Errors**: non-zero exit codes surface an alert with the last stderr line as the title and the full stderr in a "Show details" disclosure.
 - **Cancellation**: `Run` becomes `Cancel` while a subprocess is active and sends SIGTERM.
 - **Recent files**: each command remembers its last N inputs in `UserDefaults`, keyed by command. No cross-command sharing (the source formats overlap but the intent does not).
@@ -203,11 +206,12 @@ The binary is discovered by, in order: bundled path (if we ship one), `~/.local/
 
 ## Open questions
 
-1. **Recipient listing** - parse in Swift, or add `folio letter --list` to the CLI? Cleaner upstream, but adds surface area.
-2. **Preview** - the Vision doc mentions live-rendered preview as a future goal. Do we ship the app without it, or block on a PDF preview implementation? A first release without preview is honest to scope; a `Preview as text` mode on the Convert screen is a low-cost partial step.
-3. **Landing page vs sidebar** - the sidebar is proposed as primary; is a landing page needed for first-run guidance, or does a first-run sheet inside the Convert view suffice?
-4. **App discovery of Typst/Pandoc** - if `folio` exits with a "typst not found" error, should the app offer install guidance (e.g. brew commands) or just relay the error? Relaying is safer; guidance risks going stale.
-5. **Sandboxing** - full sandboxing constrains subprocess execution and PATH lookups. Decide early whether the app is distributed via App Store (sandbox mandatory) or direct download (sandbox optional). This shapes how `FolioRunner` locates the binary.
+1. **Style axis vs flat style flag** - the UI's Nation × Variant model produces four combinations, but the current CLI exposes a flat `--style british|us|screenplay` flag and `presets/` has no British-screenplay override. Options: (a) add a second CLI flag such as `--variant stage|screenplay` and a matching `british-screenplay-overrides.yaml` preset; (b) grow the existing flag to accept compound values (`british-stage`, `british-screenplay`, `us-stage`, `us-screenplay`) with the old values as aliases. The UI depends on this decision.
+2. **Recipient listing** - parse in Swift, or add `folio letter --list` to the CLI? Cleaner upstream, but adds surface area.
+3. **Preview** - the Vision doc mentions live-rendered preview as a future goal. Do we ship the app without it, or block on a PDF preview implementation? A first release without preview is honest to scope; a `Preview as text` mode on the Convert screen is a low-cost partial step. Auto-opening the produced PDF in macOS Preview covers the "see the result immediately" need without embedding a preview surface.
+4. **Landing page vs sidebar** - the sidebar is proposed as primary; is a landing page needed for first-run guidance, or does a first-run sheet inside the Convert view suffice?
+5. **App discovery of Typst/Pandoc** - if `folio` exits with a "typst not found" error, should the app offer install guidance (e.g. brew commands) or just relay the error? Relaying is safer; guidance risks going stale.
+6. **Sandboxing** - full sandboxing constrains subprocess execution and PATH lookups. Decide early whether the app is distributed via App Store (sandbox mandatory) or direct download (sandbox optional). This shapes how `FolioRunner` locates the binary.
 
 ## What this proposal does not commit to
 
