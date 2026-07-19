@@ -138,6 +138,8 @@ The app does not write config files (matches the CLI contract in `docs/config.md
 
 The app never edits `script.yaml` in MVP. Users who want a persistent change edit the file themselves; the app rereads it on next launch or when explicitly refreshed.
 
+**Sandbox impact.** If the app runs under the macOS App Sandbox, it cannot silently read `~/.config/first-folio/script.yaml`. Paths outside the app's container are inaccessible without a user-granted security-scoped bookmark (via `NSOpenPanel`) or an entitlement Apple discourages. Under a sandboxed build the app would need a first-run "grant access to your global folio config" prompt that opens `~/.config/first-folio/` in a file picker; the resulting bookmark is stored and re-used on subsequent launches. This turns a zero-friction feature into a one-time user action. The same constraint applies to the source files the user picks - those are already user-selected, so no additional prompt is needed for them. See Open Question 5 for the broader sandbox tradeoff.
+
 ## Preferences (post-MVP)
 
 **Status:** design captured now for direction, not scoped for the first release. MVP treats `script.yaml` as read-only.
@@ -278,7 +280,12 @@ The binary is discovered by, in order: bundled path (if we ship one), `~/.local/
 2. **Preview** - the Vision doc mentions live-rendered preview as a future goal. Do we ship the app without it, or block on a PDF preview implementation? A first release without preview is honest to scope; a `Preview as text` mode on the Convert screen is a low-cost partial step. Auto-opening the produced PDF in macOS Preview covers the "see the result immediately" need without embedding a preview surface.
 3. **Landing page vs sidebar** - the sidebar is proposed as primary; is a landing page needed for first-run guidance, or does a first-run sheet inside the Convert view suffice?
 4. **App discovery of Typst/Pandoc** - if `folio` exits with a "typst not found" error, should the app offer install guidance (e.g. brew commands) or just relay the error? Relaying is safer; guidance risks going stale.
-5. **Sandboxing** - full sandboxing constrains subprocess execution and PATH lookups. Decide early whether the app is distributed via App Store (sandbox mandatory) or direct download (sandbox optional). This shapes how `FolioRunner` locates the binary.
+5. **Sandboxing and distribution channel** - the App Sandbox conflicts with the app's core architecture in three concrete ways:
+   - **Subprocess execution.** A sandboxed app cannot spawn `folio` as an arbitrary child process; `Process`/`NSTask` for external binaries is blocked. Working around this would mean shipping `folio` as an embedded XPC helper, which is a significant structural change and would still not let the child spawn `typst` or `pandoc`. This is the deepest incompatibility.
+   - **Global config read.** As noted in §Configuration, `~/.config/first-folio/script.yaml` sits outside the app's container and cannot be read without a user-granted security-scoped bookmark. Requires a first-run prompt.
+   - **External tool discovery.** `PATH` lookups for Homebrew or `~/.local/bin` cross the sandbox boundary and need explicit user consent per location.
+   
+   Recommendation: distribute outside the Mac App Store (developer-signed and notarized, direct download or Homebrew Cask), sandbox disabled. This matches how the CLI is already installed and how Typst/Pandoc are expected to be available. If App Store distribution is required later, the app would need to bundle `folio`, `typst`, and `pandoc` and communicate with them via XPC - a much larger project.
 6. **CLI additions needed by the post-MVP Preferences pane** - the structured YAML editor needs two things from the CLI: (a) a machine-readable schema of allowed values per key (e.g. `folio config --schema` emitting JSON) to drive dropdown vocabularies without hand-maintained Swift duplicates; (b) a validate-only mode (e.g. `folio config --validate PATH`) that checks a candidate `script.yaml` and exits non-zero with a descriptive error, so the app can gate `Save`. Both preserve the "no capability the CLI cannot perform" principle by keeping validation authoritative in `folio`.
 
 ## What this proposal does not commit to
