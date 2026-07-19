@@ -131,14 +131,16 @@ Primary action: `Render Manuscript`.
 
 ## Configuration
 
-The app does not write config files (matches the CLI contract in `docs/config.md`). It does:
+The app does not write config files in MVP (matches the CLI contract in `docs/config.md`). It does:
 
 - Read `~/.config/first-folio/script.yaml` at launch, if present, to prefill default style, font, and page size in the Convert screen.
 - Show the resolved config sources in a Preferences sheet (`⚙`): global path, local path (if a source file is loaded), and the CLI overrides that will be added by the app's current field values. This is a diagnostic aid so a writer can see why an output looks the way it does.
 
+**No bundled script.yaml.** The app ships without a `script.yaml` inside its bundle. Defaults come from `folio` itself - the CLI already embeds `presets/british-script.yaml` (see `internal/config/config.go:39` and `assets.go`) and applies it when no user config is present. Duplicating those defaults in the app bundle would create two sources of truth that could drift. If the app needs to render fields with default values (for example in the post-MVP Preferences pane), it obtains them by asking `folio` (via a schema/effective-config CLI mode - see Open Question 6), not from an app-local file.
+
 The app never edits `script.yaml` in MVP. Users who want a persistent change edit the file themselves; the app rereads it on next launch or when explicitly refreshed.
 
-**Sandbox impact.** If the app runs under the macOS App Sandbox, it cannot silently read `~/.config/first-folio/script.yaml`. Paths outside the app's container are inaccessible without a user-granted security-scoped bookmark (via `NSOpenPanel`) or an entitlement Apple discourages. Under a sandboxed build the app would need a first-run "grant access to your global folio config" prompt that opens `~/.config/first-folio/` in a file picker; the resulting bookmark is stored and re-used on subsequent launches. This turns a zero-friction feature into a one-time user action. The same constraint applies to the source files the user picks - those are already user-selected, so no additional prompt is needed for them. See Open Question 5 for the broader sandbox tradeoff.
+**Sandbox impact.** Assuming distribution outside the Mac App Store (see Open Question 5), the app runs with the user's normal filesystem privileges and reads `~/.config/first-folio/script.yaml` directly, no prompts. The sandbox-specific "grant access" flow described in earlier drafts falls away with that distribution choice.
 
 ## Preferences (post-MVP)
 
@@ -198,6 +200,16 @@ The editor validates and rejects invalid config before writing to disk. No `Save
 - `Save` writes only the keys the user has touched, using `gopkg.in/yaml.v3`-compatible output. The app preserves any keys it does not recognize (forward compatibility with future `folio` versions and with the shared `yapper:` namespace).
 - The app never touches `yapper:` blocks.
 - On save, the app re-reads the resolved config so all displayed "resolved value" lines refresh.
+
+### First-save behaviour for global config
+
+The `~/.config/first-folio/` directory does not exist on a fresh machine (the CLI never creates it either). On the first `Save` in **Default config** scope:
+
+1. The app creates `~/.config/first-folio/` with mode `0755` if it does not exist. It does not create any parent directory outside `~/.config/` - that directory is standard on macOS and its absence would indicate a non-standard home layout the user should resolve themselves.
+2. The app writes `script.yaml` to that path.
+3. This path and filename are exactly what the CLI reads (`docs/config.md` §File locations), so both the app and the CLI immediately see the new file with no additional configuration.
+
+The app never creates a local `script.yaml` in a source-file directory automatically - that scope's `Save` only writes when the user explicitly chose "Prefs for this doc set", and the directory already exists (it contains the source file).
 
 ### Why this is post-MVP
 
