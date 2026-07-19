@@ -607,31 +607,31 @@ func TestRT_15_47_SinglePageUsesOddRule(t *testing.T) {
 // RT-15.63: chapter.blank-page-before: enforce-right emits a Typst pagebreak(to: "odd") directive.
 func TestRT_15_63_ChapterBlankPageEnforceRight(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      blank-page-before: enforce-right\n")
-	assertContains(t, typst, `#pagebreak(to: "odd")`)
-	assertBefore(t, typst, `#pagebreak(to: "odd")`, `#folio-chapter(first: false,`)
+	assertContains(t, typst, `#pagebreak(weak: true, to: "odd")`)
+	assertBefore(t, typst, `#pagebreak(weak: true, to: "odd")`, `#folio-chapter(first: false,`)
 }
 
 // RT-15.64: chapter.blank-page-after: enforce-left emits a Typst pagebreak(to: "even") directive after chapter.
 func TestRT_15_64_ChapterBlankPageEnforceLeft(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      blank-page-after: enforce-left\n")
-	assertContains(t, typst, `#pagebreak(to: "even")`)
-	assertBefore(t, typst, `#folio-chapter(first: false,`, `#pagebreak(to: "even")`)
+	assertContains(t, typst, `#pagebreak(weak: true, to: "even")`)
+	assertBefore(t, typst, `#folio-chapter(first: false,`, `#pagebreak(weak: true, to: "even")`)
 }
 
 // RT-15.65: part.blank-page-before: enforce-right emits pagebreak(to: "odd") before part.
 func TestRT_15_65_PartBlankPageEnforceRight(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    part:\n      blank-page-before: enforce-right\n")
-	assertContains(t, typst, `#pagebreak(to: "odd")`)
-	assertBefore(t, typst, `#pagebreak(to: "odd")`, `#folio-part(first: true,`)
+	assertContains(t, typst, `#pagebreak(weak: true, to: "odd")`)
+	assertBefore(t, typst, `#pagebreak(weak: true, to: "odd")`, `#folio-part(first: true,`)
 }
 
 // RT-15.66: toc.blank-page-before: enforce-right emits pagebreak(to: "odd") before the TOC section.
 func TestRT_15_66_TOCBlankPageEnforceRight(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    toc:\n      blank-page-before: enforce-right\n")
-	assertContains(t, typst, `#pagebreak(to: "odd")`)
+	assertContains(t, typst, `#pagebreak(weak: true, to: "odd")`)
 	// The directive must appear in the title/TOC region and precede the TOC heading.
 	titleTOC := extractTitleAndTOCBlock(t, typst)
-	assertContains(t, titleTOC, `#pagebreak(to: "odd")`)
+	assertContains(t, titleTOC, `#pagebreak(weak: true, to: "odd")`)
 }
 
 // RT-15.67: toc.blank-page-after: true emits an unconditional blank page after the TOC.
@@ -652,7 +652,7 @@ func TestRT_15_68_InvalidBlankPageValueRejected(t *testing.T) {
 func TestRT_15_69_BoolTrueStillEmitsUnconditionalBlankPage(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    chapter:\n      blank-page-before: true\n")
 	assertContains(t, typst, `#folio-blank-page()`)
-	assertNotContains(t, typst, `#pagebreak(to: "odd")`)
+	assertNotContains(t, typst, `#pagebreak(weak: true, to: "odd")`)
 }
 
 // -----------------------------------------------------------------------------

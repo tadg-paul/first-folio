@@ -34,7 +34,7 @@
   state("folio-current-part").update(body)
   state("folio-current-chapter").update([])
   if not first and {{.Config.Folio.Manuscript.Part.PageBreakBefore}} {
-    pagebreak()
+    pagebreak(weak: true)
   }
   // After any pagebreak, record this heading's page number in the skip lists
   // when its flags are set. The header/footer context checks membership.
@@ -59,10 +59,10 @@
 }
 
 #let folio-chapter(first: false, skip-header: false, skip-footer: false, body) = {
-  state("folio-current-chapter").update(body)
   if not first and {{.Config.Folio.Manuscript.Chapter.PageBreakBefore}} {
-    pagebreak()
+    pagebreak(weak: true)
   }
+  state("folio-current-chapter").update(body)
   context {
     let pg = counter(page).at(here()).first()
     if skip-header {

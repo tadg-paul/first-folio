@@ -56,18 +56,20 @@ func (b *BlankPageMode) UnmarshalYAML(node *yaml.Node) error {
 
 // TypstDirective returns the Typst source line(s) to emit for this mode, or the empty string
 // when no blank/parity break is required. For enforce-right / enforce-left, the emitted code
-// records the page number of any inserted parity blank into folio-skip-header-pages /
-// folio-skip-footer-pages so the running header/footer stays hidden on that blank page too.
+// records both the CURRENT page (which becomes a phantom empty page when the enforce-right
+// directive is emitted at the top of a fresh page whose parity already matches the target)
+// and the potentially-inserted parity blank into folio-skip-header-pages /
+// folio-skip-footer-pages, so the running header/footer stays hidden on those pages too.
 func (b BlankPageMode) TypstDirective() string {
 	switch b {
 	case BlankPageTrue:
 		return "#folio-blank-page()"
 	case BlankPageEnforceRight:
-		return `#context { let pg = counter(page).at(here()).first(); if calc.odd(pg) { state("folio-skip-header-pages", ()).update(pages => pages + (pg + 1,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg + 1,)) } }
-#pagebreak(to: "odd")`
+		return `#context { let pg = counter(page).at(here()).first(); state("folio-skip-header-pages", ()).update(pages => pages + (pg,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg,)); if calc.odd(pg) { state("folio-skip-header-pages", ()).update(pages => pages + (pg + 1,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg + 1,)) } }
+#pagebreak(weak: true, to: "odd")`
 	case BlankPageEnforceLeft:
-		return `#context { let pg = counter(page).at(here()).first(); if calc.even(pg) { state("folio-skip-header-pages", ()).update(pages => pages + (pg + 1,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg + 1,)) } }
-#pagebreak(to: "even")`
+		return `#context { let pg = counter(page).at(here()).first(); state("folio-skip-header-pages", ()).update(pages => pages + (pg,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg,)); if calc.even(pg) { state("folio-skip-header-pages", ()).update(pages => pages + (pg + 1,)); state("folio-skip-footer-pages", ()).update(pages => pages + (pg + 1,)) } }
+#pagebreak(weak: true, to: "even")`
 	default:
 		return ""
 	}
