@@ -10,7 +10,7 @@ Last migrated: AC10.11 from #10 on 2026-07-15
 
 ## Issue 9: Manuscript PDF Mode
 
-GitHub issue: https://github.com/tadg-paul/first-folio/issues/9
+GitHub issue: https://github.com/tigger-developer/first-folio/issues/9
 
 | ID | AC | Tests |
 |---|---|---|
@@ -30,7 +30,7 @@ GitHub issue: https://github.com/tadg-paul/first-folio/issues/9
 
 ## Go Runtime Migration
 
-Introduced: [#10](https://github.com/tadg-paul/first-folio/issues/10)
+Introduced: [#10](https://github.com/tigger-developer/first-folio/issues/10)
 
 Migrated: 2026-07-15
 

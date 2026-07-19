@@ -3,7 +3,7 @@ BUILD_DIR ?= $(CURDIR)/dist
 CURRENT_VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)
 VERSION ?= $(patsubst v%,%,$(CURRENT_VERSION))
 RELEASE_VERSION ?= $(shell echo "$(CURRENT_VERSION)" | awk -F. '{printf "%s.%s.%d", $$1, $$2, $$3+1}')
-LDFLAGS := -X github.com/tadg-paul/first-folio/internal/app.Version=$(VERSION)
+LDFLAGS := -X github.com/tigger-developer/first-folio/internal/app.Version=$(VERSION)
 
 .PHONY: build install uninstall test lint check-release-deps release sync
 
