@@ -24,6 +24,20 @@ type templateData struct {
 	FooterAlt        string
 	HasFooterAlt     bool
 	Body             string
+
+	// #18: seed the first part / first chapter semantic-authoring state at document top so
+	// the FIRST body page's header context (which evaluates at page-top, before the first
+	// folio-part / folio-chapter macro body has run its state.update) still sees the
+	// correct values. Multi-part / multi-chapter manuscripts update the state again in
+	// their block emissions; the seed is a starting value only.
+	FirstPartName     string
+	FirstPartNumber   string
+	FirstPartPrefix   string
+	FirstPartFull     string
+	FirstChapterName   string
+	FirstChapterNumber string
+	FirstChapterPrefix string
+	FirstChapterFull   string
 	IsUS             bool
 	Leading          string
 	Spacing          string
@@ -125,6 +139,7 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	firstPart, firstChapter := firstHeadingSeeds(doc.Blocks, cfg)
 	safeMeta := escapedMetadata(doc.Metadata)
 	safeMeta.Date = escapeTypst(renderDate(doc.Metadata.Date, cfg.Folio.Manuscript.DateFormat))
 	leading := lineSpacingLeading(cfg.Folio.Manuscript.LineSpacing)
@@ -170,6 +185,14 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		ContactFloatable:    TitleItemFloatable(cfg.Folio.Manuscript.TitlePage.Contact.Align),
 		TitleBlockAlignExpr: titleBlockExpr,
 		FooterGroupAlignExpr: footerGroupExpr,
+		FirstPartName:       firstPart.Name,
+		FirstPartNumber:     firstPart.Number,
+		FirstPartPrefix:     firstPart.Prefix,
+		FirstPartFull:       firstPart.Full,
+		FirstChapterName:    firstChapter.Name,
+		FirstChapterNumber:  firstChapter.Number,
+		FirstChapterPrefix:  firstChapter.Prefix,
+		FirstChapterFull:    firstChapter.Full,
 	}
 	raw, err := folio.Assets.ReadFile("templates/manuscript.typ")
 	if err != nil {
@@ -190,6 +213,26 @@ var gutterZeroRE = regexp.MustCompile(`^\s*0(?:\.0+)?(?:mm|in|pt|cm|em)?\s*$`)
 
 func isGutterActive(gutter string) bool {
 	return !gutterZeroRE.MatchString(gutter)
+}
+
+// firstHeadingSeeds returns the composed heading pieces for the FIRST heading block only,
+// used to seed the semantic-authoring state at document top so the first body page's
+// header context (which evaluates before any block's state.update runs) sees the correct
+// initial values. If the first heading is a part, the chapter seed stays empty (so [chapter]
+// renders empty on the part page, as expected). If the first heading is a chapter, the part
+// seed stays empty. Subsequent block emissions overwrite these seeds as parts/chapters change.
+func firstHeadingSeeds(blocks []Block, cfg Config) (part, chapter HeadingParts) {
+	for _, block := range blocks {
+		if block.Kind == "part" {
+			part = composeHeadingParts(block, cfg.Folio.Manuscript.Part)
+			return
+		}
+		if block.Kind == "chapter" {
+			chapter = composeHeadingParts(block, cfg.Folio.Manuscript.Chapter)
+			return
+		}
+	}
+	return
 }
 
 func renderDate(value string, layout string) string {
@@ -246,6 +289,33 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 	// page number in `folio-skip-header-pages` / `folio-skip-footer-pages` at context time.
 	// The header/footer context reads that list via `.final()` and hides the running band only
 	// on those pages, leaving subsequent body pages of a multi-page block unaffected.
+	// emitPartState / emitChapterState pre-populate the semantic-authoring state at a source
+	// position before the folio-part / folio-chapter call. This matters for the first body
+	// page: its header context evaluates at page-top, and state updates inside the folio-part
+	// macro body happen at the call position (which is after page-top for a first block).
+	// Pre-emitting means header sees the correct [part] / [chapter] values on the very first
+	// body page.
+	emitPartState := func(lines []string, cp HeadingParts) []string {
+		return append(lines,
+			fmt.Sprintf(`#state("folio-current-part-name").update(%q)`, cp.Name),
+			fmt.Sprintf(`#state("folio-current-part-number").update(%q)`, cp.Number),
+			fmt.Sprintf(`#state("folio-current-part-prefix").update(%q)`, cp.Prefix),
+			fmt.Sprintf(`#state("folio-current-part-full").update(%q)`, cp.Full),
+			`#state("folio-current-chapter-name").update("")`,
+			`#state("folio-current-chapter-number").update("")`,
+			`#state("folio-current-chapter-prefix").update("")`,
+			`#state("folio-current-chapter-full").update("")`,
+		)
+	}
+	emitChapterState := func(lines []string, cp HeadingParts) []string {
+		return append(lines,
+			fmt.Sprintf(`#state("folio-current-chapter-name").update(%q)`, cp.Name),
+			fmt.Sprintf(`#state("folio-current-chapter-number").update(%q)`, cp.Number),
+			fmt.Sprintf(`#state("folio-current-chapter-prefix").update(%q)`, cp.Prefix),
+			fmt.Sprintf(`#state("folio-current-chapter-full").update(%q)`, cp.Full),
+		)
+	}
+
 	var lines []string
 	firstPageBlock := true
 	for _, block := range blocks {
@@ -254,6 +324,7 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 			hc := cfg.Folio.Manuscript.Part
 			lines = emitDirective(lines, hc.BlankPageBefore.TypstDirective())
 			composed := composeHeadingParts(block, hc)
+			lines = emitPartState(lines, composed)
 			lines = append(lines, fmt.Sprintf(
 				"#folio-part(first: %t, skip-header: %t, skip-footer: %t, name: %q, number: %q, prefix: %q, full: %q)[%s]",
 				firstPageBlock,
@@ -271,6 +342,7 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 			hc := cfg.Folio.Manuscript.Chapter
 			lines = emitDirective(lines, hc.BlankPageBefore.TypstDirective())
 			composed := composeHeadingParts(block, hc)
+			lines = emitChapterState(lines, composed)
 			lines = append(lines, fmt.Sprintf(
 				"#folio-chapter(first: %t, skip-header: %t, skip-footer: %t, name: %q, number: %q, prefix: %q, full: %q)[%s]",
 				firstPageBlock,

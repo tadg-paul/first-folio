@@ -26,6 +26,19 @@
   str(physical - offset)
 }
 
+// #18 semantic-authoring state seeds: pre-populate the first part / first chapter values so
+// the FIRST body page's header context sees the correct [part] / [chapter] on entry. Multi-
+// part / multi-chapter manuscripts overwrite these via state.update at each folio-part /
+// folio-chapter call site.
+#state("folio-current-part-name").update({{printf "%q" .FirstPartName}})
+#state("folio-current-part-number").update({{printf "%q" .FirstPartNumber}})
+#state("folio-current-part-prefix").update({{printf "%q" .FirstPartPrefix}})
+#state("folio-current-part-full").update({{printf "%q" .FirstPartFull}})
+#state("folio-current-chapter-name").update({{printf "%q" .FirstChapterName}})
+#state("folio-current-chapter-number").update({{printf "%q" .FirstChapterNumber}})
+#state("folio-current-chapter-prefix").update({{printf "%q" .FirstChapterPrefix}})
+#state("folio-current-chapter-full").update({{printf "%q" .FirstChapterFull}})
+
 // A blank page macro used to satisfy folio.manuscript.{part,chapter}.blank-page-{before,after}.
 // A weak pagebreak avoids doubling with an adjacent hard break; the empty page() scope removes
 // numbering, header, and footer so the blank page is visually blank and unnumbered.
