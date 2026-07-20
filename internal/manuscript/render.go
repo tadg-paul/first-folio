@@ -18,7 +18,11 @@ type templateData struct {
 	Config           Config
 	Meta             Metadata
 	Header           string
+	HeaderAlt        string
+	HasHeaderAlt     bool
 	Footer           string
+	FooterAlt        string
+	HasFooterAlt     bool
 	Body             string
 	IsUS             bool
 	Leading          string
@@ -129,7 +133,11 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		Config:              cfg,
 		Meta:                safeMeta,
 		Header:              renderHeader(doc.Metadata, cfg),
+		HeaderAlt:           renderHeaderAlt(doc.Metadata, cfg),
+		HasHeaderAlt:        cfg.Folio.Manuscript.PageHeader.AltFormat != "",
 		Footer:              renderFooter(doc.Metadata, cfg),
+		FooterAlt:           renderFooterAlt(doc.Metadata, cfg),
+		HasFooterAlt:        cfg.Folio.Manuscript.PageFooter.AltFormat != "",
 		Body:                body,
 		IsUS:                cfg.Folio.Manuscript.Style == "us",
 		Leading:             leading,
@@ -243,22 +251,38 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 	for _, block := range blocks {
 		switch block.Kind {
 		case "part":
-			lines = emitDirective(lines, cfg.Folio.Manuscript.Part.BlankPageBefore.TypstDirective())
-			lines = append(lines, fmt.Sprintf("#folio-part(first: %t, skip-header: %t, skip-footer: %t)[%s]",
+			hc := cfg.Folio.Manuscript.Part
+			lines = emitDirective(lines, hc.BlankPageBefore.TypstDirective())
+			composed := composeHeadingParts(block, hc)
+			lines = append(lines, fmt.Sprintf(
+				"#folio-part(first: %t, skip-header: %t, skip-footer: %t, name: %q, number: %q, prefix: %q, full: %q)[%s]",
 				firstPageBlock,
 				partSkipHeader,
 				partSkipFooter,
-				caseTransform(block.Text, cfg.Folio.Manuscript.Part.CaseTransform)))
-			lines = emitDirective(lines, cfg.Folio.Manuscript.Part.BlankPageAfter.TypstDirective())
+				composed.Name,
+				composed.Number,
+				composed.Prefix,
+				composed.Full,
+				caseTransform(composed.Full, hc.CaseTransform),
+			))
+			lines = emitDirective(lines, hc.BlankPageAfter.TypstDirective())
 			firstPageBlock = false
 		case "chapter":
-			lines = emitDirective(lines, cfg.Folio.Manuscript.Chapter.BlankPageBefore.TypstDirective())
-			lines = append(lines, fmt.Sprintf("#folio-chapter(first: %t, skip-header: %t, skip-footer: %t)[%s]",
+			hc := cfg.Folio.Manuscript.Chapter
+			lines = emitDirective(lines, hc.BlankPageBefore.TypstDirective())
+			composed := composeHeadingParts(block, hc)
+			lines = append(lines, fmt.Sprintf(
+				"#folio-chapter(first: %t, skip-header: %t, skip-footer: %t, name: %q, number: %q, prefix: %q, full: %q)[%s]",
 				firstPageBlock,
 				chapterSkipHeader,
 				chapterSkipFooter,
-				caseTransform(block.Text, cfg.Folio.Manuscript.Chapter.CaseTransform)))
-			lines = emitDirective(lines, cfg.Folio.Manuscript.Chapter.BlankPageAfter.TypstDirective())
+				composed.Name,
+				composed.Number,
+				composed.Prefix,
+				composed.Full,
+				caseTransform(composed.Full, hc.CaseTransform),
+			))
+			lines = emitDirective(lines, hc.BlankPageAfter.TypstDirective())
 			firstPageBlock = false
 		case "section":
 			lines = append(lines, "#folio-section["+typstInline(block.Text, cfg)+"]")
@@ -280,14 +304,179 @@ func renderBlocks(blocks []Block, cfg Config) (string, error) {
 	return strings.Join(lines, "\n"), nil
 }
 
+// HeadingParts is the decomposed form of a rendered part or chapter heading.
+// Full is the composed string that renders in the body; Name is the semantic
+// name only (used by the [chapter] / [part] placeholders); Number is the
+// formatted number (arabic, roman upper, or roman lower per NumberFormat);
+// Prefix is the configured prefix as-is.
+type HeadingParts struct {
+	Name   string
+	Number string
+	Prefix string
+	Full   string
+}
+
+func composeHeadingParts(block Block, hc HeadingConfig) HeadingParts {
+	showName := true
+	if hc.ShowName != nil {
+		showName = *hc.ShowName
+	}
+	showNumber := false
+	if hc.ShowNumber != nil {
+		showNumber = *hc.ShowNumber
+	}
+
+	name := block.Name
+	if name == "" {
+		name = block.Text
+	}
+	name = applyNameCase(name, hc.NameCase)
+
+	number := block.Number
+	if hc.ExplicitNumbering == "source" && block.SourceNumber != "" {
+		if parsed, err := strconv.Atoi(block.SourceNumber); err == nil {
+			number = parsed
+		}
+	}
+	numberStr := formatHeadingNumber(number, hc.NumberFormat)
+
+	prefix := hc.Prefix
+
+	var full strings.Builder
+	if showNumber || showName {
+		full.WriteString(prefix)
+	}
+	if showNumber {
+		full.WriteString(numberStr)
+	}
+	if showNumber && showName && name != "" {
+		full.WriteString(hc.Separator)
+	}
+	if showName {
+		full.WriteString(name)
+	}
+	full.WriteString(hc.Suffix)
+
+	return HeadingParts{
+		Name:   name,
+		Number: numberStr,
+		Prefix: prefix,
+		Full:   full.String(),
+	}
+}
+
+// formatHeadingNumber renders an integer per the configured number-format:
+//   - "1" or empty (default): arabic ("1", "2", "10")
+//   - "I": roman upper ("I", "II", "X")
+//   - "i": roman lower ("i", "ii", "x")
+func formatHeadingNumber(n int, format string) string {
+	switch format {
+	case "I":
+		return toRomanUpper(n)
+	case "i":
+		return strings.ToLower(toRomanUpper(n))
+	default:
+		return strconv.Itoa(n)
+	}
+}
+
+// toRomanUpper converts a positive integer to upper-case Roman numerals.
+// Returns the arabic form for zero or negative inputs (defensive fallback).
+func toRomanUpper(n int) string {
+	if n <= 0 {
+		return strconv.Itoa(n)
+	}
+	values := []struct {
+		v int
+		s string
+	}{
+		{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"},
+		{100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"},
+		{10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"},
+	}
+	var b strings.Builder
+	for _, val := range values {
+		for n >= val.v {
+			b.WriteString(val.s)
+			n -= val.v
+		}
+	}
+	return b.String()
+}
+
+// applyNameCase applies the configured name-case to the semantic name segment.
+// Values: "" (as-written), "upper", "lower", "title".
+func applyNameCase(name string, nameCase string) string {
+	switch nameCase {
+	case "upper":
+		return strings.ToUpper(name)
+	case "lower":
+		return strings.ToLower(name)
+	case "title":
+		return simpleTitleCase(name)
+	default:
+		return name
+	}
+}
+
+// simpleTitleCase capitalises the first rune of each whitespace-separated word and
+// lower-cases the rest. Adequate for AC18.5's name-case: title requirement without
+// pulling in golang.org/x/text/cases.
+func simpleTitleCase(s string) string {
+	var b strings.Builder
+	upcomingWord := true
+	for _, r := range s {
+		if r == ' ' || r == '\t' || r == '\n' {
+			b.WriteRune(r)
+			upcomingWord = true
+			continue
+		}
+		if upcomingWord {
+			b.WriteRune(unicodeToUpper(r))
+			upcomingWord = false
+		} else {
+			b.WriteRune(unicodeToLower(r))
+		}
+	}
+	return b.String()
+}
+
+func unicodeToUpper(r rune) rune {
+	if r >= 'a' && r <= 'z' {
+		return r - 32
+	}
+	return r
+}
+
+func unicodeToLower(r rune) rune {
+	if r >= 'A' && r <= 'Z' {
+		return r + 32
+	}
+	return r
+}
+
 var placeholderRE = regexp.MustCompile(`\[([a-z-]+)\]`)
 
 func renderHeader(meta Metadata, cfg Config) string {
 	return substitutePlaceholders(cfg.Folio.Manuscript.PageHeader.Format, meta)
 }
 
+func renderHeaderAlt(meta Metadata, cfg Config) string {
+	if cfg.Folio.Manuscript.PageHeader.AltFormat == "" {
+		return ""
+	}
+	return substitutePlaceholders(cfg.Folio.Manuscript.PageHeader.AltFormat, meta)
+}
+
 func renderFooter(meta Metadata, cfg Config) string {
 	return substitutePlaceholders(cfg.Folio.Manuscript.PageFooter.Format, meta)
+}
+
+func renderFooterAlt(meta Metadata, cfg Config) string {
+	if cfg.Folio.Manuscript.PageFooter.AltFormat == "" {
+		return ""
+	}
+	return substitutePlaceholders(cfg.Folio.Manuscript.PageFooter.AltFormat, meta)
 }
 
 // substitutePlaceholders resolves [author], [title], [page], [part], [chapter] placeholders in
@@ -366,13 +555,32 @@ func placeholderItemExpr(name string, meta Metadata, literal string) string {
 		return "[" + escapeTypst(meta.Title) + "]"
 	case "page":
 		return "folio-display-page()"
+	// AC18.4: [part] returns the semantic name only (folio-current-part-name state).
 	case "part":
-		return `{ let v = state("folio-current-part").get(); if v == none or v == "" or v == [] { none } else { v } }`
+		return placeholderStateGuard("folio-current-part-name")
+	case "part-number":
+		return placeholderStateGuard("folio-current-part-number")
+	case "part-prefix":
+		return placeholderStateGuard("folio-current-part-prefix")
+	case "part-full":
+		return placeholderStateGuard("folio-current-part-full")
 	case "chapter":
-		return `{ let v = state("folio-current-chapter").get(); if v == none or v == "" or v == [] { none } else { v } }`
+		return placeholderStateGuard("folio-current-chapter-name")
+	case "chapter-number":
+		return placeholderStateGuard("folio-current-chapter-number")
+	case "chapter-prefix":
+		return placeholderStateGuard("folio-current-chapter-prefix")
+	case "chapter-full":
+		return placeholderStateGuard("folio-current-chapter-full")
 	default:
 		return "[" + escapeTypst(literal) + "]"
 	}
+}
+
+// placeholderStateGuard returns a Typst expression that reads a state value and
+// evaluates to `none` when the state is empty (unset, empty string, or empty content).
+func placeholderStateGuard(stateName string) string {
+	return `{ let v = state(` + strconv.Quote(stateName) + `).get(); if v == none or v == "" or v == [] { none } else { v } }`
 }
 
 // naiveSubstitute is the pre-smart-join substitution kept as the fallback for formats with
@@ -390,10 +598,23 @@ func naiveSubstitute(format string, meta Metadata) string {
 			out.WriteString(escapeTypst(meta.Title))
 		case "page":
 			out.WriteString("#folio-display-page()")
+		// AC18.4 extended placeholders.
 		case "part":
-			out.WriteString(`#context state("folio-current-part").get()`)
+			out.WriteString(`#context state("folio-current-part-name").get()`)
+		case "part-number":
+			out.WriteString(`#context state("folio-current-part-number").get()`)
+		case "part-prefix":
+			out.WriteString(`#context state("folio-current-part-prefix").get()`)
+		case "part-full":
+			out.WriteString(`#context state("folio-current-part-full").get()`)
 		case "chapter":
-			out.WriteString(`#context state("folio-current-chapter").get()`)
+			out.WriteString(`#context state("folio-current-chapter-name").get()`)
+		case "chapter-number":
+			out.WriteString(`#context state("folio-current-chapter-number").get()`)
+		case "chapter-prefix":
+			out.WriteString(`#context state("folio-current-chapter-prefix").get()`)
+		case "chapter-full":
+			out.WriteString(`#context state("folio-current-chapter-full").get()`)
 		default:
 			out.WriteString(escapeTypst(format[m[0]:m[1]]))
 		}

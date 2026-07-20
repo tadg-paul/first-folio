@@ -195,6 +195,10 @@ type PageHeaderConfig struct {
 	FontSize            string `yaml:"font-size"`
 	FontWeight          string `yaml:"font-weight"`
 	Format              string `yaml:"format"`
+	// AC18.6: when set, AltFormat renders on right-hand (recto, odd) pages while Format
+	// continues to render on left-hand (verso, even) pages. When unset, Format renders
+	// on every page (unchanged from AC15.1).
+	AltFormat           string `yaml:"alt-format"`
 	Align               string `yaml:"align"`
 	DistanceFromEdge    string `yaml:"distance-from-edge"`
 	ContentPaddingAfter string `yaml:"content-padding-after"`
@@ -210,6 +214,8 @@ type PageFooterConfig struct {
 	FontSize            string `yaml:"font-size"`
 	FontWeight          string `yaml:"font-weight"`
 	Format              string `yaml:"format"`
+	// AC18.6: verso uses Format, recto uses AltFormat when set (see PageHeaderConfig).
+	AltFormat           string `yaml:"alt-format"`
 	Align               string `yaml:"align"`
 	DistanceFromEdge    string `yaml:"distance-from-edge"`
 	ContentPaddingAfter string `yaml:"content-padding-after"`
@@ -257,6 +263,19 @@ type HeadingConfig struct {
 	Align           string        `yaml:"align"`
 	CaseTransform   string        `yaml:"case-transform"`
 	SpaceAfter      string        `yaml:"space-after"`
+	// AC18.3: presentation-side fields that compose the rendered heading string
+	// as Prefix + FormatNumber(Number, NumberFormat) + Separator + Name + Suffix.
+	Prefix       string `yaml:"prefix"`
+	NumberFormat string `yaml:"number-format"` // "1" arabic (default), "I" roman-upper, "i" roman-lower
+	Separator    string `yaml:"separator"`
+	Suffix       string `yaml:"suffix"`
+	ShowName     *bool  `yaml:"show-name,omitempty"`   // nil = default true
+	ShowNumber   *bool  `yaml:"show-number,omitempty"` // nil = default false
+	// AC18.5: name-case applies to the name segment only, taking precedence over
+	// case-transform for that segment. Values: "" (as-written), "upper", "lower", "title".
+	NameCase string `yaml:"name-case"`
+	// AC18.2: choose between derived (source-order) and source (parsed from source) numbering.
+	ExplicitNumbering string `yaml:"explicit-numbering"` // "" or "derived" (default), "source"
 }
 
 func LoadConfig(sourceDir string, opts Options) (Config, error) {

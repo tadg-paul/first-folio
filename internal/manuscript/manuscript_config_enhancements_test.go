@@ -17,7 +17,8 @@ import (
 // folio-part function updates the state at each part start so downstream headers pick it up.
 func TestRT_15_1_HeaderPartPlaceholderTracksCurrentPart(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-header:\n      format: \"[part]\"\n")
-	assertContains(t, typst, `state("folio-current-part").get()`)
+	// AC18.4: [part] now returns semantic name via folio-current-part-name state.
+	assertContains(t, typst, `state("folio-current-part-name").get()`)
 	assertContains(t, typst, `state("folio-current-part").update`)
 }
 
@@ -25,7 +26,8 @@ func TestRT_15_1_HeaderPartPlaceholderTracksCurrentPart(t *testing.T) {
 // folio-chapter function updates that state at each chapter start.
 func TestRT_15_2_HeaderChapterPlaceholderTracksCurrentChapter(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "folio:\n  manuscript:\n    page-header:\n      format: \"[chapter]\"\n")
-	assertContains(t, typst, `state("folio-current-chapter").get()`)
+	// AC18.4: [chapter] now returns semantic name via folio-current-chapter-name state.
+	assertContains(t, typst, `state("folio-current-chapter-name").get()`)
 	assertContains(t, typst, `state("folio-current-chapter").update`)
 }
 
@@ -113,8 +115,8 @@ func TestRT_15_9_PageFooterFormatSupportsAllPlaceholders(t *testing.T) {
 	body := extractBodyPageBlock(t, typst)
 	assertContains(t, body, `Example Author`)
 	assertContains(t, body, `The Glass Orchard`)
-	assertContains(t, body, `state("folio-current-part").get()`)
-	assertContains(t, body, `state("folio-current-chapter").get()`)
+	assertContains(t, body, `state("folio-current-part-name").get()`)
+	assertContains(t, body, `state("folio-current-chapter-name").get()`)
 	assertContains(t, body, `#folio-display-page()`)
 }
 
@@ -776,7 +778,7 @@ func TestRT_15_52_DefaultHeaderFormatIsTitleChapterAuthor(t *testing.T) {
 	// bullet is the .join separator, and the chapter placeholder is a state read.
 	assertContains(t, body, `[The Glass Orchard]`)
 	assertContains(t, body, `[Example Author]`)
-	assertContains(t, body, `state("folio-current-chapter").get()`)
+	assertContains(t, body, `state("folio-current-chapter-name").get()`)
 	assertContains(t, body, `.join([ • ])`)
 }
 

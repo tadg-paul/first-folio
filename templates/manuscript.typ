@@ -44,9 +44,19 @@
   v(0.4em)
 }
 
-#let folio-part(first: false, skip-header: false, skip-footer: false, body) = {
+#let folio-part(first: false, skip-header: false, skip-footer: false, name: "", number: "", prefix: "", full: "", body) = {
+  // Legacy state for backward compat (returns the full body as content).
   state("folio-current-part").update(body)
   state("folio-current-chapter").update([])
+  // AC18.4 semantic-authoring state (returns just the semantic name / number / prefix / composed heading).
+  state("folio-current-part-name").update(name)
+  state("folio-current-part-number").update(number)
+  state("folio-current-part-prefix").update(prefix)
+  state("folio-current-part-full").update(full)
+  state("folio-current-chapter-name").update("")
+  state("folio-current-chapter-number").update("")
+  state("folio-current-chapter-prefix").update("")
+  state("folio-current-chapter-full").update("")
   if not first and {{.Config.Folio.Manuscript.Part.PageBreakBefore}} {
     pagebreak(weak: true)
   }
@@ -78,11 +88,16 @@
   ]
 }
 
-#let folio-chapter(first: false, skip-header: false, skip-footer: false, body) = {
+#let folio-chapter(first: false, skip-header: false, skip-footer: false, name: "", number: "", prefix: "", full: "", body) = {
   // Update state BEFORE pagebreak so the new chapter page's header/footer context sees the
   // new chapter title (state updates take effect from their source position onward, and the
   // pagebreak's new page is a later source position).
   state("folio-current-chapter").update(body)
+  // AC18.4 semantic-authoring state.
+  state("folio-current-chapter-name").update(name)
+  state("folio-current-chapter-number").update(number)
+  state("folio-current-chapter-prefix").update(prefix)
+  state("folio-current-chapter-full").update(full)
   if not first and {{.Config.Folio.Manuscript.Chapter.PageBreakBefore}} {
     pagebreak(weak: true)
   }
@@ -352,7 +367,7 @@
           font: "{{.Config.Folio.Manuscript.PageFooter.Font}}",
           size: {{.Config.Folio.Manuscript.PageFooter.FontSize}},
           weight: "{{.Config.Folio.Manuscript.PageFooter.FontWeight}}",
-        )[{{.Footer}}]
+        )[{{if .HasFooterAlt}}#{ if calc.odd(pg) { [{{.FooterAlt}}] } else { [{{.Footer}}] } }{{else}}{{.Footer}}{{end}}]
       ]
     }
   },{{else}}footer: none,{{end}}
@@ -366,7 +381,7 @@
           font: "{{.Config.Folio.Manuscript.PageHeader.Font}}",
           size: {{.Config.Folio.Manuscript.PageHeader.FontSize}},
           weight: "{{.Config.Folio.Manuscript.PageHeader.FontWeight}}",
-        )[{{.Header}}]
+        )[{{if .HasHeaderAlt}}#{ if calc.odd(pg) { [{{.HeaderAlt}}] } else { [{{.Header}}] } }{{else}}{{.Header}}{{end}}]
       ]
     }
   },{{else}}header: none,{{end}}

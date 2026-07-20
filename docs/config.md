@@ -125,12 +125,32 @@ Common manuscript keys:
 - `[author]` -- the manuscript author
 - `[title]` -- the manuscript title
 - `[page]` -- the current page number
-- `[part]` -- the current part title (empty until the first part heading)
-- `[chapter]` -- the current chapter title (empty until the first chapter heading; reset when a new part starts)
+- `[part]` -- the current part's **semantic name** (issue #18: whatever remains after `Part N:` prefix stripping; e.g. `Unbelieved` for a source heading `# PART ONE: UNBELIEVED`)
+- `[part-number]` -- the current part's number, formatted per `part.number-format` (`1`, `I`, `i`)
+- `[part-prefix]` -- the configured `part.prefix` string
+- `[part-full]` -- the fully rendered part heading (`prefix + number + separator + name + suffix`)
+- `[chapter]` -- current chapter's semantic name (analogous to `[part]`)
+- `[chapter-number]` -- current chapter's formatted number
+- `[chapter-prefix]` -- configured `chapter.prefix` string
+- `[chapter-full]` -- fully rendered chapter heading
 
 Unknown bracket tokens (e.g. `[unknown]`) are rendered as literal text.
 
 The British and US presets both default to `format: "[title] • [chapter] • [author]"` for the header and `format: "[page]"` for the footer.
+
+#### `alt-format` for facing-page layouts
+
+`page-header.alt-format` and `page-footer.alt-format` (issue #18 AC18.6) are optional companion format strings. When set, `format` renders on left (verso, even) pages and `alt-format` renders on right (recto, odd) pages. Common use: put the page number on the *outer* edge of the book on both pages by pairing the two format strings mirror-image.
+
+```yaml
+folio:
+  manuscript:
+    page-header:
+      format:     "[page] • [chapter] • [author]"     # verso (left) -- [page] on outer
+      alt-format: "[author] • [chapter] • [page]"     # recto (right) -- [page] on outer
+```
+
+When `alt-format` is unset, `format` renders on every page (unchanged from AC15.1).
 
 ### Page-footer block
 
@@ -181,6 +201,58 @@ A `0mm` gutter leaves the running-page margin configuration byte-identical to th
 - `enforce-left` -- ensure the next section starts on a left-hand (verso/even) page. Uses Typst's `pagebreak(to: "even")`.
 
 Independent of `page-break-before`; combining `page-break-before: true` with `blank-page-before: true` produces one blank page and one heading page (no doubling). Combining with `enforce-right` / `enforce-left` inserts the parity blank if and only if the natural next page has the wrong parity.
+
+### Semantic authoring of parts and chapters (issue #18)
+
+Parts and chapters can be authored with just the semantic name -- the parser derives the number from source order (H1s count 1, 2, 3, ...; H2s reset per H1) and composes the rendered heading from configurable prefix, number, separator, name, and suffix.
+
+**Source (author-facing):**
+
+```markdown
+# Unbelieved
+
+## Character
+
+The hedges were higher than he remembered.
+```
+
+**Config (presentation):**
+
+```yaml
+folio:
+  manuscript:
+    part:
+      prefix: "PART "               # "PART "
+      number-format: "1"            # "1" arabic (default), "I" roman-upper, "i" roman-lower
+      separator: ": "               # ": "
+      suffix: ""                    # trailing suffix (rare)
+      show-name: true               # default true
+      show-number: true             # default false; set true to include the number
+      name-case: "as-written"       # "as-written" (default), "upper", "lower", "title"
+      case-transform: "as-written"  # applies to the composed heading as a whole
+      explicit-numbering: "derived" # "derived" (default) or "source"
+    chapter:
+      # same shape as part
+      prefix: "Chapter "
+      show-number: true
+```
+
+Rendered outcomes for the source above with the config above:
+
+- Part body heading: `PART 1: Unbelieved`
+- Chapter body heading: `Chapter 1: Character`
+
+**Backward compatibility:** existing manuscripts that write `# PART ONE: UNBELIEVED` or `## Chapter 12: The Watch` continue to render sensibly. The parser detects the `Part <token>` / `Chapter <token>` prefix pattern and strips it, capturing the source number in `SourceNumber` (used only when `explicit-numbering: source` is set) and the remainder as the semantic name. If the source heading is plain (no prefix, e.g. `# Unbelieved`), it's used verbatim as the semantic name.
+
+**Numbering (`explicit-numbering`):**
+
+- `derived` (default): part and chapter numbers come from source order (safe if you renumber chapters by moving files around).
+- `source`: use the number literal from the source heading. Useful when a manuscript deliberately skips numbers (Chapter 7 is called "Chapter 7" for in-fiction reasons).
+
+**Name case vs case-transform (AC18.5):**
+
+- `case-transform` applies to the *composed* heading (`prefix + number + separator + name + suffix`) as a whole. Set to `upper` to render `PART 1: UNBELIEVED`.
+- `name-case` applies only to the name segment. Values: `""` (as-written, default), `"upper"`, `"lower"`, `"title"`. Set `name-case: "title"` to auto-capitalise a source like `# the watch` into `Part 1: The Watch`.
 
 ### Skipping running header or footer on part / chapter pages
 

@@ -7,11 +7,39 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 
 	"gopkg.in/yaml.v3"
 )
+
+// #18 AC18.2: detect and strip a leading `Part <number>[<sep>] <name>` or
+// `Chapter <number>[<sep>] <name>` prefix from H1/H2 heading text. The number
+// token is captured as-is (arabic, roman, or a spelled-out word); the separator
+// is `:` or `.` optionally; whitespace between number/separator/name is tolerated.
+// The remainder after the separator is the semantic name.
+var (
+	partPrefixRE    = regexp.MustCompile(`(?i)^part\s+(\w+)\s*([:.])?\s*(.*)$`)
+	chapterPrefixRE = regexp.MustCompile(`(?i)^chapter\s+(\w+)\s*([:.])?\s*(.*)$`)
+)
+
+// splitHeadingPrefix returns (name, sourceNumber, separator) for a heading, stripping
+// the prefix if present. If the heading does not match the prefix pattern, the whole
+// heading is returned as the semantic name and sourceNumber / separator are empty.
+func splitHeadingPrefix(heading string, re *regexp.Regexp) (name, sourceNumber, separator string) {
+	m := re.FindStringSubmatch(heading)
+	if m == nil {
+		return heading, "", ""
+	}
+	// m[1] = number token, m[2] = separator (: or . or ""), m[3] = remainder
+	name = strings.TrimSpace(m[3])
+	if name == "" {
+		// The prefix matched but nothing followed (e.g. "Part 1" with no name).
+		// Preserve the source-order derivation and leave the semantic name empty.
+	}
+	return name, m[1], m[2]
+}
 
 func Parse(format string, text string) (Document, error) {
 	switch format {
@@ -302,6 +330,10 @@ func mergeMetadata(target *Metadata, source Metadata) {
 func pandocTypstBlocks(typst string) ([]Block, error) {
 	var blocks []Block
 	var raw []string
+	// AC18.1: derive part and chapter numbers from source order.
+	// The chapter counter resets at each new part.
+	partNumber := 0
+	chapterNumber := 0
 	flushRaw := func() {
 		var chunk []string
 		flushChunk := func() {
@@ -332,9 +364,30 @@ func pandocTypstBlocks(typst string) ([]Block, error) {
 			flushRaw()
 			switch level {
 			case 1:
-				blocks = append(blocks, Block{Kind: "part", Level: level, Text: heading})
+				partNumber++
+				chapterNumber = 0
+				name, sourceNum, sep := splitHeadingPrefix(heading, partPrefixRE)
+				blocks = append(blocks, Block{
+					Kind:            "part",
+					Level:           level,
+					Text:            heading,
+					Name:            name,
+					Number:          partNumber,
+					SourceNumber:    sourceNum,
+					SourceSeparator: sep,
+				})
 			case 2:
-				blocks = append(blocks, Block{Kind: "chapter", Level: level, Text: heading})
+				chapterNumber++
+				name, sourceNum, sep := splitHeadingPrefix(heading, chapterPrefixRE)
+				blocks = append(blocks, Block{
+					Kind:            "chapter",
+					Level:           level,
+					Text:            heading,
+					Name:            name,
+					Number:          chapterNumber,
+					SourceNumber:    sourceNum,
+					SourceSeparator: sep,
+				})
 			default:
 				blocks = append(blocks, Block{Kind: "section", Level: level, Text: heading})
 			}

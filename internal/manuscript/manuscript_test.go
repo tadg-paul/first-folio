@@ -42,9 +42,15 @@ func TestMarkdownManuscriptCLIProducesTypstContract(t *testing.T) {
 	assertContains(t, typst, `above: if it.level == 1 { 0.5em } else { 0pt }`)
 	assertContains(t, typst, `if it.level == 1 and true`)
 	assertContains(t, typst, `footer: none`)
-	assertContains(t, typst, `#folio-part(first: true, skip-header: false, skip-footer: false)[PART ONE]`)
-	assertContains(t, typst, `#folio-chapter(first: false, skip-header: false, skip-footer: false)[Chapter 1]`)
-	assertContains(t, typst, `#folio-chapter(first: false, skip-header: false, skip-footer: false)[Chapter 2]`)
+	// The folio-part / folio-chapter signature now takes name/number/prefix/full kwargs
+	// (issue #18 semantic-authoring). Assert on the part/chapter macro call and the
+	// heading text in the body separately to keep the tests robust to future signature
+	// additions.
+	assertContains(t, typst, `#folio-part(first: true, skip-header: false, skip-footer: false, `)
+	assertContains(t, typst, `[PART ONE]`)
+	assertContains(t, typst, `#folio-chapter(first: false, skip-header: false, skip-footer: false, `)
+	assertContains(t, typst, `[Chapter 1]`)
+	assertContains(t, typst, `[Chapter 2]`)
 	assertContains(t, typst, `#folio-scene-break()`)
 	assertContains(t, typst, `#show raw.where(block: false): it => text(`)
 	assertContains(t, typst, "Mira found the `watch` under the loose floorboard.")
@@ -63,9 +69,15 @@ func TestOrgManuscriptCLIProducesTypstContract(t *testing.T) {
 	typst := readFile(t, output)
 
 	assertContains(t, typst, `The Glass Orchard`)
-	assertContains(t, typst, `#folio-part(first: true, skip-header: false, skip-footer: false)[PART ONE]`)
-	assertContains(t, typst, `#folio-chapter(first: false, skip-header: false, skip-footer: false)[Chapter 1]`)
-	assertContains(t, typst, `#folio-chapter(first: false, skip-header: false, skip-footer: false)[Chapter 2]`)
+	// The folio-part / folio-chapter signature now takes name/number/prefix/full kwargs
+	// (issue #18 semantic-authoring). Assert on the part/chapter macro call and the
+	// heading text in the body separately to keep the tests robust to future signature
+	// additions.
+	assertContains(t, typst, `#folio-part(first: true, skip-header: false, skip-footer: false, `)
+	assertContains(t, typst, `[PART ONE]`)
+	assertContains(t, typst, `#folio-chapter(first: false, skip-header: false, skip-footer: false, `)
+	assertContains(t, typst, `[Chapter 1]`)
+	assertContains(t, typst, `[Chapter 2]`)
 	assertContains(t, typst, `#folio-scene-break()`)
 	assertNotContains(t, typst, `Private planning`)
 	assertBefore(t, typst, `Chapter 1`, `Chapter 2`)
