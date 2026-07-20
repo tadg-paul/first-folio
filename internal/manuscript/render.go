@@ -294,7 +294,90 @@ func renderFooter(meta Metadata, cfg Config) string {
 // a header/footer format string. Recognized tokens are replaced with escaped metadata or the
 // corresponding Typst state/counter reads; interstitial text is escapeTypst'd so unknown
 // tokens like [unknown] survive as literal brackets in the rendered Typst source.
+//
+// When the format has a consistent separator between placeholders (e.g. " * " between three
+// placeholders) and at least one dynamic placeholder ([part] or [chapter] whose value may be
+// empty on some pages), the emission uses a Typst filter-join block so an empty state
+// placeholder drops its surrounding separator too -- avoiding the "TITLE * * AUTHOR" quirk on
+// pages preceding the first chapter. Formats with irregular separators fall back to naive
+// substitution.
 func substitutePlaceholders(format string, meta Metadata) string {
+	if joined, ok := tryFilterJoin(format, meta); ok {
+		return joined
+	}
+	return naiveSubstitute(format, meta)
+}
+
+// tryFilterJoin returns a Typst filter-join emission if the format's placeholders are
+// separated by a single consistent literal separator (leading and trailing literals may vary).
+// Returns ok=false if the format has irregular separators, no placeholders, or only literal
+// text; the caller falls back to naiveSubstitute.
+func tryFilterJoin(format string, meta Metadata) (string, bool) {
+	matches := placeholderRE.FindAllStringSubmatchIndex(format, -1)
+	if len(matches) < 2 {
+		return "", false
+	}
+	sep := format[matches[0][1]:matches[1][0]]
+	for i := 1; i < len(matches)-1; i++ {
+		if format[matches[i][1]:matches[i+1][0]] != sep {
+			return "", false
+		}
+	}
+	if sep == "" {
+		return "", false
+	}
+	leading := format[:matches[0][0]]
+	trailing := format[matches[len(matches)-1][1]:]
+	items := make([]string, 0, len(matches))
+	for _, m := range matches {
+		name := format[m[2]:m[3]]
+		items = append(items, placeholderItemExpr(name, meta, format[m[0]:m[1]]))
+	}
+	var out strings.Builder
+	out.WriteString(escapeTypst(leading))
+	out.WriteString("#{ (")
+	for i, item := range items {
+		if i > 0 {
+			out.WriteString(", ")
+		}
+		out.WriteString(item)
+	}
+	out.WriteString(`).filter(x => x != none and x != "" and x != []).join(`)
+	out.WriteString("[" + escapeTypst(sep) + "]")
+	out.WriteString(") }")
+	out.WriteString(escapeTypst(trailing))
+	return out.String(), true
+}
+
+// placeholderItemExpr returns the Typst expression for a placeholder in an array-item context.
+// Unknown placeholders return their literal bracketed text (escaped) so the fallback naive
+// substitute path is symmetric.
+func placeholderItemExpr(name string, meta Metadata, literal string) string {
+	switch name {
+	case "author":
+		if meta.Author == "" {
+			return "none"
+		}
+		return "[" + escapeTypst(meta.Author) + "]"
+	case "title":
+		if meta.Title == "" {
+			return "none"
+		}
+		return "[" + escapeTypst(meta.Title) + "]"
+	case "page":
+		return "folio-display-page()"
+	case "part":
+		return `{ let v = state("folio-current-part").get(); if v == none or v == "" or v == [] { none } else { v } }`
+	case "chapter":
+		return `{ let v = state("folio-current-chapter").get(); if v == none or v == "" or v == [] { none } else { v } }`
+	default:
+		return "[" + escapeTypst(literal) + "]"
+	}
+}
+
+// naiveSubstitute is the pre-smart-join substitution kept as the fallback for formats with
+// irregular separators or a single placeholder.
+func naiveSubstitute(format string, meta Metadata) string {
 	var out strings.Builder
 	last := 0
 	for _, m := range placeholderRE.FindAllStringSubmatchIndex(format, -1) {

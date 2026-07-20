@@ -771,11 +771,13 @@ func TestRT_15_51_ExplicitZeroGutterMatchesUnconfigured(t *testing.T) {
 func TestRT_15_52_DefaultHeaderFormatIsTitleChapterAuthor(t *testing.T) {
 	typst := renderIssue15Manuscript(t, "")
 	body := extractBodyPageBlock(t, typst)
-	// Header text contains the bullet separator and both literal substitutions.
-	assertContains(t, body, `The Glass Orchard • `)
-	assertContains(t, body, ` • Example Author`)
-	// The chapter placeholder is preserved as a state read (no chapter yet on this header line).
+	// The default header uses the smart-join filter-join emission (bullet separator with
+	// three placeholders). Title and author appear as content items in the array, the
+	// bullet is the .join separator, and the chapter placeholder is a state read.
+	assertContains(t, body, `[The Glass Orchard]`)
+	assertContains(t, body, `[Example Author]`)
 	assertContains(t, body, `state("folio-current-chapter").get()`)
+	assertContains(t, body, `.join([ • ])`)
 }
 
 // RT-15.53: the default page-header.align is left-right -- left-page (verso) left, right-page
