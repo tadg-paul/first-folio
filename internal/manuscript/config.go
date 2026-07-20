@@ -194,6 +194,7 @@ type PageHeaderConfig struct {
 	Font                string `yaml:"font"`
 	FontSize            string `yaml:"font-size"`
 	FontWeight          string `yaml:"font-weight"`
+	FontStyle           string `yaml:"font-style"`
 	Format              string `yaml:"format"`
 	// AC18.6: when set, AltFormat renders on right-hand (recto, odd) pages while Format
 	// continues to render on left-hand (verso, even) pages. When unset, Format renders
@@ -213,6 +214,7 @@ type PageFooterConfig struct {
 	Font                string `yaml:"font"`
 	FontSize            string `yaml:"font-size"`
 	FontWeight          string `yaml:"font-weight"`
+	FontStyle           string `yaml:"font-style"`
 	Format              string `yaml:"format"`
 	// AC18.6: verso uses Format, recto uses AltFormat when set (see PageHeaderConfig).
 	AltFormat           string `yaml:"alt-format"`
@@ -403,6 +405,7 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.PageFooter.Font, ms.PageHeader.Font)
 	fill(&ms.PageFooter.FontSize, ms.PageHeader.FontSize)
 	fill(&ms.PageFooter.FontWeight, ms.PageHeader.FontWeight)
+	fill(&ms.PageFooter.FontStyle, ms.PageHeader.FontStyle)
 	fill(&ms.PageFooter.Format, "[page]")
 	fill(&ms.PageFooter.Align, "center")
 	fill(&ms.PageFooter.DistanceFromEdge, ms.Margin)

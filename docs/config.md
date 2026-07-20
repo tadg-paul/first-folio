@@ -154,7 +154,9 @@ When `alt-format` is unset, `format` renders on every page (unchanged from AC15.
 
 ### Page-footer block
 
-`folio.manuscript.page-footer` mirrors the fields of `folio.manuscript.page-header`. Typography fields (`font`, `font-size`, `font-weight`) inherit from `page-header` when unset. Default: enabled with a centered `[page]` number, `distance-from-edge` and `content-padding-after` matching `page-header`. Set `page-footer.enabled: false` to omit the running footer.
+`folio.manuscript.page-footer` mirrors the fields of `folio.manuscript.page-header`. Typography fields (`font`, `font-size`, `font-weight`, `font-style`) inherit from `page-header` when unset. Default: enabled with a centered `[page]` number, `distance-from-edge` and `content-padding-after` matching `page-header`. Set `page-footer.enabled: false` to omit the running footer.
+
+Both `page-header` and `page-footer` accept `font-style` alongside `font`, `font-size`, and `font-weight`. Accepted values are `regular` (default), `italic`, and `oblique`. When unset, no `style:` argument is emitted, preserving the default upright rendering.
 
 ### Book-layout page-pair alignment
 

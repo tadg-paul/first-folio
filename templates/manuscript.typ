@@ -379,7 +379,8 @@
         #text(
           font: "{{.Config.Folio.Manuscript.PageFooter.Font}}",
           size: {{.Config.Folio.Manuscript.PageFooter.FontSize}},
-          weight: "{{.Config.Folio.Manuscript.PageFooter.FontWeight}}",
+          weight: "{{.Config.Folio.Manuscript.PageFooter.FontWeight}}",{{if .Config.Folio.Manuscript.PageFooter.FontStyle}}
+          style: "{{.Config.Folio.Manuscript.PageFooter.FontStyle}}",{{end}}
         )[{{if .HasFooterAlt}}#{ if calc.odd(pg) { [{{.FooterAlt}}] } else { [{{.Footer}}] } }{{else}}{{.Footer}}{{end}}]
       ]
     }
@@ -393,7 +394,8 @@
         #text(
           font: "{{.Config.Folio.Manuscript.PageHeader.Font}}",
           size: {{.Config.Folio.Manuscript.PageHeader.FontSize}},
-          weight: "{{.Config.Folio.Manuscript.PageHeader.FontWeight}}",
+          weight: "{{.Config.Folio.Manuscript.PageHeader.FontWeight}}",{{if .Config.Folio.Manuscript.PageHeader.FontStyle}}
+          style: "{{.Config.Folio.Manuscript.PageHeader.FontStyle}}",{{end}}
         )[{{if .HasHeaderAlt}}#{ if calc.odd(pg) { [{{.HeaderAlt}}] } else { [{{.Header}}] } }{{else}}{{.Header}}{{end}}]
       ]
     }
