@@ -199,7 +199,7 @@
 
 #set page(
   {{if .PageSpec.Custom}}width: {{.PageSpec.Width}}, height: {{.PageSpec.Height}},{{else}}paper: "{{.PageSpec.Named}}",{{end}}
-  margin: {{.Config.Folio.Manuscript.Margin}},
+  {{if .GutterActive}}margin: (inside: {{.Config.Folio.Manuscript.Margin}} + {{.Gutter}}, outside: {{.Config.Folio.Manuscript.Margin}}, rest: {{.Config.Folio.Manuscript.Margin}}),{{else}}margin: {{.Config.Folio.Manuscript.Margin}},{{end}}
   numbering: {{if .Config.Folio.Manuscript.TitlePage.PageNumber}}"1"{{else}}none{{end}},
 )
 
