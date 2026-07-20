@@ -656,55 +656,12 @@ func TestRT_15_69_BoolTrueStillEmitsUnconditionalBlankPage(t *testing.T) {
 }
 
 // -----------------------------------------------------------------------------
-// AC15.12 -- publisher-ready title-page corner defaults in the British and US presets
+// AC15.12 [🚫 WITHDRAWN]: the earlier "corners as app defaults" proposal was reverted
+// during the review after visual inspection showed the layout was not what the user
+// wanted for the app-shipped default. Per-item title-page align remains available under
+// AC15.5; the British and US presets keep the pre-issue-15 centred layout. RT-15.70 and
+// RT-15.71 were withdrawn along with the AC.
 // -----------------------------------------------------------------------------
-
-// RT-15.70: an unconfigured British manuscript places each title-page item at the shipped
-// corner default. Verified via #place() calls in generated Typst.
-func TestRT_15_70_BritishPresetShipsTitleCornerDefaults(t *testing.T) {
-	typst := renderIssue15Manuscript(t, "")
-	// Title at top-center, author at top-right, version at top-left,
-	// date at bottom-left, wordcount at bottom-right, contact at bottom-center.
-	assertContains(t, typst, `#place(top + center`)
-	assertContains(t, typst, `#place(top + right`)
-	assertContains(t, typst, `#place(top + left`)
-	assertContains(t, typst, `#place(bottom + left`)
-	assertContains(t, typst, `#place(bottom + right`)
-	assertContains(t, typst, `#place(bottom + center`)
-}
-
-// RT-15.71: a user override that empties per-item aligns reverts to the legacy centred group.
-func TestRT_15_71_ExplicitEmptyPerItemAlignRevertsToLegacyGroup(t *testing.T) {
-	typst := renderIssue15Manuscript(t, strings.Join([]string{
-		"folio:",
-		"  manuscript:",
-		"    title-page:",
-		"      title-block-align: center",
-		"      title:",
-		"        align: \"\"",
-		"      subtitle:",
-		"        align: \"\"",
-		"      author:",
-		"        align: \"\"",
-		"      date:",
-		"        align: \"\"",
-		"      wordcount:",
-		"        align: \"\"",
-		"      version:",
-		"        align: \"\"",
-		"      contact:",
-		"        align: \"\"",
-		"",
-	}, "\n"))
-	// With per-item aligns cleared and title-block-align set to center, the legacy centred
-	// group is used for title/subtitle/author. No per-item #place(top + right)[...] etc.
-	// (Contact still uses #place(top + left, float: true) as its default legacy placement.)
-	titleTOC := extractTitleAndTOCBlock(t, typst)
-	// The title group is aligned via #align(center + horizon) legacy path.
-	assertContains(t, titleTOC, `center + horizon`)
-	// The stack under the legacy align contains the title text.
-	assertContains(t, titleTOC, `The Glass Orchard`)
-}
 
 // -----------------------------------------------------------------------------
 // AC15.9 -- skip-header / skip-footer on part and chapter blocks

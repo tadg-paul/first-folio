@@ -71,21 +71,11 @@ folio:
       include-email: true
       include-website: true
       include-version: true
-      # Publisher-ready default layout (AC15.12): items placed at the six corners plus
-      # top-center for the title. Users can revert to the legacy centred group by
-      # unsetting these per-item aligns and setting title-block-align: center.
-      title:
-        align: top-center
-      author:
-        align: top-right
-      version:
-        align: top-left
-      date:
-        align: bottom-left
-      wordcount:
-        align: bottom-right
-      contact:
-        align: bottom-center
+      # Per-item title-page align is available via AC15.5 (title/subtitle/author/date/
+      # wordcount/version/contact each accept `align:` values). Defaults are intentionally
+      # left unset here so an unconfigured British manuscript renders the legacy centred
+      # title-block layout with contact at top-left and the British footer grid at the
+      # bottom (version | wordcount | date), unchanged from the pre-issue-15 look.
 
     page-header:
       enabled: true
