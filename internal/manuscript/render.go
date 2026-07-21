@@ -95,6 +95,14 @@ type templateData struct {
 	// Legacy title-block-align, used for the title/subtitle/author group when no per-item align is set.
 	TitleBlockAlignExpr string
 	FooterGroupAlignExpr string
+
+	// #21: copyright page emit (composed by renderCopyrightPage) and its position knob.
+	// HasCopyright is true iff cfg.Folio.Manuscript.Copyright.Enabled is true.
+	// The template inserts CopyrightEmit at one of two locations based on CopyrightPosition:
+	// after-title -> between title-page and TOC; after-toc / after-frontmatter -> after TOC.
+	HasCopyright        bool
+	CopyrightEmit       string
+	CopyrightPosition   string
 }
 
 func RenderTypst(doc Document, cfg Config) (string, error) {
@@ -214,6 +222,9 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		FirstChapterNumber:  firstChapter.Number,
 		FirstChapterPrefix:  firstChapter.Prefix,
 		FirstChapterFull:    firstChapter.Full,
+		HasCopyright:        cfg.Folio.Manuscript.Copyright.Enabled,
+		CopyrightEmit:       renderCopyrightPage(doc.Metadata, cfg),
+		CopyrightPosition:   cfg.Folio.Manuscript.Copyright.Position,
 	}
 	raw, err := folio.Assets.ReadFile("templates/manuscript.typ")
 	if err != nil {

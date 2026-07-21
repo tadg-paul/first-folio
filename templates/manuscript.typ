@@ -316,6 +316,10 @@
 {{if .Config.Folio.Manuscript.TOC.PageBreakBefore}}#pagebreak(){{end}}
 {{end}}
 
+{{if and .HasCopyright (eq .CopyrightPosition "after-title")}}
+{{.CopyrightEmit}}
+{{end}}
+
 {{if .Config.Folio.Manuscript.TOC.Enabled}}
 // Clear the title-page footer before the TOC's blank-page-before directive so any inserted
 // parity blank does not inherit the British title-page grid footer.
@@ -343,6 +347,10 @@
 ]
 #pagebreak()
 {{.Config.Folio.Manuscript.TOC.BlankPageAfter.TypstDirective}}
+{{end}}
+
+{{if and .HasCopyright (or (eq .CopyrightPosition "after-toc") (eq .CopyrightPosition "after-frontmatter"))}}
+{{.CopyrightEmit}}
 {{end}}
 
 // counter(page) is intentionally NOT reset here. The physical counter continues from

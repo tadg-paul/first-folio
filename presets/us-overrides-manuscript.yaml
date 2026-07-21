@@ -79,3 +79,11 @@ folio:
 
     part:
       case-transform: upper
+
+    # #21: US copyright body defaults. No moral-rights sentence (Berne Article 6bis
+    # is not implemented in US law the same way as Ireland/UK). Legal deposit is
+    # via Library of Congress CIP.
+    copyright:
+      body:
+        - "**All rights reserved.** No part of this publication may be reproduced, stored in a retrieval system, or transmitted, in any form or by any means, electronic, mechanical, photocopying, recording, or otherwise, without the prior written permission of the copyright holder."
+        - "A CIP catalog record for this book has been applied for from the Library of Congress."

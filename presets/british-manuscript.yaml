@@ -143,3 +143,12 @@ folio:
       align: center
       case-transform: as-written
       space-after: 2em
+
+    # #21: copyright page. Disabled by default; when enabled, the British preset
+    # supplies moral-rights, all-rights-reserved, and NLI/BL legal-deposit text.
+    # Users can override the body list wholesale in local script.yaml.
+    copyright:
+      body:
+        - "The moral rights of the authors and photographers to be identified as the creators of their work have been asserted."
+        - "**All rights reserved.** No part of this publication, including text or images, may be reproduced, stored in a retrieval system, or transmitted in any form or by any means without prior written permission from the respective copyright holder."
+        - "Legal deposit copies lodged with the National Library of Ireland, the five designated Irish libraries, and the British Library. A catalogue record is available from the National Library of Ireland."

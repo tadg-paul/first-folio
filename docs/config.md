@@ -228,6 +228,64 @@ A `0mm` gutter leaves the running-page margin configuration byte-identical to th
 
 Independent of `page-break-before`; combining `page-break-before: true` with `blank-page-before: true` produces one blank page and one heading page (no doubling). Combining with `enforce-right` / `enforce-left` inserts the parity blank if and only if the natural next page has the wrong parity.
 
+### Copyright page (issue #21)
+
+The `folio.manuscript.copyright` block renders a frontmatter copyright page (verso, page ii by convention) between the title page and the TOC. Disabled by default. Every field is optional.
+
+```yaml
+folio:
+  manuscript:
+    copyright:
+      enabled: true
+      credits:
+        - heading: "Copyright"
+          year: 2026                # default: year(folio.date)
+          holders: [Author One, Author Two]
+        - heading: "Photography"
+          holders: [Photographer One]
+      body:
+        - "The moral rights of the authors have been asserted."
+        - "**All rights reserved.** No part of this publication may be..."
+        - "Photo front cover by Cover Photographer."
+      separator: "———"
+      publication:
+        - "First published in Ireland in 2026"
+      publisher: "Example Publisher"
+      isbn: "978-0-000000-00-2"
+      isbn-barcode: none            # none | render | file | render-and-file
+```
+
+**Rendering order** (fixed):
+
+1. Credit blocks in list order (each: bold `<heading> © YEAR` followed by comma-joined holders with trailing full stop)
+2. Body paragraphs (markdown-mini: `**bold**`, `*italic*`, `--` en-dash, `---` em-dash)
+3. Separator glyph (centred)
+4. Publication lines
+5. `<preposition> <publisher>` (publisher bold)
+6. `<isbn-label>: <isbn>` (label bold)
+7. Barcode (when configured)
+
+Missing blocks silently collapse.
+
+**Defaults**:
+
+- `credits` unset → single default entry: `{heading: "Copyright", year: year(folio.date), holders: [folio.author]}`
+- `body` unset → British preset ships Irish/UK moral-rights + all-rights-reserved + NLI/BL legal-deposit; US preset ships all-rights-reserved + Library of Congress CIP text
+- `folio.date` unset → defaults to today at config-load time so year derivation always resolves
+- `skip-header: true` (default) → no running header on copyright page
+- `skip-footer: false` (default) → page number renders in footer
+- `blank-page-before: enforce-left` (default) → lands on verso (page ii)
+- `position: after-title` (default) → between title page and TOC
+
+**ISBN barcode**:
+
+- `none` — no barcode (default)
+- `render` — embed EAN-13 SVG on the copyright page below the ISBN text
+- `file` — write `<output-basename>.barcode.svg` alongside the output PDF; do not embed
+- `render-and-file` — both
+
+Invalid ISBNs (wrong length, non-numeric, or wrong EAN-13 check digit for a 13-digit input) are rejected at config-load time with a diagnostic naming the offending value.
+
 ### Semantic authoring of parts and chapters (issue #18)
 
 Parts and chapters can be authored with just the semantic name -- the parser derives the number from source order (H1s count 1, 2, 3, ...; H2s reset per H1) and composes the rendered heading from configurable prefix, number, separator, name, and suffix.
