@@ -67,8 +67,10 @@ func TestRT_21_4_MultiCreditRendersAll(t *testing.T) {
 	assertContains(t, typst, "Photographer One.")
 }
 
-// RT-21.5: entry with empty holders is omitted.
-func TestRT_21_5_EmptyHoldersOmitsEntry(t *testing.T) {
+// RT-21.5: entry with omitted holders defaults to [folio.author] so a user can
+// list "Copyright" and other roles without repeating their name on every entry.
+// To omit a credit block entirely, drop it from the credits list.
+func TestRT_21_5_OmittedHoldersDefaultsToFolioAuthor(t *testing.T) {
 	typst := renderIssue15Manuscript(t, strings.Join([]string{
 		"folio:",
 		"  manuscript:",
@@ -77,14 +79,22 @@ func TestRT_21_5_EmptyHoldersOmitsEntry(t *testing.T) {
 		"      credits:",
 		"        - heading: Copyright",
 		"          year: 2026",
-		"          holders: [Author One]",
-		"        - heading: Photography",
+		"        - heading: Illustrations",
 		"          year: 2026",
-		"          holders: []",
+		"        - heading: Photography",
+		"          year: 1988",
+		"          holders:",
+		"            - Sarah-Louise Fortune",
 		"",
 	}, "\n"))
+	// Copyright and Illustrations both default holders to folio.author.
 	assertContains(t, typst, "Copyright © 2026")
-	assertNotContains(t, typst, "Photography ©")
+	assertContains(t, typst, "Illustrations © 2026")
+	assertContains(t, typst, "Photography © 1988")
+	// Fixture author "Example Author" should appear in the Copyright + Illustrations blocks.
+	// (Sarah-Louise Fortune appears once in the Photography block.)
+	assertContains(t, typst, "Example Author")
+	assertContains(t, typst, "Sarah-Louise Fortune")
 }
 
 // RT-21.6: body list renders each entry as a paragraph.

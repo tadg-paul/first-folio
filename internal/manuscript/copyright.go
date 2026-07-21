@@ -22,6 +22,11 @@ func renderCopyrightPage(meta Metadata, cfg Config) string {
 	}
 	var b strings.Builder
 
+	// Reset the title-page footer/numbering that would otherwise persist into the
+	// copyright page (the British title-page grid footer for example). skip-header
+	// / skip-footer are applied per-page via the state list below.
+	b.WriteString("#set page(numbering: none, footer: none)\n")
+
 	// Blank-page-before directive (enforce-left / enforce-right / true / false).
 	if d := c.BlankPageBefore.TypstDirective(); d != "" {
 		b.WriteString(d)
@@ -48,13 +53,27 @@ func renderCopyrightPage(meta Metadata, cfg Config) string {
 	b.WriteString(fmt.Sprintf("#set par(leading: %s)\n", copyrightLeading(c.LineSpacing)))
 	b.WriteString(fmt.Sprintf("#align(%s)[\n", copyrightAlignExpr(c.Align)))
 
-	blocks := composeCopyrightBlocks(meta, cfg, c)
-	for i, block := range blocks {
+	// Split blocks into "top" (credits + body + separator) and "bottom"
+	// (publication + publisher + ISBN + barcode), separated by #v(1fr) so
+	// the bottom section pushes to the page bottom -- matching typical
+	// publisher copyright-page layout.
+	top, bottom := composeCopyrightBlocks(meta, cfg, c)
+	for i, block := range top {
 		if i > 0 {
 			b.WriteString(fmt.Sprintf("#v(%s)\n", c.BlockSpacing))
 		}
 		b.WriteString(block)
 		b.WriteString("\n")
+	}
+	if len(bottom) > 0 {
+		b.WriteString("#v(1fr)\n")
+		for i, block := range bottom {
+			if i > 0 {
+				b.WriteString(fmt.Sprintf("#v(%s)\n", c.BlockSpacing))
+			}
+			b.WriteString(block)
+			b.WriteString("\n")
+		}
 	}
 
 	b.WriteString("]\n") // close align
@@ -72,40 +91,36 @@ func renderCopyrightPage(meta Metadata, cfg Config) string {
 	return b.String()
 }
 
-// composeCopyrightBlocks returns the ordered non-empty content blocks that make up
-// the copyright page body: credits, body paragraphs, separator, publication,
-// publisher, ISBN, barcode. Empty blocks are omitted so block-spacing collapses.
-func composeCopyrightBlocks(meta Metadata, cfg Config, c CopyrightConfig) []string {
-	var out []string
-
-	// Credit blocks.
+// composeCopyrightBlocks returns two ordered lists of non-empty content blocks:
+// top (credits + body + separator) rendered from the top of the page, and bottom
+// (publication + publisher + ISBN + barcode) pushed to the page bottom by a
+// #v(1fr) spacer in the calling emit. Empty blocks are omitted so block-spacing
+// collapses.
+func composeCopyrightBlocks(meta Metadata, cfg Config, c CopyrightConfig) (top, bottom []string) {
+	// ---- Top: credits + body + separator ----
 	credits := effectiveCredits(meta, c)
 	for _, credit := range credits {
 		if len(credit.Holders) == 0 {
 			continue
 		}
-		out = append(out, renderCreditBlock(credit, c))
+		top = append(top, renderCreditBlock(credit, c))
 	}
-
-	// Body paragraphs.
 	for _, para := range c.Body {
 		trimmed := strings.TrimSpace(para)
 		if trimmed == "" {
 			continue
 		}
-		out = append(out, renderBodyParagraph(trimmed))
+		top = append(top, renderBodyParagraph(trimmed, cfg))
 	}
-
-	// Separator.
 	if c.Separator != "" {
-		out = append(out, fmt.Sprintf("#v(%s)\n%s\n#v(%s)",
+		top = append(top, fmt.Sprintf("#v(%s)\n#align(center)[%s]\n#v(%s)",
 			c.SeparatorSpaceBefore,
 			escapeTypst(c.Separator),
 			c.SeparatorSpaceAfter,
 		))
 	}
 
-	// Publication lines.
+	// ---- Bottom: publication + publisher + ISBN + barcode ----
 	if len(c.Publication) > 0 {
 		var pub strings.Builder
 		for i, line := range c.Publication {
@@ -119,46 +134,44 @@ func composeCopyrightBlocks(meta Metadata, cfg Config, c CopyrightConfig) []stri
 			pub.WriteString(escapeTypst(trimmed))
 		}
 		if pub.Len() > 0 {
-			out = append(out, pub.String())
+			bottom = append(bottom, pub.String())
 		}
 	}
-
-	// Publisher.
 	if c.Publisher != "" {
-		out = append(out, fmt.Sprintf("%s #text(weight: %q)[%s]",
+		bottom = append(bottom, fmt.Sprintf("%s #text(weight: %q)[%s]",
 			escapeTypst(c.PublisherPreposition),
 			c.HeadingFontWeight,
 			escapeTypst(c.Publisher),
 		))
 	}
-
-	// ISBN (label bold, value regular).
 	if c.ISBN != "" {
-		out = append(out, fmt.Sprintf("#text(weight: %q)[%s]: %s",
+		bottom = append(bottom, fmt.Sprintf("#text(weight: %q)[%s]: %s",
 			c.HeadingFontWeight,
 			escapeTypst(c.ISBNLabel),
 			escapeTypst(c.ISBN),
 		))
 	}
-
-	// Barcode (render or render-and-file). SVG is embedded as inline Typst image.
 	if c.ISBNBarcode == "render" || c.ISBNBarcode == "render-and-file" {
 		if svg, err := renderEAN13SVG(c.ISBN); err == nil {
-			// Typst image() accepts SVG data via bytes; embed as a UTF-8 string.
-			out = append(out, fmt.Sprintf("#image(bytes(%q), format: \"svg\", width: 40mm)", svg))
+			bottom = append(bottom, fmt.Sprintf("#image(bytes(%q), format: \"svg\", width: 40mm)", svg))
 		}
 	}
-
-	return out
+	return top, bottom
 }
 
 // effectiveCredits returns the user-configured credits list, or a single default
 // entry ({Copyright, folio.date year, [folio.author]}) if the list is empty.
+// Per-entry defaults: year falls back to the primary (first) credit's year (or
+// the year derived from folio.date if the primary is also unset), and holders
+// falls back to [folio.author] when omitted, so a user can write
+//     - heading: "Copyright"
+//       year: 2026
+// and the author's name is filled in automatically.
 func effectiveCredits(meta Metadata, c CopyrightConfig) []CopyrightCredit {
 	if len(c.Credits) > 0 {
-		// Fill in defaults on each entry.
 		primaryYear := ""
 		for i := range c.Credits {
+			// Year fallback: primary year -> derived year.
 			if c.Credits[i].Year == "" && primaryYear != "" {
 				c.Credits[i].Year = primaryYear
 			}
@@ -167,6 +180,12 @@ func effectiveCredits(meta Metadata, c CopyrightConfig) []CopyrightCredit {
 				primaryYear = c.Credits[i].Year
 			} else if primaryYear == "" {
 				primaryYear = c.Credits[i].Year
+			}
+			// Holders fallback: entries with omitted holders default to [folio.author].
+			// This lets users list "Copyright" / "Illustrations" without repeating
+			// their name on every entry.
+			if len(c.Credits[i].Holders) == 0 && meta.Author != "" {
+				c.Credits[i].Holders = []string{meta.Author}
 			}
 		}
 		return c.Credits
@@ -224,8 +243,38 @@ func renderCreditBlock(credit CopyrightCredit, c CopyrightConfig) string {
 // renderBodyParagraph converts a markdown-mini body string to a Typst content
 // paragraph, translating **bold** -> *bold*, *italic* -> _italic_, --- -> em-dash,
 // -- -> en-dash. Emitted as a single paragraph -- callers apply block-spacing.
-func renderBodyParagraph(md string) string {
+//
+// Markdown rule syntax: when the entry is ONLY the horizontal-rule form
+// (`---`, `***`, or `___` optionally with trailing whitespace), render as a
+// scene-break line using the configured scene-break marker (centred).
+func renderBodyParagraph(md string, cfg Config) string {
+	trimmed := strings.TrimSpace(md)
+	if isMarkdownRule(trimmed) {
+		marker := cfg.Folio.Manuscript.SceneBreak.Marker
+		if marker == "" {
+			marker = "#"
+		}
+		return fmt.Sprintf("#align(center)[%s]", escapeTypst(marker))
+	}
 	return markdownMiniToTypst(md)
+}
+
+// isMarkdownRule returns true if s is exactly a Markdown thematic-break token
+// (3+ hyphens, asterisks, or underscores, all matching, no other characters).
+func isMarkdownRule(s string) bool {
+	if len(s) < 3 {
+		return false
+	}
+	ch := s[0]
+	if ch != '-' && ch != '*' && ch != '_' {
+		return false
+	}
+	for i := 1; i < len(s); i++ {
+		if s[i] != ch {
+			return false
+		}
+	}
+	return true
 }
 
 var (

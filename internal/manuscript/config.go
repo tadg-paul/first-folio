@@ -615,7 +615,11 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.Copyright.Font, ms.Font)
 	fill(&ms.Copyright.FontSize, ms.FontSize)
 	fill(&ms.Copyright.HeadingFontWeight, "bold")
-	fill(&ms.Copyright.LineSpacing, ms.LineSpacing)
+	// #21: copyright page uses a more generous default line-spacing than body
+	// prose. British / US body may be 1.0 (single) or 2.0 (double) — neither is
+	// ideal for a densely-set legal boilerplate page. 1.4 gives publisher-typical
+	// breathing room. Users can override via copyright.line-spacing.
+	fill(&ms.Copyright.LineSpacing, "1.4")
 	fill(&ms.Copyright.BlockSpacing, "0.75em")
 	// #16 page-numbering defaults.
 	fill(&ms.PageNumbering.FrontmatterFormat, "1")
