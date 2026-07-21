@@ -98,12 +98,12 @@ func renderCopyrightPage(meta Metadata, cfg Config) string {
 // collapses.
 func composeCopyrightBlocks(meta Metadata, cfg Config, c CopyrightConfig) (top, bottom []string) {
 	// ---- Top: credits + body + separator ----
-	credits := effectiveCredits(meta, c)
-	for _, credit := range credits {
-		if len(credit.Holders) == 0 {
+	for _, credit := range effectiveCredits(meta, c) {
+		trimmed := strings.TrimSpace(credit)
+		if trimmed == "" {
 			continue
 		}
-		top = append(top, renderCreditBlock(credit, c))
+		top = append(top, renderBodyParagraph(trimmed, cfg))
 	}
 	for _, para := range c.Body {
 		trimmed := strings.TrimSpace(para)
@@ -160,50 +160,21 @@ func composeCopyrightBlocks(meta Metadata, cfg Config, c CopyrightConfig) (top, 
 }
 
 // effectiveCredits returns the user-configured credits list, or a single default
-// entry ({Copyright, folio.date year, [folio.author]}) if the list is empty.
-// Per-entry defaults: year falls back to the primary (first) credit's year (or
-// the year derived from folio.date if the primary is also unset), and holders
-// falls back to [folio.author] when omitted, so a user can write
-//     - heading: "Copyright"
-//       year: 2026
-// and the author's name is filled in automatically.
-func effectiveCredits(meta Metadata, c CopyrightConfig) []CopyrightCredit {
+// line ("Copyright © YEAR Author Name.") if the list is empty and folio.author
+// is set. Returns nil (no credit block) if the user set an explicit empty list
+// AND folio.author is empty.
+func effectiveCredits(meta Metadata, c CopyrightConfig) []string {
 	if len(c.Credits) > 0 {
-		primaryYear := ""
-		for i := range c.Credits {
-			// Year fallback: primary year -> derived year.
-			if c.Credits[i].Year == "" && primaryYear != "" {
-				c.Credits[i].Year = primaryYear
-			}
-			if c.Credits[i].Year == "" {
-				c.Credits[i].Year = deriveYear(meta.Date)
-				primaryYear = c.Credits[i].Year
-			} else if primaryYear == "" {
-				primaryYear = c.Credits[i].Year
-			}
-			// Holders fallback: entries with omitted holders default to [folio.author].
-			// This lets users list "Copyright" / "Illustrations" without repeating
-			// their name on every entry.
-			if len(c.Credits[i].Holders) == 0 && meta.Author != "" {
-				c.Credits[i].Holders = []string{meta.Author}
-			}
-		}
 		return c.Credits
 	}
-	// Default single-author copyright.
-	year := deriveYear(meta.Date)
-	holders := []string{}
-	if meta.Author != "" {
-		holders = append(holders, meta.Author)
-	}
-	if len(holders) == 0 {
+	if meta.Author == "" {
 		return nil
 	}
-	return []CopyrightCredit{{
-		Heading: "Copyright",
-		Year:    year,
-		Holders: holders,
-	}}
+	year := deriveYear(meta.Date)
+	if year == "" {
+		return []string{fmt.Sprintf("Copyright © %s.", meta.Author)}
+	}
+	return []string{fmt.Sprintf("Copyright © %s %s.", year, meta.Author)}
 }
 
 // deriveYear returns the 4-digit year parsed from meta.Date (YYYY-MM-DD form).
@@ -213,31 +184,6 @@ func deriveYear(date string) string {
 		return date[:4]
 	}
 	return strconv.Itoa(time.Now().Year())
-}
-
-// renderCreditBlock returns "<heading> © YEAR" (bold heading) followed by the
-// comma-joined holders with a trailing full stop.
-func renderCreditBlock(credit CopyrightCredit, c CopyrightConfig) string {
-	var b strings.Builder
-	headingLine := credit.Heading
-	if credit.Year != "" {
-		headingLine = fmt.Sprintf("%s © %s", credit.Heading, credit.Year)
-	}
-	b.WriteString(fmt.Sprintf("#text(weight: %q)[%s]", c.HeadingFontWeight, escapeTypst(headingLine)))
-	b.WriteString(" \\\n")
-	names := make([]string, 0, len(credit.Holders))
-	for _, h := range credit.Holders {
-		trimmed := strings.TrimSpace(h)
-		if trimmed == "" {
-			continue
-		}
-		names = append(names, escapeTypst(trimmed))
-	}
-	if len(names) > 0 {
-		b.WriteString(strings.Join(names, ", "))
-		b.WriteString(".")
-	}
-	return b.String()
 }
 
 // renderBodyParagraph converts a markdown-mini body string to a Typst content

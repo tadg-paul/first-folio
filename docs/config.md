@@ -267,45 +267,45 @@ folio:
   manuscript:
     copyright:
       enabled: true
-      credits:
-        - heading: "Copyright"
-          year: 2026                # default: year(folio.date)
-          holders: [Author One, Author Two]
-        - heading: "Photography"
-          holders: [Photographer One]
-      body:
+      credits:                          # free-text lines rendered as paragraphs
+        - "Copyright © 2026 Author Name."
+        - "Front cover image: © 1988 Photographer Name."
+        - "Back cover illustration: © 2026 Illustrator Name."
+      body:                             # legal boilerplate paragraphs
         - "The moral rights of the authors have been asserted."
         - "**All rights reserved.** No part of this publication may be..."
-        - "Photo front cover by Cover Photographer."
       separator: "———"
       publication:
         - "First published in Ireland in 2026"
       publisher: "Example Publisher"
       isbn: "978-0-000000-00-2"
-      isbn-barcode: none            # none | render | file | render-and-file
+      isbn-barcode: none                # none | render | file | render-and-file
+      line-spacing: 1.4                 # multiplier (default 1.4; override to inherit body)
 ```
 
 **Rendering order** (fixed):
 
-1. Credit blocks in list order (each: bold `<heading> © YEAR` followed by comma-joined holders with trailing full stop)
-2. Body paragraphs (markdown-mini: `**bold**`, `*italic*`, `--` en-dash, `---` em-dash)
-3. Separator glyph (centred)
-4. Publication lines
-5. `<preposition> <publisher>` (publisher bold)
-6. `<isbn-label>: <isbn>` (label bold)
-7. Barcode (when configured)
+1. `credits` lines (rendered as centred paragraphs; write the exact text including `©`, year, name)
+2. `body` paragraphs (markdown-mini: `**bold**`, `*italic*`, `--` en-dash, `---` em-dash; a body entry that is only `---` / `***` / `___` renders as a scene-break line)
+3. Separator glyph (centred, between top and bottom sections)
+4. `#v(1fr)` — pushes the sections below to the bottom of the page
+5. Publication lines
+6. `<preposition> <publisher>` (publisher bold)
+7. `<isbn-label>: <isbn>` (label bold)
+8. Barcode (when `isbn-barcode: render` or `render-and-file`)
 
-Missing blocks silently collapse.
+Missing blocks silently collapse. The bottom section (publication onwards) is always page-bottom-aligned; the top section flows from the top.
 
 **Defaults**:
 
-- `credits` unset → single default entry: `{heading: "Copyright", year: year(folio.date), holders: [folio.author]}`
+- `credits` unset → single default line: `Copyright © YEAR Author Name.` (year from `folio.date`, name from `folio.author`)
 - `body` unset → British preset ships Irish/UK moral-rights + all-rights-reserved + NLI/BL legal-deposit; US preset ships all-rights-reserved + Library of Congress CIP text
 - `folio.date` unset → defaults to today at config-load time so year derivation always resolves
 - `skip-header: true` (default) → no running header on copyright page
 - `skip-footer: false` (default) → page number renders in footer
 - `blank-page-before: enforce-left` (default) → lands on verso (page ii)
 - `position: after-title` (default) → between title page and TOC
+- `line-spacing: 1.4` (default) → generous publisher-typical spacing; override to `1.0` (single) or inherit body via explicit value
 
 **ISBN barcode**:
 

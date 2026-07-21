@@ -45,7 +45,7 @@ func TestRT_21_3_MinimalConfigRendersDefaultCredit(t *testing.T) {
 	assertContains(t, typst, "978-0-000000-00-2")
 }
 
-// RT-21.4: explicit credits list renders all entries with headings and holders.
+// RT-21.4: explicit credits (free-text list) renders each line as a paragraph.
 func TestRT_21_4_MultiCreditRendersAll(t *testing.T) {
 	typst := renderIssue15Manuscript(t, strings.Join([]string{
 		"folio:",
@@ -53,48 +53,26 @@ func TestRT_21_4_MultiCreditRendersAll(t *testing.T) {
 		"    copyright:",
 		"      enabled: true",
 		"      credits:",
-		"        - heading: Copyright",
-		"          year: 2026",
-		"          holders: [Author One, Author Two]",
-		"        - heading: Photography",
-		"          year: 2026",
-		"          holders: [Photographer One]",
+		"        - \"Copyright © 2026 Author One, Author Two.\"",
+		"        - \"Photography © 2026 Photographer One.\"",
 		"",
 	}, "\n"))
-	assertContains(t, typst, "Copyright © 2026")
-	assertContains(t, typst, "Author One, Author Two.")
-	assertContains(t, typst, "Photography © 2026")
-	assertContains(t, typst, "Photographer One.")
+	assertContains(t, typst, "Copyright © 2026 Author One, Author Two.")
+	assertContains(t, typst, "Photography © 2026 Photographer One.")
 }
 
-// RT-21.5: entry with omitted holders defaults to [folio.author] so a user can
-// list "Copyright" and other roles without repeating their name on every entry.
-// To omit a credit block entirely, drop it from the credits list.
-func TestRT_21_5_OmittedHoldersDefaultsToFolioAuthor(t *testing.T) {
+// RT-21.5: when credits is unset, a single default line is generated from
+// folio.author and the folio.date year: "Copyright © YEAR Author Name."
+func TestRT_21_5_DefaultCreditLineFromAuthorAndYear(t *testing.T) {
 	typst := renderIssue15Manuscript(t, strings.Join([]string{
 		"folio:",
 		"  manuscript:",
 		"    copyright:",
 		"      enabled: true",
-		"      credits:",
-		"        - heading: Copyright",
-		"          year: 2026",
-		"        - heading: Illustrations",
-		"          year: 2026",
-		"        - heading: Photography",
-		"          year: 1988",
-		"          holders:",
-		"            - Sarah-Louise Fortune",
 		"",
 	}, "\n"))
-	// Copyright and Illustrations both default holders to folio.author.
-	assertContains(t, typst, "Copyright © 2026")
-	assertContains(t, typst, "Illustrations © 2026")
-	assertContains(t, typst, "Photography © 1988")
-	// Fixture author "Example Author" should appear in the Copyright + Illustrations blocks.
-	// (Sarah-Louise Fortune appears once in the Photography block.)
-	assertContains(t, typst, "Example Author")
-	assertContains(t, typst, "Sarah-Louise Fortune")
+	// The shared fixture sets folio.author = "Example Author" and date 2026-07-06.
+	assertContains(t, typst, "Copyright © 2026 Example Author.")
 }
 
 // RT-21.6: body list renders each entry as a paragraph.

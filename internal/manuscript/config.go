@@ -185,7 +185,14 @@ type CopyrightConfig struct {
 	BlankPageBefore      BlankPageMode         `yaml:"blank-page-before"`
 	BlankPageAfter       BlankPageMode         `yaml:"blank-page-after"`
 	Align                string                `yaml:"align"`
-	Credits              []CopyrightCredit     `yaml:"credits"`
+	// Credits is a list of free-text credit lines rendered as centred paragraphs at
+	// the top of the copyright page (before the body). Users write the full copyright
+	// text they want -- including the © character, year, and holder name(s). Markdown-
+	// mini formatting (**bold**, *italic*, en-dash, em-dash) applies. When unset, a
+	// single default line is generated from folio.author and the folio.date year:
+	// `Copyright © YEAR Author Name.` To omit the credit block entirely, set credits
+	// to an empty list AND unset folio.author.
+	Credits              []string              `yaml:"credits"`
 	Body                 []string              `yaml:"body"`
 	Separator            string                `yaml:"separator"`
 	SeparatorSpaceBefore string                `yaml:"separator-space-before"`
@@ -203,11 +210,6 @@ type CopyrightConfig struct {
 	BlockSpacing         string                `yaml:"block-spacing"`
 }
 
-type CopyrightCredit struct {
-	Heading string   `yaml:"heading"`
-	Year    string   `yaml:"year"`
-	Holders []string `yaml:"holders"`
-}
 
 type TitlePageConfig struct {
 	Enabled            bool                    `yaml:"enabled"`
