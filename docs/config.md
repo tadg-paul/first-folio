@@ -158,6 +158,30 @@ When `alt-format` is unset, `format` renders on every page (unchanged from AC15.
 
 Both `page-header` and `page-footer` accept `font-style` alongside `font`, `font-size`, and `font-weight`. Accepted values are `regular` (default), `italic`, and `oblique`. When unset, no `style:` argument is emitted, preserving the default upright rendering.
 
+### Frontmatter-format (issue #24)
+
+`page-header` and `page-footer` each accept `frontmatter-format` and `alt-frontmatter-format` that apply on frontmatter pages (title, copyright, TOC, and any page before the first part or chapter). Body pages use the normal `format` / `alt-format` pair.
+
+- **Unset** (key absent from YAML) → frontmatter pages use `format` / `alt-format` (backwards-compatible, no change).
+- **Set to non-empty string** → that string renders on frontmatter pages.
+- **Set to empty string `""`** → frontmatter pages render blank (no header or footer text).
+- **`alt-frontmatter-format` set alongside `frontmatter-format`** → verso frontmatter uses `frontmatter-format`, recto frontmatter uses `alt-frontmatter-format` (same verso/recto pairing as `format` / `alt-format`).
+
+The frontmatter/body boundary is defined as: any page before the first part or chapter block is frontmatter; from the first part or chapter onward is body. Matches standard publishing convention.
+
+Example — suppress the running header on frontmatter but keep body headers:
+
+```yaml
+folio:
+  manuscript:
+    page-header:
+      format: "[title] • [chapter] • [author]"
+      frontmatter-format: ""       # blank on frontmatter
+    page-footer:
+      format: "[page]"
+      frontmatter-format: "[page]" # keep page numbers on frontmatter too
+```
+
 ### Book-layout page-pair alignment
 
 `page-header.align` and `page-footer.align` accept:

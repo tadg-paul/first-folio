@@ -23,6 +23,19 @@ type templateData struct {
 	Footer           string
 	FooterAlt        string
 	HasFooterAlt     bool
+	// #24: frontmatter-format branches. HasHeaderFrontmatter is true iff PageHeader
+	// FrontmatterFormat is non-nil (the field was set in YAML, including empty string).
+	// When true, HeaderFrontmatter and HeaderAltFrontmatter carry the substituted format
+	// content used on frontmatter pages; when false, frontmatter pages fall through to
+	// Header/HeaderAlt (backwards-compatible).
+	HeaderFrontmatter       string
+	HeaderAltFrontmatter    string
+	HasHeaderFrontmatter    bool
+	HasHeaderAltFrontmatter bool
+	FooterFrontmatter       string
+	FooterAltFrontmatter    string
+	HasFooterFrontmatter    bool
+	HasFooterAltFrontmatter bool
 	Body             string
 
 	// #18: seed the first part / first chapter semantic-authoring state at document top so
@@ -150,9 +163,17 @@ func RenderTypst(doc Document, cfg Config) (string, error) {
 		Header:              renderHeader(doc.Metadata, cfg),
 		HeaderAlt:           renderHeaderAlt(doc.Metadata, cfg),
 		HasHeaderAlt:        cfg.Folio.Manuscript.PageHeader.AltFormat != "",
+		HeaderFrontmatter:       renderHeaderFrontmatter(doc.Metadata, cfg),
+		HeaderAltFrontmatter:    renderHeaderAltFrontmatter(doc.Metadata, cfg),
+		HasHeaderFrontmatter:    cfg.Folio.Manuscript.PageHeader.FrontmatterFormat != nil,
+		HasHeaderAltFrontmatter: cfg.Folio.Manuscript.PageHeader.AltFrontmatterFormat != nil,
 		Footer:              renderFooter(doc.Metadata, cfg),
 		FooterAlt:           renderFooterAlt(doc.Metadata, cfg),
 		HasFooterAlt:        cfg.Folio.Manuscript.PageFooter.AltFormat != "",
+		FooterFrontmatter:       renderFooterFrontmatter(doc.Metadata, cfg),
+		FooterAltFrontmatter:    renderFooterAltFrontmatter(doc.Metadata, cfg),
+		HasFooterFrontmatter:    cfg.Folio.Manuscript.PageFooter.FrontmatterFormat != nil,
+		HasFooterAltFrontmatter: cfg.Folio.Manuscript.PageFooter.AltFrontmatterFormat != nil,
 		Body:                body,
 		IsUS:                cfg.Folio.Manuscript.Style == "us",
 		Leading:             leading,
@@ -582,6 +603,39 @@ func renderFooterAlt(meta Metadata, cfg Config) string {
 		return ""
 	}
 	return substitutePlaceholders(cfg.Folio.Manuscript.PageFooter.AltFormat, meta)
+}
+
+// #24: frontmatter-format renderers. Return the substituted format string for the
+// frontmatter region. When the FrontmatterFormat pointer is nil the field was not
+// set in YAML, and callers use HasHeaderFrontmatter / HasFooterFrontmatter to skip
+// the branch entirely (frontmatter falls through to Header / Footer). When the
+// pointer is non-nil but the string is empty, the frontmatter renders blank.
+func renderHeaderFrontmatter(meta Metadata, cfg Config) string {
+	if cfg.Folio.Manuscript.PageHeader.FrontmatterFormat == nil {
+		return ""
+	}
+	return substitutePlaceholders(*cfg.Folio.Manuscript.PageHeader.FrontmatterFormat, meta)
+}
+
+func renderHeaderAltFrontmatter(meta Metadata, cfg Config) string {
+	if cfg.Folio.Manuscript.PageHeader.AltFrontmatterFormat == nil {
+		return ""
+	}
+	return substitutePlaceholders(*cfg.Folio.Manuscript.PageHeader.AltFrontmatterFormat, meta)
+}
+
+func renderFooterFrontmatter(meta Metadata, cfg Config) string {
+	if cfg.Folio.Manuscript.PageFooter.FrontmatterFormat == nil {
+		return ""
+	}
+	return substitutePlaceholders(*cfg.Folio.Manuscript.PageFooter.FrontmatterFormat, meta)
+}
+
+func renderFooterAltFrontmatter(meta Metadata, cfg Config) string {
+	if cfg.Folio.Manuscript.PageFooter.AltFrontmatterFormat == nil {
+		return ""
+	}
+	return substitutePlaceholders(*cfg.Folio.Manuscript.PageFooter.AltFrontmatterFormat, meta)
 }
 
 // substitutePlaceholders resolves [author], [title], [page], [part], [chapter] placeholders in

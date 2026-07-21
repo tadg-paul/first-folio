@@ -196,6 +196,12 @@ type PageHeaderConfig struct {
 	FontWeight          string `yaml:"font-weight"`
 	FontStyle           string `yaml:"font-style"`
 	Format              string `yaml:"format"`
+	// #24: frontmatter-format / alt-frontmatter-format apply on frontmatter pages
+	// (title, copyright, TOC, and any page before the first part/chapter). nil ->
+	// fall back to Format / AltFormat. Non-nil empty string -> blank header on
+	// frontmatter. Non-nil non-empty -> use this format on frontmatter.
+	FrontmatterFormat    *string `yaml:"frontmatter-format,omitempty"`
+	AltFrontmatterFormat *string `yaml:"alt-frontmatter-format,omitempty"`
 	// AC18.6: when set, AltFormat renders on right-hand (recto, odd) pages while Format
 	// continues to render on left-hand (verso, even) pages. When unset, Format renders
 	// on every page (unchanged from AC15.1).
@@ -216,6 +222,11 @@ type PageFooterConfig struct {
 	FontWeight          string `yaml:"font-weight"`
 	FontStyle           string `yaml:"font-style"`
 	Format              string `yaml:"format"`
+	// #24: frontmatter-format / alt-frontmatter-format apply on frontmatter pages.
+	// nil -> fall back to Format / AltFormat. Non-nil empty string -> blank footer
+	// on frontmatter. Non-nil non-empty -> use this format on frontmatter.
+	FrontmatterFormat    *string `yaml:"frontmatter-format,omitempty"`
+	AltFrontmatterFormat *string `yaml:"alt-frontmatter-format,omitempty"`
 	// AC18.6: verso uses Format, recto uses AltFormat when set (see PageHeaderConfig).
 	AltFormat           string `yaml:"alt-format"`
 	Align               string `yaml:"align"`

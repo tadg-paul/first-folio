@@ -78,6 +78,9 @@
     context {
       state("folio-page-offset", 0).update(counter(page).at(here()).first() - 1)
     }
+    // #24: mark the frontmatter/body boundary. Header/footer context reads this
+    // state via state.at(here()) to pick between format and frontmatter-format.
+    state("folio-is-body", false).update(true)
   }
   // After any pagebreak, record this heading's page number in the skip lists
   // when its flags are set. The header/footer context checks membership.
@@ -119,6 +122,8 @@
     context {
       state("folio-page-offset", 0).update(counter(page).at(here()).first() - 1)
     }
+    // #24: mark the frontmatter/body boundary.
+    state("folio-is-body", false).update(true)
   }
   context {
     let pg = counter(page).at(here()).first()
@@ -372,6 +377,7 @@
   numbering: none,
   {{if .PageFooterEnabled}}footer: context {
     let pg = counter(page).at(here()).first()
+    let is-body = state("folio-is-body", false).at(here())
     if pg in state("folio-skip-footer-pages", ()).final() {
       none
     } else {
@@ -381,12 +387,13 @@
           size: {{.Config.Folio.Manuscript.PageFooter.FontSize}},
           weight: "{{.Config.Folio.Manuscript.PageFooter.FontWeight}}",{{if .Config.Folio.Manuscript.PageFooter.FontStyle}}
           style: "{{.Config.Folio.Manuscript.PageFooter.FontStyle}}",{{end}}
-        )[{{if .HasFooterAlt}}#{ if calc.odd(pg) { [{{.FooterAlt}}] } else { [{{.Footer}}] } }{{else}}{{.Footer}}{{end}}]
+        )[{{if .HasFooterFrontmatter}}#{ if is-body { {{if .HasFooterAlt}}if calc.odd(pg) { [{{.FooterAlt}}] } else { [{{.Footer}}] }{{else}}[{{.Footer}}]{{end}} } else { {{if .HasFooterAltFrontmatter}}if calc.odd(pg) { [{{.FooterAltFrontmatter}}] } else { [{{.FooterFrontmatter}}] }{{else}}[{{.FooterFrontmatter}}]{{end}} } }{{else}}{{if .HasFooterAlt}}#{ if calc.odd(pg) { [{{.FooterAlt}}] } else { [{{.Footer}}] } }{{else}}{{.Footer}}{{end}}{{end}}]
       ]
     }
   },{{else}}footer: none,{{end}}
   {{if .Config.Folio.Manuscript.PageHeader.Enabled}}header: context {
     let pg = counter(page).at(here()).first()
+    let is-body = state("folio-is-body", false).at(here())
     if pg in state("folio-skip-header-pages", ()).final() {
       none
     } else {
@@ -396,7 +403,7 @@
           size: {{.Config.Folio.Manuscript.PageHeader.FontSize}},
           weight: "{{.Config.Folio.Manuscript.PageHeader.FontWeight}}",{{if .Config.Folio.Manuscript.PageHeader.FontStyle}}
           style: "{{.Config.Folio.Manuscript.PageHeader.FontStyle}}",{{end}}
-        )[{{if .HasHeaderAlt}}#{ if calc.odd(pg) { [{{.HeaderAlt}}] } else { [{{.Header}}] } }{{else}}{{.Header}}{{end}}]
+        )[{{if .HasHeaderFrontmatter}}#{ if is-body { {{if .HasHeaderAlt}}if calc.odd(pg) { [{{.HeaderAlt}}] } else { [{{.Header}}] }{{else}}[{{.Header}}]{{end}} } else { {{if .HasHeaderAltFrontmatter}}if calc.odd(pg) { [{{.HeaderAltFrontmatter}}] } else { [{{.HeaderFrontmatter}}] }{{else}}[{{.HeaderFrontmatter}}]{{end}} } }{{else}}{{if .HasHeaderAlt}}#{ if calc.odd(pg) { [{{.HeaderAlt}}] } else { [{{.Header}}] } }{{else}}{{.Header}}{{end}}{{end}}]
       ]
     }
   },{{else}}header: none,{{end}}
