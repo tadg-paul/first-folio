@@ -5,6 +5,7 @@ package manuscript
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	sharedconfig "github.com/tigger-developer/first-folio/internal/config"
 	"gopkg.in/yaml.v3"
@@ -158,6 +159,43 @@ type ManuscriptConfig struct {
 	CodeBlock           SpacedBlockConfig `yaml:"code-block"`
 	Part                HeadingConfig     `yaml:"part"`
 	Chapter             HeadingConfig     `yaml:"chapter"`
+	Copyright           CopyrightConfig   `yaml:"copyright"`
+}
+
+// #21 CopyrightConfig -- frontmatter copyright page rendered from declarative
+// config. Every field is optional. Enabled defaults to false for backwards
+// compatibility. When enabled, the page renders on the frontmatter (verso, page
+// ii by default) between the title page and the TOC.
+type CopyrightConfig struct {
+	Enabled              bool                  `yaml:"enabled"`
+	Position             string                `yaml:"position"`             // "after-title" (default), "after-toc", "after-frontmatter"
+	SkipHeader           *bool                 `yaml:"skip-header,omitempty"` // default true
+	SkipFooter           *bool                 `yaml:"skip-footer,omitempty"` // default false
+	BlankPageBefore      BlankPageMode         `yaml:"blank-page-before"`
+	BlankPageAfter       BlankPageMode         `yaml:"blank-page-after"`
+	Align                string                `yaml:"align"`
+	Credits              []CopyrightCredit     `yaml:"credits"`
+	Body                 []string              `yaml:"body"`
+	Separator            string                `yaml:"separator"`
+	SeparatorSpaceBefore string                `yaml:"separator-space-before"`
+	SeparatorSpaceAfter  string                `yaml:"separator-space-after"`
+	Publication          []string              `yaml:"publication"`
+	Publisher            string                `yaml:"publisher"`
+	PublisherPreposition string                `yaml:"publisher-preposition"`
+	ISBN                 string                `yaml:"isbn"`
+	ISBNLabel            string                `yaml:"isbn-label"`
+	ISBNBarcode          string                `yaml:"isbn-barcode"` // "none" (default), "render", "file", "render-and-file"
+	Font                 string                `yaml:"font"`
+	FontSize             string                `yaml:"font-size"`
+	HeadingFontWeight    string                `yaml:"heading-font-weight"`
+	LineSpacing          string                `yaml:"line-spacing"`
+	BlockSpacing         string                `yaml:"block-spacing"`
+}
+
+type CopyrightCredit struct {
+	Heading string   `yaml:"heading"`
+	Year    string   `yaml:"year"`
+	Holders []string `yaml:"holders"`
 }
 
 type TitlePageConfig struct {
@@ -350,6 +388,61 @@ func validateConfig(cfg *Config) error {
 		}
 		_ = item.name
 	}
+	if err := validateCopyright(&ms.Copyright); err != nil {
+		return err
+	}
+	return nil
+}
+
+// validateCopyright enforces enum and format constraints on the copyright block.
+// Only runs when Enabled == true, so an unconfigured manuscript still loads even
+// if defaults would trip validation (they don't, but the guard is defensive).
+func validateCopyright(c *CopyrightConfig) error {
+	if !c.Enabled {
+		return nil
+	}
+	switch c.Position {
+	case "after-title", "after-toc", "after-frontmatter":
+	default:
+		return fmt.Errorf("copyright.position %q is not one of after-title, after-toc, after-frontmatter", c.Position)
+	}
+	switch c.ISBNBarcode {
+	case "none", "render", "file", "render-and-file":
+	default:
+		return fmt.Errorf("copyright.isbn-barcode %q is not one of none, render, file, render-and-file", c.ISBNBarcode)
+	}
+	if c.ISBN != "" {
+		if err := validateISBN13(c.ISBN); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// validateISBN13 checks that an ISBN string has 13 digits (ignoring hyphens) and
+// a valid EAN-13 check digit. Non-numeric, wrong length, or wrong check digit
+// input is rejected with a diagnostic naming the offending value.
+func validateISBN13(isbn string) error {
+	digits := strings.ReplaceAll(isbn, "-", "")
+	digits = strings.ReplaceAll(digits, " ", "")
+	if len(digits) != 13 {
+		return fmt.Errorf("copyright.isbn %q must be 13 digits (ignoring hyphens); got %d", isbn, len(digits))
+	}
+	sum := 0
+	for i, r := range digits {
+		if r < '0' || r > '9' {
+			return fmt.Errorf("copyright.isbn %q contains non-digit character %q", isbn, r)
+		}
+		d := int(r - '0')
+		if i%2 == 0 {
+			sum += d
+		} else {
+			sum += d * 3
+		}
+	}
+	if sum%10 != 0 {
+		return fmt.Errorf("copyright.isbn %q has invalid EAN-13 check digit", isbn)
+	}
 	return nil
 }
 
@@ -448,6 +541,31 @@ func normalizeConfig(cfg *Config) {
 	fill(&ms.Chapter.Position, "one-third")
 	fill(&ms.Chapter.CaseTransform, "as-written")
 	fill(&ms.Chapter.SpaceAfter, "2em")
+	// #21 Copyright page defaults.
+	fill(&ms.Copyright.Position, "after-title")
+	if ms.Copyright.SkipHeader == nil {
+		t := true
+		ms.Copyright.SkipHeader = &t
+	}
+	if ms.Copyright.SkipFooter == nil {
+		f := false
+		ms.Copyright.SkipFooter = &f
+	}
+	if ms.Copyright.BlankPageBefore == BlankPageMode("") {
+		ms.Copyright.BlankPageBefore = BlankPageMode("enforce-left")
+	}
+	fill(&ms.Copyright.Align, "center")
+	fill(&ms.Copyright.Separator, "———")
+	fill(&ms.Copyright.SeparatorSpaceBefore, "1.5em")
+	fill(&ms.Copyright.SeparatorSpaceAfter, "1.5em")
+	fill(&ms.Copyright.PublisherPreposition, "by")
+	fill(&ms.Copyright.ISBNLabel, "ISBN")
+	fill(&ms.Copyright.ISBNBarcode, "none")
+	fill(&ms.Copyright.Font, ms.Font)
+	fill(&ms.Copyright.FontSize, ms.FontSize)
+	fill(&ms.Copyright.HeadingFontWeight, "bold")
+	fill(&ms.Copyright.LineSpacing, ms.LineSpacing)
+	fill(&ms.Copyright.BlockSpacing, "0.75em")
 }
 
 func fill(target *string, value string) {

@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	folio "github.com/tigger-developer/first-folio"
 )
@@ -172,6 +173,11 @@ func applyMetadataOverrides(meta *Metadata, opts Options, cfg Config) {
 	overrideString(&meta.Author, opts.Author, cfg.Author)
 	overrideString(&meta.AuthorAttribution, opts.AuthorAttribution, cfg.Attribution, cfg.AuthorAttribution, cfg.Folio.Manuscript.Attribution, cfg.Folio.Manuscript.AuthorAttribution)
 	overrideString(&meta.Date, opts.Date, cfg.Date)
+	// #21: default folio.date to today when otherwise unset, so copyright-year
+	// derivation and any other year-of-publication tokens always resolve.
+	if meta.Date == "" {
+		meta.Date = time.Now().Format("2006-01-02")
+	}
 	overrideString(&meta.Version, opts.Version, cfg.Version)
 	overrideString(&meta.WordCount, opts.WordCount, cfg.WordCount)
 	overrideString(&meta.ContactName, opts.ContactName, cfg.ContactName)
