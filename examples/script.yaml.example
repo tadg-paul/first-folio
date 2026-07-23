@@ -17,7 +17,7 @@
 # Override #+TITLE, #+AUTHOR, etc. from the source. Usually leave these
 # in the source doc and only set date/version here per-project.
 # title: About Time
-# author: Taḋg Paul
+# author: Tadhg O'Brien
 # date: "2026-04-26"
 # version: "Draft v3"
 

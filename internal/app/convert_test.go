@@ -17,7 +17,7 @@ func TestConvertTextFormats(t *testing.T) {
 	orgPath := filepath.Join(dir, "play.org")
 	mdPath := filepath.Join(dir, "play.md")
 	writeAppFile(t, orgPath, `#+TITLE: Samhain
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 * ACT ONE
 ** Scene One
 **** CÁIT quietly

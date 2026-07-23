@@ -1,5 +1,5 @@
 #+TITLE: One Day
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 #+SUBTITLE: A Play in Two Acts
 #+DATE: June 2026
 #+VERSION: Draft v3

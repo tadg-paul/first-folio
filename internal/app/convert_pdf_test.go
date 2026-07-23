@@ -19,7 +19,7 @@ func TestConvertTypstUsesConfiguredTemplate(t *testing.T) {
 	source := filepath.Join(dir, "play.org")
 	target := filepath.Join(dir, "play.typ")
 	writeAppFile(t, source, `#+TITLE: Syntax # [Test]
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 * ACT ONE
 ** Scene One
 *** A sign reads #OPEN [NOW].
@@ -69,7 +69,7 @@ func TestConvertPDFCompiles(t *testing.T) {
 	t.Setenv("HOME", t.TempDir())
 	source := filepath.Join(dir, "play.md")
 	target := filepath.Join(dir, "play.pdf")
-	writeAppFile(t, source, "# Samhain\n\n*by Taḋg Paul*\n\n## ACT ONE\n\n**CÁIT:**\nHello.\n")
+	writeAppFile(t, source, "# Samhain\n\n*by Tadhg O'Brien*\n\n## ACT ONE\n\n**CÁIT:**\nHello.\n")
 
 	status, stdout, stderr := runApp(t, "convert", source, target)
 	if status != 0 {

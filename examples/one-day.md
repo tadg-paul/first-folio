@@ -2,7 +2,7 @@
 
 **A Play in Two Acts**
 
-*by Taḋg Paul*
+*by Tadhg O'Brien*
 
 --- Draft v3 | June 2026 ---
 

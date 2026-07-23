@@ -396,7 +396,7 @@ Manuscript metadata supports `title`, `subtitle`, `author`, `attribution`, `date
 
 ### Yapper namespace (`yapper:`)
 
-Anything beneath a top-level `yapper:` block is exclusively Yapper configuration and is ignored by First Folio. First Folio does not define or document Yapper's child keys; see the [Yapper documentation](https://github.com/tadg-paul/yapper) for that schema.
+Anything beneath a top-level `yapper:` block is exclusively Yapper configuration and is ignored by First Folio. First Folio does not define or document Yapper's child keys; see the [Yapper documentation](https://github.com/tigger-developer/yapper) for that schema.
 
 ## YAML
 

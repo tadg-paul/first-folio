@@ -15,7 +15,7 @@ import (
 
 var scriptRoundTripSources = map[play.Format]string{
 	play.FormatOrg: `#+TITLE: Matrix Play
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 * ACT ONE
 ** SCENE ONE
 *** Night.
@@ -24,7 +24,7 @@ Hello.
 `,
 	play.FormatMarkdown: `# Matrix Play
 
-*by Taḋg Paul*
+*by Tadhg O'Brien*
 
 ## ACT ONE
 
@@ -36,7 +36,7 @@ Hello.
 Hello.
 `,
 	play.FormatFountain: `Title: Matrix Play
-Author: Taḋg Paul
+Author: Tadhg O'Brien
 
 > **ACT ONE** <
 
@@ -59,7 +59,7 @@ var scriptFormatExtensions = map[play.Format]string{
 func TestConversionMatrixParity(t *testing.T) {
 	sources := map[string]string{
 		"org": `#+TITLE: Matrix Play
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 * ACT ONE
 ** Scene One
 *** Night.
@@ -69,7 +69,7 @@ Hello.
 `,
 		"md": `# Matrix Play
 
-*by Taḋg Paul*
+*by Tadhg O'Brien*
 
 ## ACT ONE
 
@@ -83,7 +83,7 @@ Hello.
 > CUT TO
 `,
 		"fountain": `Title: Matrix Play
-Author: Taḋg Paul
+Author: Tadhg O'Brien
 
 > **ACT ONE** <
 

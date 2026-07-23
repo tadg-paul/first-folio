@@ -1,7 +1,7 @@
 #+TITLE: A Place at the Table
 #+SUBTITLE: A Halloween Tradition
 #+TEMPLATE: play
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 #+STARTUP: showeverything
 #+OPTIONS: toc:nil
 #+DATE: OCT 2025

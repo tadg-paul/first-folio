@@ -121,7 +121,7 @@ make lint   # Go static analysis
 
 ## Licence
 
-MIT - Copyright Taḋg Paul
+MIT - Copyright Tadhg O'Brien
 
 ## Acknowledgements
 

@@ -9,7 +9,7 @@ import (
 
 func TestParseOrgPlayEvents(t *testing.T) {
 	source := `#+TITLE: Samhain
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 * CHARACTERS
 | CÁIT | A doctor |
 * Synopsis
@@ -31,7 +31,7 @@ Hello [fn:door].
 	}
 	want := []Event{
 		{Kind: EventFrontMatter, Key: "title", Text: "Samhain"},
-		{Kind: EventFrontMatter, Key: "author", Text: "Taḋg Paul"},
+		{Kind: EventFrontMatter, Key: "author", Text: "Tadhg O'Brien"},
 		{Kind: EventCharacterTableStart, Text: "CHARACTERS"},
 		{Kind: EventCharacterTableRow, Name: "CÁIT", Text: "A doctor"},
 		{Kind: EventCharacterTableEnd},
@@ -53,7 +53,7 @@ func TestParseMarkdownPlayEvents(t *testing.T) {
 
 **A Play**
 
-*by Taḋg Paul*
+*by Tadhg O'Brien*
 
 ## ACT ONE
 
@@ -81,7 +81,7 @@ Hello.[^door]
 
 func TestParseFountainWarningsAndEvents(t *testing.T) {
 	source := `Title: Samhain
-Author: Taḋg Paul
+Author: Tadhg O'Brien
 
 = dropped synopsis
 ===
@@ -109,7 +109,7 @@ CUT TO:
 
 func TestTextEmittersPreserveCoreContract(t *testing.T) {
 	doc := Document{
-		Metadata: map[string]string{"title": "Samhain", "subtitle": "A Play", "author": "Taḋg Paul", "version": "Draft 2", "date": "2026-07-13"},
+		Metadata: map[string]string{"title": "Samhain", "subtitle": "A Play", "author": "Tadhg O'Brien", "version": "Draft 2", "date": "2026-07-13"},
 		Events: []Event{
 			{Kind: EventActHeader, Text: "ACT ONE"},
 			{Kind: EventSceneHeader, Text: "Scene One"},

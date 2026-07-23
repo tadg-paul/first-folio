@@ -10,7 +10,7 @@ import (
 )
 
 const letterFixture = `#+TITLE: Test Play
-#+AUTHOR: Taḋg Paul
+#+AUTHOR: Tadhg O'Brien
 #+EMAIL: author@example.invalid
 * Cover letters :letter:
 ** Sender / Dublin :sender:
